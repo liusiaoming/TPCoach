@@ -273,7 +273,7 @@ const I18N={
   editSkill:"評估技術項目",levelSel:"技能等級",fixBox:"標記為需修正",skNote:"說明（選填）",skNotePh:"例：拋球太高、落點太淺",avgHint:"總合評比會依已評分項目的等級自動平均。",saveSkill:"儲存技術評估",
   saveFail:"儲存失敗：",retry:"請稍後再試",addFail:"無法新增學員：",newName:"新學員",
   timeout:"載入逾時。請確認已登入 claude.ai，並重新開啟連結。",openIn:"請在 claude.ai 開啟此頁面並登入。",needLogin:"需要登入 claude.ai 才能查看學習紀錄。",readFail:c=>`無法讀取紀錄（${c}）。請確認教練已分享此頁面給你。`,
-  skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"攻擊侵略性",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
+  skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"加速與反擊",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
  ja:{locale:"ja-JP",title:"TPCoach",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
   level:"現在のレベル",start:"開始",target:"目標",gap:g=>`目標まであと ${g}`,reached:"今期の目標を達成しました",gained:g=>`（${g} 向上）`,
   overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（2.75–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
@@ -291,7 +291,7 @@ const I18N={
   editSkill:"技術項目を評価",levelSel:"スキルレベル",fixBox:"要修正にする",skNote:"コメント（任意）",skNotePh:"例：トスが高い、落下点が浅い",avgHint:"総合評価は評価済み項目のレベルの平均で自動計算されます。",saveSkill:"技術評価を保存",
   saveFail:"保存できませんでした：",retry:"しばらくしてからもう一度お試しください",addFail:"生徒を追加できませんでした：",newName:"新しい生徒",
   timeout:"読み込みがタイムアウトしました。claude.ai にログインしているか確認し、リンクを開き直してください。",openIn:"claude.ai でこのページを開き、ログインしてください。",needLogin:"学習記録を見るには claude.ai へのログインが必要です。",readFail:c=>`記録を読み込めませんでした（${c}）。コーチがこのページを共有しているか確認してください。`,
-  skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"攻撃性",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
+  skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"加速・カウンター",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
  en:{locale:"en-US",title:"TPCoach",loading:"Loading your progress…",history:"Progress record",updated:"Updated ",
   level:"Current level",start:"Start",target:"Goal",gap:g=>`${g} to reach your goal`,reached:"Goal reached for this stage",gained:g=>` · up ${g} since you started`,
   overview:"Skill overview",rateDef:"Each skill is rated by level (2.75–4.0, in 0.25 steps)",overall:"Overall",best:"Strongest",needFix:"Needs work",none:"None",notRated:"Not rated",notRatedLong:"Not rated yet",legendTitle:"What the levels mean",
@@ -309,7 +309,7 @@ const I18N={
   editSkill:"Rate skills",levelSel:"Skill level",fixBox:"Mark as needs work",skNote:"Comment (optional)",skNotePh:"e.g. toss too high, landing too short",avgHint:"Overall is the average level of the rated skills.",saveSkill:"Save skill ratings",
   saveFail:"Couldn't save: ",retry:"please try again shortly",addFail:"Couldn't add student: ",newName:"New student",
   timeout:"Loading timed out. Check that you're signed in to claude.ai, then reopen the link.",openIn:"Open this page in claude.ai and sign in.",needLogin:"Sign in to claude.ai to see your progress.",readFail:c=>`Couldn't load records (${c}). Check that your coach has shared this page with you.`,
-  skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Aggression",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
+  skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Speed-up & counter",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
 };
 Object.assign(I18N.zh,{
   prefillHint:"已依上次上課時間預填（同星期、同時段），確認後按儲存。",
@@ -475,8 +475,9 @@ function radar(sk){
     const [lx,ly]=pt(i,R+20),c=Math.cos(ang(i)),anchor=Math.abs(c)<.2?"middle":(c>0?"start":"end");
     const sn=Math.sin(ang(i)),dy=sn<-.5?-10:(sn>.5?10:0);
     const sub=fix?(val!==null?`${T.needFix} ${fmtSk(val)}`:T.needFix):(val!==null?fmtSk(val):T.notRated);
-    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="${F1}" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
-        <text x="${lx}" y="${ly+dy+GAP}" text-anchor="${anchor}" font-size="${F2}" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
+    const lab=T.skills[k],mm=lab.length>7&&lab.match(/^(.+?(?:・| &))\s*(.+)$/),lines=mm?[mm[1],mm[2]]:[lab],y0=ly+dy-(lines.length-1)*GAP*(dy<0?1:(dy>0?0:.5)),ys=y0+(lines.length-1)*GAP;
+    g+=lines.map((t,j)=>`<text x="${lx}" y="${y0+j*GAP}" text-anchor="${anchor}" font-size="${F1}" font-weight="700" fill="var(--ink)">${t}</text>`).join("")+`
+        <text x="${lx}" y="${ys+GAP}" text-anchor="${anchor}" font-size="${F2}" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.radar}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
 }
