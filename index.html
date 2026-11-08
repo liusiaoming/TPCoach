@@ -207,12 +207,12 @@ import {getFirestore,collection,doc,onSnapshot,getDoc,getDocs,setDoc,updateDoc,d
 
 /* ===== 設定區：從 Firebase 專案設定複製貼上 ===== */
 const FIREBASE_CONFIG={
-  apiKey:"",
-  authDomain:"",
-  projectId:"",
-  storageBucket:"",
-  messagingSenderId:"",
-  appId:""
+  apiKey:"AIzaSyDKo2ywoCDxK7srBvROQAhkkYqU3ii4zQ0",
+  authDomain:"tpcoaching-efcd7.firebaseapp.com",
+  projectId:"tpcoaching-efcd7",
+  storageBucket:"tpcoaching-efcd7.firebasestorage.app",
+  messagingSenderId:"1070651497320",
+  appId:"1:1070651497320:web:c494d421edc9448accd4dd"
 };
 /* 教練（全開權限）的 Google Email；新增助理教練時，這裡和 Firestore 規則都要加 */
 const COACH_EMAILS=["liusiaoming@gmail.com"];
@@ -351,6 +351,12 @@ function evalsOf(s){let e=(s.evals||[]).filter(x=>x&&x.t).slice().sort((a,b)=>St
   if(!e.length){const ov=overall(s.skills||{});if(ov!==null)e=[{t:s.evaluatedAt||s.updatedAt,overall:+ov,levels:levelsOf(s.skills||{})}]}
   return e}
 let curveKey="overall";
+const dirty=new Set();
+const NO_TRACK=new Set(["pick","curve-sel"]);
+const markDirty=e=>{const t=e.target;if(t&&t.id&&!NO_TRACK.has(t.id)&&!t.classList.contains("prep-cb"))dirty.add(t.id)};
+document.getElementById("app").addEventListener("input",markDirty);document.getElementById("app").addEventListener("change",markDirty);
+const clean=form=>{if(form)form.querySelectorAll("[id]").forEach(el=>dirty.delete(el.id))};
+async function busy(form,fn){const b=form&&form.querySelector('button[type=submit]');if(b&&b.disabled)return;if(b)b.disabled=true;try{return await fn()}finally{if(b)b.disabled=false}}
 function curveSvg(pts){
   const W=420,H=230,L=40,Rp=22,Tp=24,B=30,iw=W-L-Rp,ih=H-Tp-B;
   const t0=pts[0].d.getTime(),t1=pts[pts.length-1].d.getTime(),span=Math.max(1,t1-t0);
@@ -388,7 +394,7 @@ function curveCard(s){
 }
 
 function radar(sk){
-  const W=490,H=400,cx=245,cy=200,R=116,n=SKILL_KEYS.length;
+  const W=470,H=400,cx=235,cy=200,R=104,n=SKILL_KEYS.length;
   const ang=i=>-Math.PI/2+i*2*Math.PI/n,pt=(i,r)=>[cx+Math.cos(ang(i))*r,cy+Math.sin(ang(i))*r];
   let g="";
   const rr=lv=>R*(lv-SK_MIN)/(SK_MAX-SK_MIN);
@@ -403,8 +409,8 @@ function radar(sk){
     const [lx,ly]=pt(i,R+20),c=Math.cos(ang(i)),anchor=Math.abs(c)<.2?"middle":(c>0?"start":"end");
     const sn=Math.sin(ang(i)),dy=sn<-.5?-10:(sn>.5?10:0);
     const sub=fix?(val!==null?`${T.needFix} ${fmtSk(val)}`:T.needFix):(val!==null?fmtSk(val):T.notRated);
-    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="13" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
-        <text x="${lx}" y="${ly+dy+16}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
+    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="15" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
+        <text x="${lx}" y="${ly+dy+17}" text-anchor="${anchor}" font-size="14" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.radar}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
 }
@@ -434,7 +440,7 @@ function nextCard(s){
   return `<section class="card" aria-label="${T.next}">
     <h2>${T.next}</h2>
     <div class="goal">${esc(s.nextGoal||T.noGoal)}</div>
-    ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${esc(p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
+    ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${esc(p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
     ${msgBlock(s)}
   </section>`;
 }
@@ -553,8 +559,11 @@ function coachBar(){
 }
 
 function render(){
-  // keep any unsaved form typing across a re-render (e.g. language switch)
-  const keep={};document.querySelectorAll("#app input:not([type=checkbox]),#app textarea,#app select").forEach(el=>{if(el.id&&el.id!=="pick"&&el.id!=="curve-sel")keep[el.id]=el.value});
+  // keep only what the user has edited but not saved, plus focus, caret and scroll
+  const keep={};dirty.forEach(id=>{const el=document.getElementById(id);if(el)keep[id]=el.type==="checkbox"?el.checked:el.value});
+  const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
+  let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
+  const sy=window.scrollY;
   const open={};["ed-rec","ed-info","ed-skill","rank"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
   let h=accountBar();
@@ -571,20 +580,23 @@ function render(){
   app.innerHTML=h;
   if(open.rank!==undefined&&document.getElementById("rank"))document.getElementById("rank").open=open.rank;
   if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
-  if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el)el.value=keep[id]}
+  if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el){if(el.type==="checkbox")el.checked=keep[id];else el.value=keep[id]}}
+  else dirty.clear();
   render.lastId=s.id;
   bind();
+  if(focusId){const el=document.getElementById(focusId);if(el){el.focus({preventScroll:true});if(sel)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
+  if(Math.abs(window.scrollY-sy)>1)window.scrollTo(0,sy);
 }
 
 function bindMsgs(s){
   const f=document.getElementById("f-msg");if(!f)return;
-  f.addEventListener("submit",async ev=>{ev.preventDefault();const text=val("m-text").trim().slice(0,1000);if(!text)return;
+  f.addEventListener("submit",ev=>{ev.preventDefault();busy(f,async()=>{const text=val("m-text").trim().slice(0,1000);if(!text)return;
     const m={type:val("m-type"),text,t:new Date().toISOString(),from:canEdit?"coach":"student"};
-    try{await db.collection(`students/${s.id}/msgs`).doc().set(m);document.getElementById("m-text").value="";flash("m-msg",T.sent)}
-    catch(e){alertBox(T.msgFail+(e&&e.message||T.retry))}});
+    try{await db.collection(`students/${s.id}/msgs`).doc().set(m);dirty.delete("m-text");dirty.delete("m-type");const ta=document.getElementById("m-text");if(ta)ta.value="";flash("m-msg",T.sent)}
+    catch(e){alertBox(T.msgFail+(e&&e.message||T.retry))}})});
   if(!canEdit)return;
   document.querySelectorAll("[data-reply]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.reply,t=val("rp-"+id).trim();if(!t)return;
-    try{await db.collection(`students/${s.id}/msgs`).doc(id).update({reply:t,replyT:new Date().toISOString()})}catch(e){alertBox(T.saveFail+(e&&e.message||T.retry))}}));
+    b.disabled=true;try{await db.collection(`students/${s.id}/msgs`).doc(id).update({reply:t,replyT:new Date().toISOString()});dirty.delete("rp-"+id)}catch(e){b.disabled=false;alertBox(T.saveFail+(e&&e.message||T.retry))}}));
   document.querySelectorAll("[data-delmsg]").forEach(b=>b.addEventListener("click",async()=>{try{await db.collection(`students/${s.id}/msgs`).doc(b.dataset.delmsg).delete()}catch(e){alertBox(T.delFail)}}));
 }
 function flash(id,t){const el=document.getElementById(id);if(el){el.textContent=t;setTimeout(()=>{if(el)el.textContent=""},2500)}}
@@ -611,34 +623,39 @@ function bind(){
     catch(e){alertBox(T.addFail+(e&&e.message||""))}
   });
   if(!s)return;
-  document.getElementById("f-rec")?.addEventListener("submit",async ev=>{ev.preventDefault();
+  const fRec=document.getElementById("f-rec");
+  fRec?.addEventListener("submit",ev=>{ev.preventDefault();busy(fRec,async()=>{
     const r={rid:Math.random().toString(36).slice(2,9),date:val("r-date"),item:val("r-item").trim(),
       before:Math.max(0,Math.min(10,parseInt(val("r-before"))||0)),after:Math.max(0,Math.min(10,parseInt(val("r-after"))||0)),note:val("r-note").trim()};
-    if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note"].forEach(i=>{const el=document.getElementById(i);if(el)el.value=""});flash("m-rec",T.added)}
-  });
-  document.getElementById("f-info")?.addEventListener("submit",async ev=>{ev.preventDefault();
+    if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note"].forEach(i=>{dirty.delete(i);const el=document.getElementById(i);if(el)el.value=""});dirty.delete("r-date");flash("m-rec",T.added)}
+  })});
+  const fInfo=document.getElementById("f-info");
+  fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
     const em=val("i-email").trim().toLowerCase();
     if(em&&!EMAIL_RE.test(em)){flash("m-info",T.emailBad);return}
     if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-info",T.emailUsed);return}
     const d={name:val("i-name").trim()||T.newName,email:em,
       gender:val("i-gender"),nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
-    if(await save(s.id,d))flash("m-info",T.saved);
-  });
-  document.getElementById("f-skill")?.addEventListener("submit",async ev=>{ev.preventDefault();
+    if(await save(s.id,d)){clean(fInfo);flash("m-info",T.saved)}
+  })});
+  const fSkill=document.getElementById("f-skill");
+  fSkill?.addEventListener("submit",ev=>{ev.preventDefault();busy(fSkill,async()=>{
     const skills={};
     for(const k of SKILL_KEYS){const lv=parseFloat(val(`k-${k}-level`)),fix=!!document.getElementById(`k-${k}-fix`)?.checked,note=val(`k-${k}-note`).trim();
       if(isFinite(lv)||fix||note){const e={fix,note};if(isFinite(lv))e.level=lv;skills[k]=e}}
     const now=new Date(),ov=overall(skills),hist=(s.evals||[]).filter(x=>x&&x.t).slice();
     if(ov!==null){const pt={t:now.toISOString(),overall:+ov,levels:levelsOf(skills)};
       const last=hist[hist.length-1];if(last&&new Date(last.t).toDateString()===now.toDateString())hist[hist.length-1]=pt;else hist.push(pt)}
-    if(await save(s.id,{skills,evals:hist,evaluatedAt:now.toISOString()}))flash("m-skill",T.saved);
-  });
+    if(await save(s.id,{skills,evals:hist,evaluatedAt:now.toISOString()})){clean(fSkill);flash("m-skill",T.saved)}
+  })});
   document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>save(s.id,{sessions:(s.sessions||[]).filter(r=>r.rid!==b.dataset.del)})));
   document.getElementById("b-delstu")?.addEventListener("click",()=>{
     const z=document.getElementById("delzone");
     z.innerHTML=`<span>${T.delAsk(esc(s.name))}</span><button class="danger" id="b-yes" type="button">${T.delYes}</button><button id="b-no" type="button">${T.cancel}</button>`;
-    document.getElementById("b-no").onclick=()=>{z.innerHTML=`<button class="danger" type="button" id="b-delstu">${T.delStu}</button>`;bind()};
-    document.getElementById("b-yes").onclick=async()=>{try{await db.collection("students").doc(s.id).delete();currentId=null;location.hash=""}catch(e){alertBox(T.delFail)}};
+    document.getElementById("b-no").onclick=()=>render();
+    document.getElementById("b-yes").onclick=async()=>{try{
+      const ms=await db.collection(`students/${s.id}/msgs`).get();for(const d of ms.docs)await db.collection(`students/${s.id}/msgs`).doc(d.id).delete();
+      await db.collection("students").doc(s.id).delete();currentId=null;location.hash=""}catch(e){alertBox(T.delFail)}};
   });
 }
 
