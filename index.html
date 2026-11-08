@@ -252,6 +252,7 @@ const FIREBASE_CONFIG={
 };
 /* 教練（全開權限）的 Google Email；新增助理教練時，這裡和 Firestore 規則都要加 */
 const COACH_EMAILS=["liusiaoming@gmail.com"];
+const NOTIFY_URL="https://script.google.com/macros/s/AKfycbzRDKmtIM5FiA3YaTLLBPdorUNhyKPGmfKDXdz9A6fLfZY7FljS8T2fPKtItV5tk15oAA/exec"; // 學員留言 → Email 通知教練（Apps Script）
 /* ================================================ */
 
 const I18N={
@@ -720,7 +721,7 @@ function bindMsgs(s){
   const f=document.getElementById("f-msg");if(!f)return;
   f.addEventListener("submit",ev=>{ev.preventDefault();busy(f,async()=>{const text=val("m-text").trim().slice(0,1000);if(!text)return;
     const m={type:val("m-type"),text,t:new Date().toISOString(),from:canEdit?"coach":"student"};
-    try{await db.collection(`students/${s.id}/msgs`).doc().set(m);dirty.delete("m-text");dirty.delete("m-type");const ta=document.getElementById("m-text");if(ta)ta.value="";flash("m-msg",T.sent)}
+    try{const ref=db.collection(`students/${s.id}/msgs`).doc();await ref.set(m);if(!canEdit)notifyCoach(s.id,ref.id);dirty.delete("m-text");dirty.delete("m-type");const ta=document.getElementById("m-text");if(ta)ta.value="";flash("m-msg",T.sent)}
     catch(e){alertBox(T.msgFail+(e&&e.message||T.retry))}})});
   if(!canEdit)return;
   document.querySelectorAll("[data-reply]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.reply,t=val("rp-"+id).trim();if(!t)return;
@@ -795,6 +796,7 @@ function bind(){
 // Firestore adapter (same shape the page already uses)
 const wrapDoc=d=>({id:d.id,exists:d.exists(),data:()=>d.data()});
 const wrapSnap=q=>({docs:q.docs.map(d=>({id:d.id,data:()=>d.data()}))});
+function notifyCoach(sid,mid){try{if(!NOTIFY_URL||!/^https:/.test(NOTIFY_URL)||!auth||!auth.currentUser)return;auth.currentUser.getIdToken().then(token=>fetch(NOTIFY_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify({sid,mid,token})})).catch(()=>{})}catch(e){}}
 function makeDb(){return{collection(path){return{
   onSnapshot(cb,err){return onSnapshot(collection(fs,path),q=>cb(wrapSnap(q)),err)},
   get:async()=>wrapSnap(await getDocs(collection(fs,path))),
