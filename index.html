@@ -676,11 +676,11 @@ function render(){
   h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
   watchMsgs(s.id);
   // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
-  const left=canEdit?basicCard(s)+skillsCard(s)+curveCard(s)+duprCard():skillsCard(s)+curveCard(s)+duprCard();
+  const left=canEdit?basicCard(s)+skillsCard(s)+curveCard(s):skillsCard(s)+curveCard(s);
   const right=canEdit?skillsEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
       +fold("c-next",`${T.next}・${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,nextCard(s))
     :nextCard(s)+rowsCard(s);
-  h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`;
+  h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
   app.innerHTML=h;
   for(const k of ["rank","dupr","c-rows","c-next"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
   if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
