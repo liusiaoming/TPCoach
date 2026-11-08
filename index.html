@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>T1 匹克球學習歷程</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:15px}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: one phone-width column, a "score card" per student — level track, next lesson, 10-ball test rows */
+:root{
+  /* TPC palette: deep navy #0c2430 + gold #eaca7e */
+  --bg:#eef0f1; --surface:#ffffff; --ink:#0c2430; --muted:#5a6a73; --line:#d6dde1;
+  --court:#0c2430; --ball:#eaca7e; --ball-ink:#2b2106; --miss:#e1e6e9; --warn:#b4432f;
+  --display:"Barlow Condensed","Noto Sans TC",system-ui,sans-serif;
+  --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c2430; --surface:#12303f; --ink:#f1ead8; --muted:#9fb0b8; --line:#24434f;
+  --court:#eaca7e; --ball:#eaca7e; --ball-ink:#0c2430; --miss:#1d3a48; --warn:#f08a74; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c2430; --surface:#12303f; --ink:#f1ead8; --muted:#9fb0b8; --line:#24434f;
+  --court:#eaca7e; --ball:#eaca7e; --ball-ink:#0c2430; --miss:#1d3a48; --warn:#f08a74; color-scheme:dark}
+.head{border-bottom:2px solid var(--ball);padding-bottom:10px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
+h1,h2{margin:0;text-wrap:balance}
+h2{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.muted{color:var(--muted);font-size:13px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px}
+button.primary{background:var(--court);border-color:var(--court);color:var(--surface);font-weight:700}
+button.danger{color:var(--warn)}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--court);outline-offset:2px}
+input,select,textarea{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px;width:100%;box-sizing:border-box;min-width:0}
+
+/* coach bar */
+.coachbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.coachbar select{flex:1 1 180px;width:auto}
+.tag{font-size:12px;font-weight:700;background:var(--ball);color:var(--ball-ink);border-radius:999px;padding:2px 10px}
+
+/* header */
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.head h1{font-size:26px}
+
+/* level track */
+.level{display:flex;align-items:baseline;gap:10px}
+.level .num{font-family:var(--display);font-size:64px;font-weight:700;line-height:1;color:var(--court);font-variant-numeric:tabular-nums}
+.track{position:relative;height:10px;background:var(--miss);border-radius:999px;margin-top:8px}
+.track .fill{position:absolute;left:0;top:0;bottom:0;background:var(--court);border-radius:999px}
+.track .dot{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--ball);border:3px solid var(--court);box-sizing:border-box}
+.ticks{display:flex;justify-content:space-between;font-family:var(--display);font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* skills */
+.skills{display:flex;flex-direction:column;gap:12px}
+.skill{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+.sk-name{font-weight:700}
+.sk-rate{font-family:var(--display);font-size:22px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
+.sk-bar{grid-column:1/-1;height:8px;background:var(--miss);border-radius:999px;overflow:hidden}
+.sk-bar div{height:100%;background:var(--court);border-radius:999px}
+.sk-note{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;border:1px solid var(--line);color:var(--muted)}
+.pill.fix{border-color:var(--warn);color:var(--warn)}
+
+.ov-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ov{display:flex;flex-direction:column;align-items:flex-end}
+.ov-label{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.ov-num{font-family:var(--display);font-size:48px;font-weight:700;line-height:1;color:var(--court);font-variant-numeric:tabular-nums}
+.ov-num small{font-size:22px}
+.radar-wrap{margin:0 -8px}
+.ov-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.ov-sum>div{display:flex;flex-direction:column;background:var(--bg);border-radius:10px;padding:8px 12px;min-width:0}
+.ov-sum b.warn{color:var(--warn)}
+.sk-notes{margin:0;padding-left:18px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.sk-notes b{color:var(--ink)}
+.jump{margin-top:8px;font-size:13px;padding:4px 12px}
+.coach-ed{border:2px solid var(--court)}
+.cv-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.cv-sel{display:flex;align-items:center;gap:6px;font-size:13px}
+.cv-sel select{width:auto}
+.cv-stat{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cv-num{font-family:var(--display);font-size:40px;font-weight:700;line-height:1;color:var(--court);font-variant-numeric:tabular-nums}
+.cv-delta{margin:0;font-weight:700;color:var(--court)}
+.cv-delta.down{color:var(--warn)}
+.cv-wrap{margin:0 -6px}
+.acct{display:flex;flex-direction:column;gap:2px;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.acct .muted{font-size:12px}
+.bindbox{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.warn-t{color:var(--warn)}
+.codebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.codebox code{flex:1 1 220px;min-width:0;overflow-wrap:anywhere;font-size:15px;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px dashed var(--ball);user-select:all}
+.hits{display:flex;flex-direction:column;gap:6px}
+.hit{display:flex;align-items:center;gap:10px;text-align:left;padding:8px 10px}
+.hit img{width:28px;height:28px;border-radius:50%;flex:none}
+.hit span{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:700}
+.hit small{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted)}
+.msgbox{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.msg-form{display:flex;flex-direction:column;gap:8px}
+.msg-form select{width:auto;align-self:flex-start}
+.msg-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.msg-item{background:var(--bg);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.msg-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px}
+.msg-meta .muted{font-size:12px}
+.mtag{font-size:12px;font-weight:700;border-radius:999px;padding:1px 10px;background:var(--ball);color:var(--ball-ink)}
+.mtag-q{background:var(--court);color:var(--surface)}
+.mtag-note{background:var(--miss);color:var(--ink)}
+.msg-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg-reply{border-left:3px solid var(--ball);padding-left:10px;font-size:14px}
+.msg-reply p{margin:2px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg-reply .muted{font-size:12px}
+.linebox{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px dashed var(--ball);border-radius:10px;font-size:14px}
+.linebtn{display:inline-block;background:#06c755;color:#fff;font-weight:700;border-radius:8px;padding:6px 14px;text-decoration:none}
+.rk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.rk-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.rk-col h3{margin:0;font-size:14px}
+.rk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.rk li{display:grid;grid-template-columns:24px 1fr auto;grid-template-areas:"no name ov" "no n n";align-items:center;gap:0 8px;padding:6px 8px;border-radius:8px}
+.rk li.rk-top{background:var(--bg);box-shadow:inset 3px 0 0 var(--ball)}
+.rk-no{grid-area:no;font-family:var(--display);font-size:20px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.rk-top .rk-no{color:var(--court)}
+.rk-nm{grid-area:name;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.rk-name{border:0;background:none;padding:0;text-align:left;font-weight:700;min-width:0;overflow-wrap:anywhere;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.rk-badge{font-size:11px;font-weight:700;border-radius:999px;padding:0 8px;background:var(--ball);color:var(--ball-ink)}
+.rk-ov{grid-area:ov;font-family:var(--display);font-size:20px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
+.rk-n{grid-area:n;font-size:12px}
+.rk-sec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.acct-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.acct-row button{font-size:12px;padding:3px 10px}
+.login{align-items:flex-start;padding-block:28px}
+.login h1{font-size:22px}
+.gbtn{font-size:16px;padding:10px 18px}
+.legend{border-top:1px solid var(--line);padding-top:10px}
+.legend summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--court)}
+.legend dl{margin:10px 0 6px;display:flex;flex-direction:column;gap:8px}
+.legend dl>div{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:baseline}
+.legend dt{font-family:var(--display);font-size:20px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
+.legend dd{margin:0;font-size:13px;min-width:0}
+.fixbox{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--warn);cursor:pointer;align-self:end;padding-bottom:6px}
+.fixbox input{width:18px;height:18px;flex:none;accent-color:var(--warn)}
+
+/* language switch */
+.langbar{display:flex;justify-content:flex-end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface);gap:2px}
+.seg button{border:0;border-radius:999px;padding:4px 12px;font-size:13px;background:transparent;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--court);color:var(--surface);font-weight:700}
+:lang(ja) body,:lang(ja) input,:lang(ja) textarea,:lang(ja) select,:lang(ja) button{font-family:"Noto Sans JP",var(--body)}
+
+/* next lesson */
+.goal{font-size:18px;font-weight:700}
+.prep{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.prep label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.prep input{width:18px;height:18px;margin-top:3px;flex:none;accent-color:var(--court)}
+
+/* test rows */
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0;padding-top:0}
+.row .item{font-weight:700;min-width:0}
+.row .date{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.balls{grid-column:1/-1;display:grid;grid-template-columns:44px 1fr auto;gap:4px 8px;align-items:center;font-size:12px;color:var(--muted)}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--miss)}
+.dots i.on{background:var(--ball);box-shadow:inset 0 0 0 2px var(--court)}
+.score{font-family:var(--display);font-size:18px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+.delta{font-family:var(--display);font-weight:700;color:var(--court)}
+.note{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.row .del{grid-column:1/-1;justify-self:start;font-size:12px;padding:2px 8px}
+
+/* editor */
+details.card>summary{cursor:pointer;font-weight:700;list-style:none}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::before{content:"＋ ";color:var(--court)}
+details[open].card>summary::before{content:"－ "}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.msg{font-size:13px;color:var(--court)}
+.empty{text-align:center;padding:32px 18px}
+@media (prefers-reduced-motion:no-preference){.track .fill,.track .dot{transition:all .4s ease}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="langbar"><div class="seg" role="group" aria-label="Language" id="langseg">
+    <button type="button" data-lang="zh">中文</button><button type="button" data-lang="ja">日本語</button><button type="button" data-lang="en">EN</button>
+  </div></div>
+  <div id="app" style="display:flex;flex-direction:column;gap:16px">
+    <div class="card empty" id="loading"><p class="muted">…</p></div>
+  </div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,onSnapshot,getDoc,getDocs,setDoc,updateDoc,deleteDoc,query,where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ===== 設定區：從 Firebase 專案設定複製貼上 ===== */
+const FIREBASE_CONFIG={
+  apiKey:"",
+  authDomain:"",
+  projectId:"",
+  storageBucket:"",
+  messagingSenderId:"",
+  appId:""
+};
+/* 教練（全開權限）的 Google Email；新增助理教練時，這裡和 Firestore 規則都要加 */
+const COACH_EMAILS=["liusiaoming@gmail.com"];
+/* ================================================ */
+
+const I18N={
+ zh:{locale:"zh-TW",title:"匹克球學習歷程",loading:"正在載入學習紀錄…",history:"學習歷程",updated:"更新於 ",
+  level:"目前程度",start:"起點",target:"目標",gap:g=>`距離目標還差 ${g} 級`,reached:"已達成本階段目標",gained:g=>`，已進步 ${g} 級`,
+  overview:"能力總覽",rateDef:"每項依技能等級評分（3.0–4.0，每級 0.25）",overall:"總合評比",best:"最強項",needFix:"需修正",none:"無",notRated:"未評估",notRatedLong:"尚未評估",legendTitle:"等級說明",
+  legend:{"3.0":"能穩定對打，發球、接發球大多進區；開始練丁克和第三拍，但還不穩定","3.5":"能控制方向與深度，懂得上網與搭檔移位；丁克較穩定，開始使用第三拍放小球","4.0":"失誤少，能依情況選擇放小球或抽球；網前能耐心丁克、重置來球，有團隊戰術觀念"},
+  between:"3.25、3.75 代表介於兩級之間",radar:"能力雷達圖",sep:"、",colon:"：",
+  next:"下次上課",noGoal:"教練尚未設定",prepHint:"完成就打勾（只存在你的裝置）",improve:"改進重點",msgTitle:"留言給教練",msgHint:"寫下想學的技術、問題或備註，按「用 LINE 傳送」並選擇教練傳出。教練回覆後會顯示在下方。",mtypes:{ask:"想學的",q:"問題",note:"備註"},msgPh:"例：想學反手抽球、膝蓋有點痠",send:"送出",sent:"已送出",reply:"教練回覆",replyPh:"回覆學員…",replyBtn:"回覆",fromStu:"學員",fromLog:"教練代記錄",noMsg:"還沒有留言",lineTitle:"這個頁面目前無法直接送出留言，請改用 LINE 傳給教練：",lineBtn:"用 LINE 傳送",copyMsg:"複製內容",logTitle:"記錄學員從 LINE 傳來的留言",logBtn:"加入",delMsg:"刪除",msgFail:"送出失敗：",
+  curve:"進步曲線",curveHint:"每次儲存技術評估會記錄一個時間點（同一天以最後一次為準）",latest:"最新",sinceFirst:(d,dt)=>`比第一次（${dt}）${d}`,onePoint:"再評估一次就會畫出進步曲線",noEval:"教練完成第一次技術評估後，這裡會出現進步曲線",show:"顯示",evaluated:"評估時間 ",
+  progress:"我的進步 · 每項 10 球測驗",progressShort:"我的進步",noRec:"還沒有紀錄，第一堂課後教練會加上。",before:"修正前",after:"修正後",balls:d=>`${d>0?"+":""}${d} 球`,delRec:"刪除這筆",
+  coach:"教練模式",pick:"選擇學員…",newStu:"新增學員",shareHint:"學員登入：從右上角「分享」用學員的 Email 邀請為「檢視者」。學員用自己的 claude.ai 帳號登入後，會看到一組帳號代碼，請他傳給你，再到「學員資料」裡綁定。每位學員只看得到自己的紀錄。",
+  me:"登入身分",roleCoach:"教練",roleStu:"學員",logoutHint:"要登出，請登出 claude.ai 帳號；在共用裝置使用後務必登出。",notLinked:"你的帳號還沒有連結學習紀錄",sendCode:"請把下面的帳號代碼傳給教練。教練綁定後，這裡就會出現你的學習歷程。",copy:"複製代碼",copied:"已複製",noId:"無法取得你的帳號代碼。請確認已登入 claude.ai，或聯絡教練。",bindTitle:"綁定學員帳號",bindHint:"備用方式：請學員打開此頁面，把畫面上的帳號代碼傳給你，貼在這裡。",searchF:"搜尋已分享的人（姓名或 Email）",searchPh:"輸入至少 2 個字",noHit:"找不到這個人。從組織外邀請的學員可能搜尋不到，請改用下方的帳號代碼。",guestTag:"外部",pickBind:"點選即可綁定",bindBtn:"綁定",bound:"已綁定帳號",unbind:"解除綁定",badCode:"代碼格式不正確，應以 u_ 開頭",codeUsed:"這個帳號已經綁定其他學員",bindOk:"綁定完成",notBound:"尚未綁定帳號，學員目前看不到這份紀錄",unbound:"未綁定",
+  emptyCoach:"從上方選擇一位學員，或新增學員。",emptyNone:"還沒有學員，按「新增學員」開始。",emptyStu:"請使用教練傳給你的專屬連結開啟。",
+  addRec:"新增上課紀錄",date:"日期時間",item:"修正動作",itemPh:"例：反手 dink 斜線",beforeN:"修正前（/10）",afterN:"修正後（/10）",noteF:"一句話提醒（給學員看）",notePh:"例：拍面朝天、膝蓋先彎",addBtn:"加入紀錄",added:"已加入",
+  editInfo:"學員資料・下次目標與改進重點",rankTitle:"學員排名（僅教練可見）",rankHint:"點名字可打開該學員。",rkOverall:"總合評比排名",rkOverallHint:"同分時以最近評估的在前",rkGain:"進步最快排名",rkGainHint:"最新總合評比減去第一次評估；同分時花的時間較短者在前。至少評估 2 次才列入。",noGain:"還沒有評估 2 次以上的學員",weeks:w=>w<1?"1 週內":`${w} 週`,male:"男生",female:"女生",unsetG:"未設定性別",genderF:"性別",noRanked:"還沒有已評分的學員",evalsN:n=>`評估 ${n} 次`,top:"第一名",name:"學員姓名",startF:"起點程度",levelF:"目前程度",targetF:"目標程度",goalF:"下次上課目標",prepF:"改進重點（一行一項）",save:"儲存",saved:"已儲存",
+  delStu:"刪除這位學員",delAsk:n=>`確定刪除「${n}」和所有紀錄？無法復原。`,delYes:"確定刪除",cancel:"取消",delFail:"刪除失敗",
+  editSkill:"評估技術項目",levelSel:"技能等級",fixBox:"標記為需修正",skNote:"說明（選填）",skNotePh:"例：拋球太高、落點太淺",avgHint:"總合評比會依已評分項目的等級自動平均。",saveSkill:"儲存技術評估",
+  saveFail:"儲存失敗：",retry:"請稍後再試",addFail:"無法新增學員：",newName:"新學員",
+  timeout:"載入逾時。請確認已登入 claude.ai，並重新開啟連結。",openIn:"請在 claude.ai 開啟此頁面並登入。",needLogin:"需要登入 claude.ai 才能查看學習紀錄。",readFail:c=>`無法讀取紀錄（${c}）。請確認教練已分享此頁面給你。`,
+  skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"攻擊侵略性",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
+ ja:{locale:"ja-JP",title:"ピックルボール学習記録",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
+  level:"現在のレベル",start:"開始",target:"目標",gap:g=>`目標まであと ${g}`,reached:"今期の目標を達成しました",gained:g=>`（${g} 向上）`,
+  overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（3.0–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
+  legend:{"3.0":"ラリーが安定し、サーブとリターンはほぼ入る。ディンクとサードショットを練習中だが、まだ安定しない","3.5":"コースと深さをコントロールでき、ネットへの前進やパートナーとの連携を理解している。ディンクが安定し、サードショットドロップを使い始める","4.0":"ミスが少なく、状況に応じてドロップとドライブを使い分ける。ネット際で粘り強くディンクし、速い球をリセットでき、チーム戦術の意識がある"},
+  between:"3.25・3.75 は2つのレベルの中間です",radar:"能力レーダーチャート",sep:"、",colon:"：",
+  next:"次回のレッスン",noGoal:"コーチが設定中です",prepHint:"できたらチェック（この端末にのみ保存）",improve:"改善ポイント",msgTitle:"コーチへのメッセージ",msgHint:"習いたい技術、質問、メモを書いて「LINE で送る」を押し、コーチを選んで送信してください。コーチの返信は下に表示されます。",mtypes:{ask:"習いたいこと",q:"質問",note:"メモ"},msgPh:"例：バックハンドのドライブを習いたい、膝が少し痛い",send:"送信",sent:"送信しました",reply:"コーチの返信",replyPh:"生徒に返信…",replyBtn:"返信",fromStu:"生徒",fromLog:"コーチが代理記録",noMsg:"まだメッセージはありません",lineTitle:"このページからは直接送信できません。LINE でコーチに送ってください：",lineBtn:"LINE で送る",copyMsg:"内容をコピー",logTitle:"LINE で届いたメッセージを記録",logBtn:"追加",delMsg:"削除",msgFail:"送信できませんでした：",
+  curve:"上達グラフ",curveHint:"技術評価を保存するたびに記録されます（同じ日は最後の評価を採用）",latest:"最新",sinceFirst:(d,dt)=>`初回（${dt}）から ${d}`,onePoint:"もう一度評価するとグラフが表示されます",noEval:"コーチが最初の技術評価をすると、ここに上達グラフが表示されます",show:"表示",evaluated:"評価日時 ",
+  progress:"上達の記録 · 各10球テスト",progressShort:"上達の記録",noRec:"まだ記録がありません。初回レッスン後にコーチが追加します。",before:"修正前",after:"修正後",balls:d=>`${d>0?"+":""}${d} 球`,delRec:"この記録を削除",
+  coach:"コーチモード",pick:"生徒を選択…",newStu:"生徒を追加",shareHint:"生徒のログイン：右上の「共有」から生徒のメールアドレスを「閲覧者」として招待します。生徒が自分の claude.ai アカウントでログインするとアカウントコードが表示されるので、それを送ってもらい「生徒情報」で紐付けてください。各生徒は自分の記録だけを見られます。",
+  me:"ログイン中",roleCoach:"コーチ",roleStu:"生徒",logoutHint:"ログアウトするには claude.ai からログアウトしてください。共有端末では使用後に必ずログアウトしてください。",notLinked:"あなたのアカウントはまだ学習記録と紐付けられていません",sendCode:"下のアカウントコードをコーチに送ってください。紐付けが完了すると、ここに学習記録が表示されます。",copy:"コードをコピー",copied:"コピーしました",noId:"アカウントコードを取得できません。claude.ai にログインしているか確認するか、コーチに連絡してください。",bindTitle:"生徒アカウントを紐付け",bindHint:"予備の方法：生徒にこのページを開いてもらい、表示されたアカウントコードをここに貼り付けてください。",searchF:"共有した人を検索（名前またはメール）",searchPh:"2文字以上入力",noHit:"見つかりません。組織外から招待した生徒は検索に出ないことがあります。下のアカウントコードを使ってください。",guestTag:"外部",pickBind:"タップで紐付け",bindBtn:"紐付ける",bound:"紐付け済みアカウント",unbind:"紐付けを解除",badCode:"コードの形式が正しくありません（u_ で始まります）",codeUsed:"このアカウントは別の生徒に紐付け済みです",bindOk:"紐付けが完了しました",notBound:"アカウント未紐付け：生徒はまだこの記録を見られません",unbound:"未紐付け",
+  emptyCoach:"上から生徒を選ぶか、生徒を追加してください。",emptyNone:"まだ生徒がいません。「生徒を追加」から始めましょう。",emptyStu:"コーチから届いた専用リンクで開いてください。",
+  addRec:"レッスン記録を追加",date:"日時",item:"修正した動作",itemPh:"例：バックハンドのクロスディンク",beforeN:"修正前（/10）",afterN:"修正後（/10）",noteF:"ひとことアドバイス（生徒に表示）",notePh:"例：面を上に向ける、先に膝を曲げる",addBtn:"記録を追加",added:"追加しました",
+  editInfo:"生徒情報・次回の目標・改善ポイント",rankTitle:"生徒ランキング（コーチのみ）",rankHint:"名前をタップするとその生徒を開きます。",rkOverall:"総合評価ランキング",rkOverallHint:"同点の場合は最近評価した生徒が上",rkGain:"上達スピードランキング",rkGainHint:"最新の総合評価から初回評価を引いた値。同点の場合は期間が短い方が上。2回以上評価した生徒のみ。",noGain:"2回以上評価した生徒はまだいません",weeks:w=>w<1?"1週間以内":`${w}週間`,male:"男子",female:"女子",unsetG:"性別未設定",genderF:"性別",noRanked:"評価済みの生徒はまだいません",evalsN:n=>`評価 ${n} 回`,top:"1位",name:"生徒の名前",startF:"開始レベル",levelF:"現在のレベル",targetF:"目標レベル",goalF:"次回の目標",prepF:"改善ポイント（1行に1項目）",save:"保存",saved:"保存しました",
+  delStu:"この生徒を削除",delAsk:n=>`「${n}」とすべての記録を削除しますか？元に戻せません。`,delYes:"削除する",cancel:"キャンセル",delFail:"削除できませんでした",
+  editSkill:"技術項目を評価",levelSel:"スキルレベル",fixBox:"要修正にする",skNote:"コメント（任意）",skNotePh:"例：トスが高い、落下点が浅い",avgHint:"総合評価は評価済み項目のレベルの平均で自動計算されます。",saveSkill:"技術評価を保存",
+  saveFail:"保存できませんでした：",retry:"しばらくしてからもう一度お試しください",addFail:"生徒を追加できませんでした：",newName:"新しい生徒",
+  timeout:"読み込みがタイムアウトしました。claude.ai にログインしているか確認し、リンクを開き直してください。",openIn:"claude.ai でこのページを開き、ログインしてください。",needLogin:"学習記録を見るには claude.ai へのログインが必要です。",readFail:c=>`記録を読み込めませんでした（${c}）。コーチがこのページを共有しているか確認してください。`,
+  skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"攻撃性",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
+ en:{locale:"en-US",title:"Pickleball Progress",loading:"Loading your progress…",history:"Progress record",updated:"Updated ",
+  level:"Current level",start:"Start",target:"Goal",gap:g=>`${g} to reach your goal`,reached:"Goal reached for this stage",gained:g=>` · up ${g} since you started`,
+  overview:"Skill overview",rateDef:"Each skill is rated by level (3.0–4.0, in 0.25 steps)",overall:"Overall",best:"Strongest",needFix:"Needs work",none:"None",notRated:"Not rated",notRatedLong:"Not rated yet",legendTitle:"What the levels mean",
+  legend:{"3.0":"Rallies consistently and gets most serves and returns in; learning dinks and third shots, still inconsistent","3.5":"Controls direction and depth, moves to the net and with a partner; dinks more reliably and starts using third-shot drops","4.0":"Makes few errors, chooses between drop and drive; dinks patiently, resets hard balls and plays as a team"},
+  between:"3.25 and 3.75 sit between two levels",radar:"Skill radar chart",sep:", ",colon:": ",
+  next:"Next lesson",noGoal:"Your coach hasn't set this yet",prepHint:"Tick each one when done (saved on this device only)",improve:"Focus points",msgTitle:"Message your coach",msgHint:"Write what you want to learn, a question or a note, tap Send with LINE and choose your coach. Replies show up below.",mtypes:{ask:"Want to learn",q:"Question",note:"Note"},msgPh:"e.g. I'd like to learn the backhand drive; my knee is a bit sore",send:"Send",sent:"Sent",reply:"Coach reply",replyPh:"Reply to the student…",replyBtn:"Reply",fromStu:"Student",fromLog:"Logged by coach",noMsg:"No messages yet",lineTitle:"This page can't send your message directly. Send it to your coach on LINE:",lineBtn:"Send with LINE",copyMsg:"Copy text",logTitle:"Log a message the student sent on LINE",logBtn:"Add",delMsg:"Delete",msgFail:"Couldn't send: ",
+  curve:"Progress curve",curveHint:"Each saved skill rating adds a point (the last one each day counts)",latest:"Latest",sinceFirst:(d,dt)=>`${d} since first rating (${dt})`,onePoint:"Rate again to draw the curve",noEval:"Your progress curve appears after your coach's first skill rating",show:"Show",evaluated:"Rated ",
+  progress:"My progress · 10-ball tests",progressShort:"My progress",noRec:"No records yet. Your coach will add them after your first lesson.",before:"Before",after:"After",balls:d=>`${d>0?"+":""}${d} ${Math.abs(d)===1?"ball":"balls"}`,delRec:"Delete this record",
+  coach:"Coach mode",pick:"Choose a student…",newStu:"Add student",shareHint:"Student sign-in: use Share at the top right to invite each student by email as a Viewer. After they sign in with their own claude.ai account, they see an account code. Have them send it to you, then link it under Student details. Each student sees only their own record.",
+  me:"Signed in as",roleCoach:"Coach",roleStu:"Student",logoutHint:"To sign out, sign out of claude.ai. Always sign out after using a shared device.",notLinked:"Your account isn't linked to a progress record yet",sendCode:"Send the account code below to your coach. Once they link it, your progress will appear here.",copy:"Copy code",copied:"Copied",noId:"Couldn't get your account code. Check that you're signed in to claude.ai, or contact your coach.",bindTitle:"Link student account",bindHint:"Backup: ask the student to open this page and send you the account code shown, then paste it here.",searchF:"Search people you shared with (name or email)",searchPh:"Type at least 2 characters",noHit:"No match. Students invited from outside your organization may not show up; use the account code below instead.",guestTag:"guest",pickBind:"Tap to link",bindBtn:"Link",bound:"Linked account",unbind:"Unlink",badCode:"That code doesn't look right. It starts with u_",codeUsed:"That account is already linked to another student",bindOk:"Linked",notBound:"No account linked yet, so the student can't see this record",unbound:"not linked",
+  emptyCoach:"Choose a student above, or add one.",emptyNone:"No students yet. Tap Add student to begin.",emptyStu:"Please open this page with the link your coach sent you.",
+  addRec:"Add a lesson record",date:"Date & time",item:"Skill corrected",itemPh:"e.g. backhand cross-court dink",beforeN:"Before (/10)",afterN:"After (/10)",noteF:"One-line tip (shown to student)",notePh:"e.g. paddle face up, bend knees first",addBtn:"Add record",added:"Added",
+  editInfo:"Student, next goal and focus points",rankTitle:"Student ranking (coach only)",rankHint:"Tap a name to open that student.",rkOverall:"Overall ranking",rkOverallHint:"Ties go to the most recently rated",rkGain:"Fastest improvement",rkGainHint:"Latest overall minus the first rating; ties go to whoever took less time. Needs at least 2 ratings.",noGain:"No student has 2 or more ratings yet",weeks:w=>w<1?"under 1 week":`${w} week${w===1?"":"s"}`,male:"Men",female:"Women",unsetG:"Gender not set",genderF:"Gender",noRanked:"No rated students yet",evalsN:n=>`${n} rating${n===1?"":"s"}`,top:"No. 1",name:"Student name",startF:"Starting level",levelF:"Current level",targetF:"Goal level",goalF:"Next lesson goal",prepF:"Focus points (one per line)",save:"Save",saved:"Saved",
+  delStu:"Delete this student",delAsk:n=>`Delete “${n}” and all records? This can't be undone.`,delYes:"Delete",cancel:"Cancel",delFail:"Couldn't delete",
+  editSkill:"Rate skills",levelSel:"Skill level",fixBox:"Mark as needs work",skNote:"Comment (optional)",skNotePh:"e.g. toss too high, landing too short",avgHint:"Overall is the average level of the rated skills.",saveSkill:"Save skill ratings",
+  saveFail:"Couldn't save: ",retry:"please try again shortly",addFail:"Couldn't add student: ",newName:"New student",
+  timeout:"Loading timed out. Check that you're signed in to claude.ai, then reopen the link.",openIn:"Open this page in claude.ai and sign in.",needLogin:"Sign in to claude.ai to see your progress.",readFail:c=>`Couldn't load records (${c}). Check that your coach has shared this page with you.`,
+  skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Aggression",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
+};
+Object.assign(I18N.zh,{
+  timeout:"載入逾時，請檢查網路後重新整理。",notBound:"還沒填學員 Email，學員目前看不到這份紀錄",
+  shareHint:"新增學員後，在「學員資料」填入學員登入用的 Google Email 並儲存。把網址傳給學員，學員用該 Google 帳號登入就只會看到自己的紀錄。",
+  logoutHint:"共用裝置使用後請按登出。",signOutBtn:"登出",
+  notLinked:"教練還沒把你的帳號加入學習歷程",sendCode:"請把下面這個 Email 告訴教練，教練加入後重新整理即可看到。",
+  noId:"無法取得你的帳號資訊，請重新登入。",
+  signInTitle:"T1 匹克球學習歷程",signInHint:"請用 Google 帳號登入，只會看到你自己的學習紀錄。",signInBtn:"使用 Google 登入",signInFail:"登入失敗：",
+  lineWarn:"你正在 LINE 內建瀏覽器中開啟，Google 不允許在這裡登入。請點右上角選單選擇「以預設瀏覽器開啟」，或按下方按鈕。",openExternal:"用瀏覽器開啟",
+  setupNeeded:"尚未完成 Firebase 設定：請在 index.html 的設定區填入 FIREBASE_CONFIG。",
+  emailF:"學員 Google Email（登入用）",emailPh:"例：student@gmail.com",emailBad:"Email 格式不正確",emailUsed:"這個 Email 已經用在其他學員",
+  msgHint:"想學的技術、問題或備註都可以留在這裡，送出後教練會在頁面上回覆。",
+  readFail:c=>`無法讀取紀錄（${c}）。請重新整理，或確認教練已加入你的 Email。`
+});
+Object.assign(I18N.ja,{
+  timeout:"読み込みがタイムアウトしました。通信状況を確認して再読み込みしてください。",notBound:"生徒のメールが未入力のため、生徒はまだこの記録を見られません",
+  shareHint:"生徒を追加したら「生徒情報」にログイン用の Google メールを入力して保存します。URL を送り、生徒がその Google アカウントでログインすると自分の記録だけが表示されます。",
+  logoutHint:"共有端末では使用後にログアウトしてください。",signOutBtn:"ログアウト",
+  notLinked:"コーチがまだあなたのアカウントを登録していません",sendCode:"下のメールアドレスをコーチに伝えてください。登録後にページを再読み込みすると表示されます。",
+  noId:"アカウント情報を取得できません。もう一度ログインしてください。",
+  signInTitle:"T1 ピックルボール学習記録",signInHint:"Google アカウントでログインしてください。自分の記録だけが表示されます。",signInBtn:"Google でログイン",signInFail:"ログインできませんでした：",
+  lineWarn:"LINE のアプリ内ブラウザで開いています。Google はここでのログインを許可していません。右上のメニューから「デフォルトのブラウザで開く」を選ぶか、下のボタンを押してください。",openExternal:"ブラウザで開く",
+  setupNeeded:"Firebase の設定が未完了です。index.html の設定欄に FIREBASE_CONFIG を入力してください。",
+  emailF:"生徒の Google メール（ログイン用）",emailPh:"例：student@gmail.com",emailBad:"メールアドレスの形式が正しくありません",emailUsed:"このメールアドレスは別の生徒に使われています",
+  msgHint:"習いたい技術、質問、メモを書いて送信してください。コーチがこのページで返信します。",
+  readFail:c=>`記録を読み込めませんでした（${c}）。再読み込みするか、コーチがメールアドレスを登録しているか確認してください。`
+});
+Object.assign(I18N.en,{
+  timeout:"Loading timed out. Check your connection and refresh.",notBound:"No student email yet, so the student can't see this record",
+  shareHint:"After adding a student, enter the Google email they sign in with under Student details and save. Send them the web address; once they sign in with that Google account they see only their own record.",
+  logoutHint:"Sign out when you're done on a shared device.",signOutBtn:"Sign out",
+  notLinked:"Your coach hasn't added your account yet",sendCode:"Give your coach the email below. Once they add it, refresh this page.",
+  noId:"Couldn't read your account. Please sign in again.",
+  signInTitle:"T1 Pickleball Progress",signInHint:"Sign in with Google. You'll only see your own progress.",signInBtn:"Sign in with Google",signInFail:"Couldn't sign in: ",
+  lineWarn:"You're in LINE's built-in browser, where Google doesn't allow sign-in. Use the menu at the top right to open in your default browser, or tap the button below.",openExternal:"Open in browser",
+  setupNeeded:"Firebase isn't set up yet. Fill in FIREBASE_CONFIG in the settings block of index.html.",
+  emailF:"Student's Google email (for sign-in)",emailPh:"e.g. student@gmail.com",emailBad:"That email doesn't look right",emailUsed:"That email is already used by another student",
+  msgHint:"Leave what you want to learn, questions or notes here. Your coach will reply on this page.",
+  readFail:c=>`Couldn't load records (${c}). Refresh, or check that your coach has added your email.`
+});
+const SKILL_KEYS=["serve","return","drive","transition","reset","dink","aggression","selection","special","composure"];
+const LEVELS_MIN=1.0,LEVELS_MAX=5.0;
+const app=document.getElementById("app");
+let db=null,fs=null,auth=null,view="loading",unsubs=[],me=null,canEdit=false,students=[],currentId=null,loaded=false,lang=pickLang(),T=I18N[lang];
+
+function pickLang(){try{const s=localStorage.getItem("lang");if(I18N[s])return s}catch(e){}const n=(navigator.language||"zh").toLowerCase();return n.startsWith("ja")?"ja":(n.startsWith("en")?"en":"zh")}
+function setLang(l){lang=l;T=I18N[l];try{localStorage.setItem("lang",l)}catch(e){}
+  document.documentElement.lang=l==="zh"?"zh-Hant":l;document.title=T.title;
+  document.querySelectorAll("#langseg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===l)));
+  if(view==="login")showLogin();else if(view==="setup")msg(T.setupNeeded);else if(loaded)render();else{const el=document.querySelector("#loading p");if(el)el.textContent=T.loading}}
+document.querySelectorAll("#langseg button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function num(v,d){const n=parseFloat(v);return isFinite(n)?n:d}
+function fmtLv(n){return Number(n).toFixed(1)}
+function hashId(){const h=location.hash.slice(1);return /^[A-Za-z0-9_-]{6,40}$/.test(h)?h:null}
+const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function newId(){const a="abcdefghijkmnpqrstuvwxyz23456789";let s="s-";for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+function loadTicks(id,goal){try{const v=JSON.parse(localStorage.getItem("prep:"+id)||"null");return v&&v.goal===goal?v.ticks:[]}catch(e){return []}}
+function saveTicks(id,goal,ticks){try{localStorage.setItem("prep:"+id,JSON.stringify({goal,ticks}))}catch(e){}}
+function dots(n){let h="";for(let i=0;i<10;i++)h+=`<i class="${i<n?"on":""}"></i>`;return `<div class="dots" aria-label="${n} / 10">${h}</div>`}
+const SK_LEVELS=[3.0,3.25,3.5,3.75,4.0],SK_MIN=2.75,SK_MAX=4.0;
+function skillVal(v){if(!v)return null;const r=parseFloat(v.level);return isFinite(r)?Math.max(3,Math.min(SK_MAX,r)):null}
+function isFix(v){return !!v&&(v.fix===true||v.mode==="fix")}
+function fmtSk(n){return n%0.5===0?n.toFixed(1):n.toFixed(2)}
+function overall(sk){const vals=SKILL_KEYS.map(k=>skillVal(sk[k])).filter(v=>v!==null);return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):null}
+function msg(html){app.innerHTML=`<div class="card empty"><p class="muted">${html}</p></div>`}
+
+function pad2(n){return String(n).padStart(2,"0")}
+function localNow(){const d=new Date();return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`}
+function fmtWhen(v){if(!v)return "";const str=String(v);if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;const d=new Date(str);if(isNaN(d))return str.replace("T"," ");
+  return d.toLocaleString(T.locale,{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false})}
+function fmtDay(d){return d.toLocaleDateString(T.locale,{month:"numeric",day:"numeric"})}
+function levelsOf(sk){const o={};SKILL_KEYS.forEach(k=>{const v=skillVal(sk[k]);if(v!==null)o[k]=v});return o}
+function evalsOf(s){let e=(s.evals||[]).filter(x=>x&&x.t).slice().sort((a,b)=>String(a.t).localeCompare(String(b.t)));
+  if(!e.length){const ov=overall(s.skills||{});if(ov!==null)e=[{t:s.evaluatedAt||s.updatedAt,overall:+ov,levels:levelsOf(s.skills||{})}]}
+  return e}
+let curveKey="overall";
+function curveSvg(pts){
+  const W=420,H=230,L=40,Rp=22,Tp=24,B=30,iw=W-L-Rp,ih=H-Tp-B;
+  const t0=pts[0].d.getTime(),t1=pts[pts.length-1].d.getTime(),span=Math.max(1,t1-t0);
+  const X=d=>pts.length===1?L+iw/2:L+iw*(d.getTime()-t0)/span, Y=v=>Tp+ih*(1-(Math.max(3,Math.min(4,v))-3));
+  let g="";
+  SK_LEVELS.forEach(lv=>{const y=Y(lv);g+=`<line x1="${L}" y1="${y}" x2="${W-Rp}" y2="${y}" stroke="var(--line)" stroke-width="1" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--muted)">${fmtSk(lv)}</text>`});
+  const xy=pts.map(p=>[X(p.d),Y(p.v)]);
+  if(xy.length>1){g+=`<polygon points="${xy[0][0]},${Y(3)} ${xy.map(q=>q.join(",")).join(" ")} ${xy[xy.length-1][0]},${Y(3)}" fill="var(--court)" fill-opacity=".12"/>`;
+    g+=`<polyline points="${xy.map(q=>q.join(",")).join(" ")}" fill="none" stroke="var(--court)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`}
+  const showAll=pts.length<=5;
+  pts.forEach((p,i)=>{const [x,y]=xy[i],last=i===pts.length-1;
+    g+=`<circle cx="${x}" cy="${y}" r="${last?6:4}" fill="${last?"var(--ball)":"var(--surface)"}" stroke="var(--court)" stroke-width="2"/>`;
+    if(showAll||i===0||last){const anc=pts.length===1?"middle":(i===0?"start":(last?"end":"middle"));
+      g+=`<text x="${x}" y="${H-10}" text-anchor="${anc}" font-size="13" fill="var(--muted)">${fmtDay(p.d)}</text>`;
+      g+=`<text x="${x}" y="${y-11}" text-anchor="${anc}" font-size="14" font-weight="700" fill="var(--ink)">${p.v.toFixed(2)}</text>`}});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.curve}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
+}
+function curveCard(s){
+  const ev=evalsOf(s);
+  if(!ev.length)return `<section class="card" aria-label="${T.curve}"><h2>${T.curve}</h2><p class="muted" style="margin:0">${T.noEval}</p></section>`;
+  const pts=ev.map(e=>({d:new Date(e.t),v:curveKey==="overall"?num(e.overall,NaN):num((e.levels||{})[curveKey],NaN)})).filter(p=>isFinite(p.v)&&!isNaN(p.d));
+  const opts=`<option value="overall" ${curveKey==="overall"?"selected":""}>${T.overall}</option>`+SKILL_KEYS.map(k=>`<option value="${k}" ${curveKey===k?"selected":""}>${T.skills[k]}</option>`).join("");
+  let body;
+  if(!pts.length)body=`<p class="muted" style="margin:0">${T.notRatedLong}</p>`;
+  else{const first=pts[0],last=pts[pts.length-1],d=last.v-first.v;
+    body=`<div class="cv-stat"><span class="cv-num">${last.v.toFixed(2)}</span><span class="muted">${T.latest} · ${fmtWhen(ev[ev.length-1].t)}</span></div>
+    ${pts.length>1?`<p class="cv-delta ${d<0?"down":""}">${T.sinceFirst(`${d>=0?"+":""}${d.toFixed(2)}`,fmtDay(first.d))}</p>`:""}
+    <div class="cv-wrap">${curveSvg(pts)}</div>
+    ${pts.length===1?`<p class="muted" style="margin:0">${T.onePoint}</p>`:""}`}
+  return `<section class="card" aria-label="${T.curve}">
+    <div class="cv-head"><h2>${T.curve}</h2><label class="cv-sel"><span class="muted">${T.show}</span><select id="curve-sel">${opts}</select></label></div>
+    ${body}
+    <p class="muted" style="margin:0;font-size:12px">${T.curveHint}</p>
+  </section>`;
+}
+
+function radar(sk){
+  const W=490,H=400,cx=245,cy=200,R=116,n=SKILL_KEYS.length;
+  const ang=i=>-Math.PI/2+i*2*Math.PI/n,pt=(i,r)=>[cx+Math.cos(ang(i))*r,cy+Math.sin(ang(i))*r];
+  let g="";
+  const rr=lv=>R*(lv-SK_MIN)/(SK_MAX-SK_MIN);
+  SK_LEVELS.forEach(lv=>{g+=`<polygon points="${SKILL_KEYS.map((_,i)=>pt(i,rr(lv)).join(",")).join(" ")}" fill="none" stroke="var(--line)" stroke-width="${lv%0.5===0?1.2:0.6}" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/>`});
+  SKILL_KEYS.forEach((_,i)=>{const [x,y]=pt(i,R);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`});
+  [3.0,3.5,4.0].forEach(lv=>{g+=`<text x="${cx+4}" y="${cy-rr(lv)+12}" font-size="10" fill="var(--muted)">${lv.toFixed(1)}</text>`});
+  const vals=SKILL_KEYS.map(k=>skillVal(sk[k])??SK_MIN);
+  g+=`<polygon points="${vals.map((v,i)=>pt(i,rr(v)).join(",")).join(" ")}" fill="var(--court)" fill-opacity=".22" stroke="var(--court)" stroke-width="2" stroke-linejoin="round"/>`;
+  SKILL_KEYS.forEach((k,i)=>{
+    const v=sk[k]||{},val=skillVal(v),fix=isFix(v);
+    if(val!==null){const [x,y]=pt(i,rr(val));g+=`<circle cx="${x}" cy="${y}" r="4.5" fill="${fix?"var(--warn)":"var(--ball)"}" stroke="${fix?"var(--warn)":"var(--court)"}" stroke-width="2"/>`}
+    const [lx,ly]=pt(i,R+20),c=Math.cos(ang(i)),anchor=Math.abs(c)<.2?"middle":(c>0?"start":"end");
+    const sn=Math.sin(ang(i)),dy=sn<-.5?-10:(sn>.5?10:0);
+    const sub=fix?(val!==null?`${T.needFix} ${fmtSk(val)}`:T.needFix):(val!==null?fmtSk(val):T.notRated);
+    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="13" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
+        <text x="${lx}" y="${ly+dy+16}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.radar}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
+}
+
+function skillsCard(s){
+  const sk=s.skills||{},ov=overall(sk),fixes=SKILL_KEYS.filter(k=>isFix(sk[k]));
+  const best=SKILL_KEYS.map(k=>({k,v:skillVal(sk[k]),fix:isFix(sk[k])})).filter(x=>x.v!==null&&!x.fix).sort((a,b)=>b.v-a.v)[0];
+  const notes=SKILL_KEYS.filter(k=>(sk[k]||{}).note).map(k=>`<li><b>${T.skills[k]}</b>${T.colon}${esc(sk[k].note)}</li>`).join("");
+  return `<section class="card" aria-label="${T.overview}">
+    <div class="ov-head"><div><h2>${T.overview}</h2><p class="muted" style="margin:0">${T.rateDef}</p>${(s.evaluatedAt||(s.evals||[]).length)?`<p class="muted" style="margin:0;font-size:12px">${T.evaluated}${fmtWhen(s.evaluatedAt||evalsOf(s).slice(-1)[0].t)}</p>`:""}${canEdit?`<button type="button" class="primary jump" id="b-rate">${T.editSkill}</button>`:""}</div>
+      <div class="ov"><span class="ov-label">${T.overall}</span><span class="ov-num">${ov===null?"—":ov}</span></div></div>
+    <div class="radar-wrap">${radar(sk)}</div>
+    <div class="ov-sum">
+      ${best?`<div><span class="muted">${T.best}</span><b>${T.skills[best.k]} ${fmtSk(best.v)}</b></div>`:""}
+      <div><span class="muted">${T.needFix}</span><b class="${fixes.length?"warn":""}">${fixes.length?fixes.map(k=>T.skills[k]).join(T.sep):T.none}</b></div>
+    </div>
+    ${notes?`<ul class="sk-notes">${notes}</ul>`:""}
+    <details class="legend"><summary>${T.legendTitle}</summary>
+      <dl>${Object.entries(T.legend).map(([lv,d])=>`<div><dt>${lv}</dt><dd>${d}</dd></div>`).join("")}</dl>
+      <p class="muted" style="margin:0">${T.between}</p>
+    </details>
+  </section>`;
+}
+
+function nextCard(s){
+  const prep=(s.prep||[]).filter(Boolean),ticks=loadTicks(s.id,s.nextGoal||"");
+  return `<section class="card" aria-label="${T.next}">
+    <h2>${T.next}</h2>
+    <div class="goal">${esc(s.nextGoal||T.noGoal)}</div>
+    ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${esc(p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
+    ${msgBlock(s)}
+  </section>`;
+}
+let msgs=[],msgFor=null,msgUnsub=null,msgCanWrite=null;
+function watchMsgs(id){if(msgFor===id||!db)return;if(msgUnsub)msgUnsub();msgFor=id;msgs=[];
+  msgUnsub=db.collection(`students/${id}/msgs`).onSnapshot(sn=>{msgs=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.t).localeCompare(String(b.t)));render()},()=>{msgs=[]})}
+function lineText(s,type,text){return `[${T.msgTitle}] ${s.name||""}\n${T.mtypes[type]||""}${T.colon}${text}`}
+function msgBlock(s){
+  const items=msgs.slice().reverse().map(m=>`<li class="msg-item">
+      <div class="msg-meta"><span class="mtag mtag-${esc(m.type)}">${esc(T.mtypes[m.type]||m.type)}</span><span class="muted">${esc(fmtWhen(m.t))} · ${m.from==="coach"?T.fromLog:T.fromStu}</span></div>
+      <p class="msg-text">${esc(m.text)}</p>
+      ${m.reply?`<div class="msg-reply"><b>${T.reply}</b><p>${esc(m.reply)}</p><span class="muted">${esc(fmtWhen(m.replyT))}</span></div>`:""}
+      ${canEdit?`<div class="actions"><input id="rp-${esc(m.id)}" placeholder="${T.replyPh}" value="" style="flex:1 1 180px;width:auto"><button type="button" class="primary" data-reply="${esc(m.id)}">${T.replyBtn}</button><button type="button" class="danger" data-delmsg="${esc(m.id)}">${T.delMsg}</button></div>`:""}
+    </li>`).join("");
+  const opts=Object.entries(T.mtypes).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  return `<div class="msgbox">
+    <h2>${T.msgTitle}</h2>
+    ${canEdit?"":`<p class="muted" style="margin:0">${T.msgHint}</p>`}
+    <form id="f-msg" class="msg-form">
+      ${canEdit?`<p class="muted" style="margin:0;font-weight:700">${T.logTitle}</p>`:""}
+      <select id="m-type" aria-label="${T.msgTitle}">${opts}</select>
+      <textarea id="m-text" rows="3" placeholder="${T.msgPh}" required></textarea>
+      <div class="actions"><button class="primary" type="submit">${canEdit?T.logBtn:T.send}</button><span class="msg" id="m-msg"></span></div>
+    </form>
+    ${items?`<ul class="msg-list">${items}</ul>`:`<p class="muted" style="margin:0">${T.noMsg}</p>`}
+  </div>`;
+}
+
+function rowsCard(s){
+  const rec=[...(s.sessions||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  if(!rec.length)return `<section class="card"><h2>${T.progressShort}</h2><p class="muted" style="margin:0">${T.noRec}</p></section>`;
+  return `<section class="card" aria-label="${T.progressShort}">
+    <h2>${T.progress}</h2>
+    <div class="rows">${rec.map(r=>{const b=num(r.before,0),a=num(r.after,0),d=a-b;
+      return `<div class="row">
+        <div class="item">${esc(r.item)}</div><div class="date">${esc(fmtWhen(r.date))}</div>
+        <div class="balls"><span>${T.before}</span>${dots(b)}<span class="score">${b}/10</span><span>${T.after}</span>${dots(a)}<span class="score">${a}/10</span></div>
+        ${d?`<div class="note"><span class="delta">${T.balls(d)}</span>${r.note?" · "+esc(r.note):""}</div>`:(r.note?`<div class="note">${esc(r.note)}</div>`:"")}
+        ${canEdit?`<button class="del danger" type="button" data-del="${esc(r.rid)}">${T.delRec}</button>`:""}
+      </div>`}).join("")}</div>
+  </section>`;
+}
+
+function recCard(s){
+  return `<details class="card" id="ed-rec" open><summary>${T.addRec}</summary>
+    <form id="f-rec" class="grid">
+      <label class="field">${T.date}<input id="r-date" type="datetime-local" value="${localNow()}" required></label>
+      <label class="field" style="grid-column:span 2">${T.item}<input id="r-item" placeholder="${T.itemPh}" required></label>
+      <label class="field">${T.beforeN}<input id="r-before" type="number" min="0" max="10" required></label>
+      <label class="field">${T.afterN}<input id="r-after" type="number" min="0" max="10" required></label>
+      <label class="field" style="grid-column:1/-1">${T.noteF}<input id="r-note" placeholder="${T.notePh}"></label>
+      <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.addBtn}</button><span class="msg" id="m-rec"></span></div>
+    </form></details>`;
+}
+function infoCard(s){
+  return `<details class="card" id="ed-info" open><summary>${T.editInfo}</summary>
+    <form id="f-info" class="grid">
+      <label class="field" style="grid-column:1/-1">${T.name}<input id="i-name" value="${esc(s.name)}" required></label>
+      <label class="field" style="grid-column:1/-1">${T.emailF}<input id="i-email" type="email" inputmode="email" autocomplete="off" value="${esc(s.email)}" placeholder="${T.emailPh}"></label>
+      ${s.email?"":`<p class="muted warn-t" style="margin:0;grid-column:1/-1">${T.notBound}</p>`}
+      <label class="field">${T.genderF}<select id="i-gender"><option value="">${T.unsetG}</option><option value="m" ${s.gender==="m"?"selected":""}>${T.male}</option><option value="f" ${s.gender==="f"?"selected":""}>${T.female}</option></select></label>
+      <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
+      <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" rows="3">${esc((s.prep||[]).join("\n"))}</textarea></label>
+      <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-info"></span></div>
+    </form>
+    <div class="confirm" id="delzone"><button class="danger" type="button" id="b-delstu">${T.delStu}</button></div>
+  </details>`;
+}
+
+function skillsEditor(s){
+  const sk=s.skills||{};
+  const noneRated=!SKILL_KEYS.some(k=>skillVal(sk[k])!==null||isFix(sk[k]));
+  return `<details class="card coach-ed" id="ed-skill" ${noneRated?"open":""}><summary>${T.editSkill}</summary>
+    <form id="f-skill" style="display:flex;flex-direction:column;gap:14px">
+    ${SKILL_KEYS.map(k=>{const v=sk[k]||{},cur=skillVal(v);return `<div class="grid">
+      <label class="field">${T.skills[k]} · ${T.levelSel}<select id="k-${k}-level"><option value="">${T.notRatedLong}</option>${SK_LEVELS.map(lv=>`<option value="${lv}" ${cur===lv?"selected":""}>${fmtSk(lv)}</option>`).join("")}</select></label>
+      <label class="fixbox"><input type="checkbox" id="k-${k}-fix" ${isFix(v)?"checked":""}><span>${T.fixBox}</span></label>
+      <label class="field" style="grid-column:1/-1">${T.skNote}<input id="k-${k}-note" value="${esc(v.note)}" placeholder="${T.skNotePh}"></label></div>`}).join("")}
+      <p class="muted" style="margin:0">${T.avgHint}</p>
+      <div class="actions"><button class="primary" type="submit">${T.saveSkill}</button><span class="msg" id="m-skill"></span></div>
+    </form></details>`;
+}
+
+function accountBar(){
+  const nm=me&&me.name?esc(me.name):"";
+  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?T.roleCoach:T.roleStu}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
+}
+function rankCard(open){
+  const rows=students.map(x=>{const ov=overall(x.skills||{});const ev=evalsOf(x).filter(e=>isFinite(+e.overall)&&!isNaN(new Date(e.t)));
+    const f=ev[0],l=ev[ev.length-1];
+    return{id:x.id,name:x.name,g:x.gender,ov:ov===null?null:+ov,n:(x.evals||[]).length,last:l?String(l.t):"",
+      gain:ev.length>=2?+(+l.overall-+f.overall).toFixed(2):null,days:ev.length>=2?(new Date(l.t)-new Date(f.t))/864e5:null,from:f&&new Date(f.t),to:l&&new Date(l.t)}});
+  const byOv=rows.filter(r=>r.ov!==null).sort((a,b)=>b.ov-a.ov||b.last.localeCompare(a.last));
+  const byGain=rows.filter(r=>r.gain!==null).sort((a,b)=>b.gain-a.gain||a.days-b.days);
+  const group=(label,list,noTop,val,sub)=>`<div class="rk-col"><h3>${label}</h3>${list.length?`<ol class="rk">${list.map((r,i)=>`<li class="${i===0&&!noTop?"rk-top":""}"><span class="rk-no">${i+1}</span>
+      <span class="rk-nm"><button type="button" class="rk-name" data-open="${esc(r.id)}">${esc(r.name)}</button>${i===0&&!noTop?`<span class="rk-badge">${T.top}</span>`:""}</span>
+      <span class="rk-ov">${val(r)}</span><span class="muted rk-n">${sub(r)}</span></li>`).join("")}</ol>`:`<p class="muted" style="margin:0">—</p>`}</div>`;
+  const split=(list,val,sub)=>{const m=list.filter(r=>r.g==="m"),f=list.filter(r=>r.g==="f"),u=list.filter(r=>r.g!=="m"&&r.g!=="f");
+    return `<div class="rk-grid">${group(T.male,m,false,val,sub)}${group(T.female,f,false,val,sub)}</div>${u.length?group(T.unsetG,u,true,val,sub):""}`};
+  const ovVal=r=>r.ov.toFixed(2),ovSub=r=>T.evalsN(Math.max(r.n,1));
+  const gVal=r=>`${r.gain>=0?"+":""}${r.gain.toFixed(2)}`,gSub=r=>`${fmtDay(r.from)} → ${fmtDay(r.to)} · ${T.weeks(Math.round(r.days/7))}`;
+  return `<details class="card" id="rank" ${open?"open":""}><summary>${T.rankTitle}</summary>
+    <p class="muted" style="margin:0">${T.rankHint}</p>
+    <section class="rk-sec"><h2>${T.rkOverall}</h2><p class="muted" style="margin:0;font-size:12px">${T.rkOverallHint}</p>
+      ${byOv.length?split(byOv,ovVal,ovSub):`<p class="muted" style="margin:0">${T.noRanked}</p>`}</section>
+    <section class="rk-sec"><h2>${T.rkGain}</h2><p class="muted" style="margin:0;font-size:12px">${T.rkGainHint}</p>
+      ${byGain.length?split(byGain,gVal,gSub):`<p class="muted" style="margin:0">${T.noGain}</p>`}</section>
+  </details>`;
+}
+function coachBar(){
+  return `<div class="card"><div class="coachbar">
+    <span class="tag">${T.coach}</span>
+    <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${students.map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${s.email?"":` · ${T.unbound}`}</option>`).join("")}</select>
+    <button id="b-new" type="button">${T.newStu}</button>
+  </div><p class="muted" style="margin:0">${T.shareHint}</p></div>`;
+}
+
+function render(){
+  // keep any unsaved form typing across a re-render (e.g. language switch)
+  const keep={};document.querySelectorAll("#app input:not([type=checkbox]),#app textarea,#app select").forEach(el=>{if(el.id&&el.id!=="pick"&&el.id!=="curve-sel")keep[el.id]=el.value});
+  const open={};["ed-rec","ed-info","ed-skill","rank"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const s=students.find(x=>x.id===currentId);
+  let h=accountBar();
+  if(canEdit)h+=coachBar()+rankCard(!s);
+  if(!canEdit&&!s){h+=me&&me.email?`<div class="card"><h2>${T.notLinked}</h2><p style="margin:0">${T.sendCode}</p>
+      <div class="codebox"><code id="my-code">${esc(me.email)}</code></div></div>`
+      :`<div class="card empty"><p class="muted">${T.noId}</p></div>`;app.innerHTML=h;bind();return}
+  if(!s){h+=`<div class="card empty"><h1 style="font-size:20px">${T.title}</h1><p class="muted">${canEdit?(students.length?T.emptyCoach:T.emptyNone):T.emptyStu}</p></div>`;app.innerHTML=h;bind();return}
+  const upd=s.updatedAt?new Date(s.updatedAt).toLocaleDateString(T.locale):"";
+  h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
+  watchMsgs(s.id);
+  h+=canEdit?skillsCard(s)+curveCard(s)+skillsEditor(s)+recCard(s)+rowsCard(s)+infoCard(s)+nextCard(s)
+            :skillsCard(s)+curveCard(s)+nextCard(s)+rowsCard(s);
+  app.innerHTML=h;
+  if(open.rank!==undefined&&document.getElementById("rank"))document.getElementById("rank").open=open.rank;
+  if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
+  if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el)el.value=keep[id]}
+  render.lastId=s.id;
+  bind();
+}
+
+function bindMsgs(s){
+  const f=document.getElementById("f-msg");if(!f)return;
+  f.addEventListener("submit",async ev=>{ev.preventDefault();const text=val("m-text").trim().slice(0,1000);if(!text)return;
+    const m={type:val("m-type"),text,t:new Date().toISOString(),from:canEdit?"coach":"student"};
+    try{await db.collection(`students/${s.id}/msgs`).doc().set(m);document.getElementById("m-text").value="";flash("m-msg",T.sent)}
+    catch(e){alertBox(T.msgFail+(e&&e.message||T.retry))}});
+  if(!canEdit)return;
+  document.querySelectorAll("[data-reply]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.reply,t=val("rp-"+id).trim();if(!t)return;
+    try{await db.collection(`students/${s.id}/msgs`).doc(id).update({reply:t,replyT:new Date().toISOString()})}catch(e){alertBox(T.saveFail+(e&&e.message||T.retry))}}));
+  document.querySelectorAll("[data-delmsg]").forEach(b=>b.addEventListener("click",async()=>{try{await db.collection(`students/${s.id}/msgs`).doc(b.dataset.delmsg).delete()}catch(e){alertBox(T.delFail)}}));
+}
+function flash(id,t){const el=document.getElementById(id);if(el){el.textContent=t;setTimeout(()=>{if(el)el.textContent=""},2500)}}
+function alertBox(t){const d=document.createElement("div");d.className="card";d.style.color="var(--warn)";d.textContent=t;app.prepend(d);setTimeout(()=>d.remove(),4000)}
+async function save(id,data){try{await db.collection("students").doc(id).update({...data,updatedAt:new Date().toISOString()});return true}catch(e){alertBox(T.saveFail+(e&&e.message||T.retry));return false}}
+function val(id){return document.getElementById(id)?.value??""}
+
+function bind(){
+  const s=students.find(x=>x.id===currentId);
+  document.querySelectorAll(".prep input").forEach(cb=>cb.addEventListener("change",()=>{
+    saveTicks(s.id,s.nextGoal||"",[...document.querySelectorAll(".prep input")].filter(x=>x.checked).map(x=>+x.dataset.i))}));
+  document.getElementById("b-signout")?.addEventListener("click",()=>{stopAll();signOut(auth)});
+  document.getElementById("curve-sel")?.addEventListener("change",e=>{curveKey=e.target.value;render()});
+  if(s)bindMsgs(s);
+  if(!canEdit)return;
+  document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{currentId=b.dataset.open;location.hash=currentId;render();scrollTo(0,0)}));
+  const pick=document.getElementById("pick");
+  pick&&pick.addEventListener("change",()=>{currentId=pick.value||null;location.hash=currentId||"";render()});
+  document.getElementById("b-rate")?.addEventListener("click",()=>{const d=document.getElementById("ed-skill");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});document.getElementById("k-serve-level")?.focus({preventScroll:true})}});
+  document.getElementById("b-new")?.addEventListener("click",async()=>{
+    const ref=db.collection("students").doc(),id=ref.id;
+    try{await ref.set({name:T.newName,email:"",nextGoal:"",prep:[],sessions:[],skills:{},evals:[],updatedAt:new Date().toISOString()});
+      currentId=id;location.hash=id;setTimeout(()=>{const d=document.getElementById("ed-info");if(d){d.open=true;document.getElementById("i-name").select()}},400)}
+    catch(e){alertBox(T.addFail+(e&&e.message||""))}
+  });
+  if(!s)return;
+  document.getElementById("f-rec")?.addEventListener("submit",async ev=>{ev.preventDefault();
+    const r={rid:Math.random().toString(36).slice(2,9),date:val("r-date"),item:val("r-item").trim(),
+      before:Math.max(0,Math.min(10,parseInt(val("r-before"))||0)),after:Math.max(0,Math.min(10,parseInt(val("r-after"))||0)),note:val("r-note").trim()};
+    if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note"].forEach(i=>{const el=document.getElementById(i);if(el)el.value=""});flash("m-rec",T.added)}
+  });
+  document.getElementById("f-info")?.addEventListener("submit",async ev=>{ev.preventDefault();
+    const em=val("i-email").trim().toLowerCase();
+    if(em&&!EMAIL_RE.test(em)){flash("m-info",T.emailBad);return}
+    if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-info",T.emailUsed);return}
+    const d={name:val("i-name").trim()||T.newName,email:em,
+      gender:val("i-gender"),nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
+    if(await save(s.id,d))flash("m-info",T.saved);
+  });
+  document.getElementById("f-skill")?.addEventListener("submit",async ev=>{ev.preventDefault();
+    const skills={};
+    for(const k of SKILL_KEYS){const lv=parseFloat(val(`k-${k}-level`)),fix=!!document.getElementById(`k-${k}-fix`)?.checked,note=val(`k-${k}-note`).trim();
+      if(isFinite(lv)||fix||note){const e={fix,note};if(isFinite(lv))e.level=lv;skills[k]=e}}
+    const now=new Date(),ov=overall(skills),hist=(s.evals||[]).filter(x=>x&&x.t).slice();
+    if(ov!==null){const pt={t:now.toISOString(),overall:+ov,levels:levelsOf(skills)};
+      const last=hist[hist.length-1];if(last&&new Date(last.t).toDateString()===now.toDateString())hist[hist.length-1]=pt;else hist.push(pt)}
+    if(await save(s.id,{skills,evals:hist,evaluatedAt:now.toISOString()}))flash("m-skill",T.saved);
+  });
+  document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>save(s.id,{sessions:(s.sessions||[]).filter(r=>r.rid!==b.dataset.del)})));
+  document.getElementById("b-delstu")?.addEventListener("click",()=>{
+    const z=document.getElementById("delzone");
+    z.innerHTML=`<span>${T.delAsk(esc(s.name))}</span><button class="danger" id="b-yes" type="button">${T.delYes}</button><button id="b-no" type="button">${T.cancel}</button>`;
+    document.getElementById("b-no").onclick=()=>{z.innerHTML=`<button class="danger" type="button" id="b-delstu">${T.delStu}</button>`;bind()};
+    document.getElementById("b-yes").onclick=async()=>{try{await db.collection("students").doc(s.id).delete();currentId=null;location.hash=""}catch(e){alertBox(T.delFail)}};
+  });
+}
+
+// Firestore adapter (same shape the page already uses)
+const wrapDoc=d=>({id:d.id,exists:d.exists(),data:()=>d.data()});
+const wrapSnap=q=>({docs:q.docs.map(d=>({id:d.id,data:()=>d.data()}))});
+function makeDb(){return{collection(path){return{
+  onSnapshot(cb,err){return onSnapshot(collection(fs,path),q=>cb(wrapSnap(q)),err)},
+  get:async()=>wrapSnap(await getDocs(collection(fs,path))),
+  doc(id){const r=id?doc(fs,path,id):doc(collection(fs,path));return{id:r.id,
+    get:async()=>wrapDoc(await getDoc(r)),set:d=>setDoc(r,d),update:d=>updateDoc(r,d),delete:()=>deleteDoc(r),
+    onSnapshot(cb,err){return onSnapshot(r,d=>cb(wrapDoc(d)),err)}}}}}}}
+function stopAll(){unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];if(msgUnsub){try{msgUnsub()}catch(e){}}msgUnsub=null;msgFor=null;msgs=[];students=[];currentId=null;loaded=false;render.lastId=null}
+const inLine=/\bLine\//i.test(navigator.userAgent);
+function showLogin(err){
+  view="login";
+  const ext=location.href.split("#")[0]+(location.search?"&":"?")+"openExternalBrowser=1";
+  app.innerHTML=`<div class="card login">
+    <h1>${T.signInTitle}</h1><p class="muted" style="margin:0">${T.signInHint}</p>
+    ${inLine?`<p class="warn-t" style="margin:0">${T.lineWarn}</p><a class="linebtn" href="${esc(ext)}">${T.openExternal}</a>`
+      :`<button type="button" class="primary gbtn" id="b-signin">${T.signInBtn}</button>`}
+    ${err?`<p class="warn-t" style="margin:0">${esc(err)}</p>`:""}
+  </div>`;
+  document.getElementById("b-signin")?.addEventListener("click",async()=>{
+    const p=new GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+    try{await signInWithPopup(auth,p)}
+    catch(e){const c=e&&e.code||"";
+      if(c==="auth/popup-blocked"||c==="auth/operation-not-supported-in-this-environment"){try{await signInWithRedirect(auth,p)}catch(e2){showLogin(T.signInFail+(e2.code||e2.message))}}
+      else if(c!=="auth/popup-closed-by-user"&&c!=="auth/cancelled-popup-request")showLogin(T.signInFail+(c||e.message))}});
+}
+function start(){
+  view="app";
+  const timer=setTimeout(()=>{if(!loaded)msg(T.timeout)},10000);
+  const fail=err=>{clearTimeout(timer);msg(T.readFail(esc(err&&err.code||"error")))};
+  if(canEdit){
+    currentId=hashId();
+    unsubs.push(db.collection("students").onSnapshot(snap=>{
+      clearTimeout(timer);loaded=true;
+      students=snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      render();
+    },fail));
+  }else{
+    unsubs.push(onSnapshot(query(collection(fs,"students"),where("email","==",me.email)),q=>{
+      clearTimeout(timer);loaded=true;
+      students=q.docs.map(d=>({id:d.id,...d.data()}));currentId=students[0]?students[0].id:null;
+      render();
+    },fail));
+  }
+}
+(()=>{
+  setLang(lang);
+  if(!FIREBASE_CONFIG.apiKey){view="setup";msg(T.setupNeeded);return}
+  const fa=initializeApp(FIREBASE_CONFIG);auth=getAuth(fa);fs=getFirestore(fa);db=makeDb();
+  getRedirectResult(auth).catch(e=>showLogin(T.signInFail+(e.code||e.message)));
+  const coaches=COACH_EMAILS.map(x=>x.toLowerCase());
+  onAuthStateChanged(auth,user=>{
+    stopAll();
+    if(!user){me=null;canEdit=false;showLogin();return}
+    me={id:user.uid,name:user.displayName||"",email:(user.email||"").toLowerCase()};
+    canEdit=coaches.includes(me.email);
+    app.innerHTML=`<div class="card empty"><p class="muted">${T.loading}</p></div>`;
+    start();
+  });
+  window.addEventListener("hashchange",()=>{if(!canEdit)return;currentId=hashId();if(loaded)render()});
+})();
+</script>
+</body>
+</html>
