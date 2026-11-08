@@ -14,6 +14,7 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;font-size:15px}
 img{max-width:100%}
 [hidden]{display:none!important}
+.sk-hint{display:block;font-size:13px;font-weight:400;color:var(--muted);line-height:1.4;margin:-2px 0 2px}
 /* Layout: one phone-width column, a "score card" per student — level track, next lesson, 10-ball test rows */
 :root{
   /* TPC palette: deep navy #0c2430 + gold #eaca7e */
@@ -270,10 +271,10 @@ const I18N={
   addRec:"新增上課紀錄",date:"日期時間",item:"修正動作",itemPh:"例：反手 dink 斜線",beforeN:"修正前（/10）",afterN:"修正後（/10）",noteF:"一句話提醒（給學員看）",notePh:"例：拍面朝天、膝蓋先彎",addBtn:"加入紀錄",added:"已加入",
   editInfo:"學員資料・下次目標與改進重點",rankTitle:"學員排名（僅教練可見）",rankHint:"點名字可打開該學員。",rkOverall:"總合評比排名",rkOverallHint:"同分時以最近評估的在前",rkGain:"進步最快排名",rkGainHint:"最新總合評比減去第一次評估；同分時花的時間較短者在前。至少評估 2 次才列入。",noGain:"還沒有評估 2 次以上的學員",weeks:w=>w<1?"1 週內":`${w} 週`,male:"男生",female:"女生",unsetG:"未設定性別",genderF:"性別",noRanked:"還沒有已評分的學員",evalsN:n=>`評估 ${n} 次`,top:"第一名",name:"學員姓名",startF:"起點程度",levelF:"目前程度",targetF:"目標程度",goalF:"下次上課目標",prepF:"改進重點（一行一項）",save:"儲存",saved:"已儲存",
   delStu:"刪除這位學員",delAsk:n=>`確定刪除「${n}」和所有紀錄？無法復原。`,delYes:"確定刪除",cancel:"取消",delFail:"刪除失敗",
-  editSkill:"評估技術項目",levelSel:"技能等級",fixBox:"標記為需修正",skNote:"說明（選填）",skNotePh:"例：拋球太高、落點太淺",avgHint:"總合評比會依已評分項目的等級自動平均。",saveSkill:"儲存技術評估",
+  editSkill:"評估技術項目",levelSel:"技能等級",fixBox:"標記為需修正",skNote:"說明（選填）",skNotePh:"例：拋球太高、落點太淺",skHints:{"composure":"例：節奏太快、被動急攻、沉穩","serve":"例：落點太淺、深度不夠、大部分落點在底線","return":"例：回發太淺、回球太快、慢又深","drive":"例：過高、太急、穩定抽低","transition":"例：不知所措、太快、流暢","reset":"例：過快、過高、穩定洩力","dink":"例：不自信、過急、節奏轉換穩定","aggression":"例：錯過時機、過早擊球、可預判偷球","selection":"例：紅綠燈判斷時機，多樣回球","special":"高吊球、ATP、Erne（僅供參考）"},avgHint:"總合評比會依已評分項目的等級自動平均。",saveSkill:"儲存技術評估",
   saveFail:"儲存失敗：",retry:"請稍後再試",addFail:"無法新增學員：",newName:"新學員",
   timeout:"載入逾時。請確認已登入 claude.ai，並重新開啟連結。",openIn:"請在 claude.ai 開啟此頁面並登入。",needLogin:"需要登入 claude.ai 才能查看學習紀錄。",readFail:c=>`無法讀取紀錄（${c}）。請確認教練已分享此頁面給你。`,
-  skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"加速與反擊",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
+  skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"加速與反擊",selection:"選球決策能力",special:"特殊技術球",composure:"沉著性"}},
  ja:{locale:"ja-JP",title:"TPCoach",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
   level:"現在のレベル",start:"開始",target:"目標",gap:g=>`目標まであと ${g}`,reached:"今期の目標を達成しました",gained:g=>`（${g} 向上）`,
   overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（2.75–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
@@ -288,7 +289,7 @@ const I18N={
   addRec:"レッスン記録を追加",date:"日時",item:"修正した動作",itemPh:"例：バックハンドのクロスディンク",beforeN:"修正前（/10）",afterN:"修正後（/10）",noteF:"ひとことアドバイス（生徒に表示）",notePh:"例：面を上に向ける、先に膝を曲げる",addBtn:"記録を追加",added:"追加しました",
   editInfo:"生徒情報・次回の目標・改善ポイント",rankTitle:"生徒ランキング（コーチのみ）",rankHint:"名前をタップするとその生徒を開きます。",rkOverall:"総合評価ランキング",rkOverallHint:"同点の場合は最近評価した生徒が上",rkGain:"上達スピードランキング",rkGainHint:"最新の総合評価から初回評価を引いた値。同点の場合は期間が短い方が上。2回以上評価した生徒のみ。",noGain:"2回以上評価した生徒はまだいません",weeks:w=>w<1?"1週間以内":`${w}週間`,male:"男子",female:"女子",unsetG:"性別未設定",genderF:"性別",noRanked:"評価済みの生徒はまだいません",evalsN:n=>`評価 ${n} 回`,top:"1位",name:"生徒の名前",startF:"開始レベル",levelF:"現在のレベル",targetF:"目標レベル",goalF:"次回の目標",prepF:"改善ポイント（1行に1項目）",save:"保存",saved:"保存しました",
   delStu:"この生徒を削除",delAsk:n=>`「${n}」とすべての記録を削除しますか？元に戻せません。`,delYes:"削除する",cancel:"キャンセル",delFail:"削除できませんでした",
-  editSkill:"技術項目を評価",levelSel:"スキルレベル",fixBox:"要修正にする",skNote:"コメント（任意）",skNotePh:"例：トスが高い、落下点が浅い",avgHint:"総合評価は評価済み項目のレベルの平均で自動計算されます。",saveSkill:"技術評価を保存",
+  editSkill:"技術項目を評価",levelSel:"スキルレベル",fixBox:"要修正にする",skNote:"コメント（任意）",skNotePh:"例：トスが高い、落下点が浅い",skHints:{"composure":"例：テンポが速すぎる、受け身で焦って攻める、落ち着いている","serve":"例：落下点が浅い、深さが足りない、ほぼベースライン付近","return":"例：リターンが浅い、球が速すぎる、遅く深く返せる","drive":"例：高すぎる、急ぎすぎ、安定して低く打てる","transition":"例：迷ってしまう、前に出るのが速すぎる、スムーズ","reset":"例：速すぎる、高すぎる、安定して勢いを殺せる","dink":"例：自信がない、急ぎすぎ、テンポの切り替えが安定","aggression":"例：タイミングを逃す、打つのが早すぎる、読んでポーチできる","selection":"例：信号（赤・黄・緑）で判断、多彩な返球","special":"ロブ、ATP、アーニー（参考）"},avgHint:"総合評価は評価済み項目のレベルの平均で自動計算されます。",saveSkill:"技術評価を保存",
   saveFail:"保存できませんでした：",retry:"しばらくしてからもう一度お試しください",addFail:"生徒を追加できませんでした：",newName:"新しい生徒",
   timeout:"読み込みがタイムアウトしました。claude.ai にログインしているか確認し、リンクを開き直してください。",openIn:"claude.ai でこのページを開き、ログインしてください。",needLogin:"学習記録を見るには claude.ai へのログインが必要です。",readFail:c=>`記録を読み込めませんでした（${c}）。コーチがこのページを共有しているか確認してください。`,
   skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"加速・カウンター",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
@@ -306,7 +307,7 @@ const I18N={
   addRec:"Add a lesson record",date:"Date & time",item:"Skill corrected",itemPh:"e.g. backhand cross-court dink",beforeN:"Before (/10)",afterN:"After (/10)",noteF:"One-line tip (shown to student)",notePh:"e.g. paddle face up, bend knees first",addBtn:"Add record",added:"Added",
   editInfo:"Student, next goal and focus points",rankTitle:"Student ranking (coach only)",rankHint:"Tap a name to open that student.",rkOverall:"Overall ranking",rkOverallHint:"Ties go to the most recently rated",rkGain:"Fastest improvement",rkGainHint:"Latest overall minus the first rating; ties go to whoever took less time. Needs at least 2 ratings.",noGain:"No student has 2 or more ratings yet",weeks:w=>w<1?"under 1 week":`${w} week${w===1?"":"s"}`,male:"Men",female:"Women",unsetG:"Gender not set",genderF:"Gender",noRanked:"No rated students yet",evalsN:n=>`${n} rating${n===1?"":"s"}`,top:"No. 1",name:"Student name",startF:"Starting level",levelF:"Current level",targetF:"Goal level",goalF:"Next lesson goal",prepF:"Focus points (one per line)",save:"Save",saved:"Saved",
   delStu:"Delete this student",delAsk:n=>`Delete “${n}” and all records? This can't be undone.`,delYes:"Delete",cancel:"Cancel",delFail:"Couldn't delete",
-  editSkill:"Rate skills",levelSel:"Skill level",fixBox:"Mark as needs work",skNote:"Comment (optional)",skNotePh:"e.g. toss too high, landing too short",avgHint:"Overall is the average level of the rated skills.",saveSkill:"Save skill ratings",
+  editSkill:"Rate skills",levelSel:"Skill level",fixBox:"Mark as needs work",skNote:"Comment (optional)",skNotePh:"e.g. toss too high, landing too short",skHints:{"composure":"e.g. rushes the pace, panics into attacks, calm","serve":"e.g. lands short, lacks depth, mostly lands near the baseline","return":"e.g. too short, too fast, slow and deep","drive":"e.g. too high, rushed, consistently low","transition":"e.g. lost, moves in too fast, smooth","reset":"e.g. too fast, too high, consistently absorbs pace","dink":"e.g. lacks confidence, rushed, steady tempo changes","aggression":"e.g. misses the moment, hits too early, reads and poaches","selection":"e.g. traffic-light decisions, varied replies","special":"Lob, ATP, Erne (for reference)"},avgHint:"Overall is the average level of the rated skills.",saveSkill:"Save skill ratings",
   saveFail:"Couldn't save: ",retry:"please try again shortly",addFail:"Couldn't add student: ",newName:"New student",
   timeout:"Loading timed out. Check that you're signed in to claude.ai, then reopen the link.",openIn:"Open this page in claude.ai and sign in.",needLogin:"Sign in to claude.ai to see your progress.",readFail:c=>`Couldn't load records (${c}). Check that your coach has shared this page with you.`,
   skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Speed-up & counter",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
@@ -644,7 +645,7 @@ function skillsEditor(s){
     ${SKILL_KEYS.map(k=>{const v=sk[k]||{},cur=skillVal(v);return `<div class="grid">
       <label class="field">${T.skills[k]} · ${T.levelSel}<select id="k-${k}-level"><option value="">${T.notRatedLong}</option>${SK_LEVELS.map(lv=>`<option value="${lv}" ${cur===lv?"selected":""}>${fmtSk(lv)}</option>`).join("")}</select></label>
       <label class="fixbox"><input type="checkbox" id="k-${k}-fix" ${isFix(v)?"checked":""}><span>${T.fixBox}</span></label>
-      <label class="field" style="grid-column:1/-1">${T.skNote}<input id="k-${k}-note" value="${esc(v.note)}" placeholder="${T.skNotePh}"></label></div>`}).join("")}
+      <label class="field" style="grid-column:1/-1">${T.skNote}<span class="sk-hint">${esc((T.skHints||{})[k]||T.skNotePh)}</span><input id="k-${k}-note" value="${esc(v.note)}"></label></div>`}).join("")}
       <p class="muted" style="margin:0">${T.avgHint}</p>
       <div class="actions"><button class="primary" type="submit">${T.saveSkill}</button><span class="msg" id="m-skill"></span></div>
     </form></details>`;
