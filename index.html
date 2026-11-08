@@ -377,7 +377,7 @@ Object.assign(I18N.en,{
   msgHint:"Leave what you want to learn, questions or notes here. Your coach will reply on this page.",
   readFail:c=>`Couldn't load records (${c}). Refresh, or check that your coach has added your email.`
 });
-const SKILL_KEYS=["serve","return","drive","transition","reset","dink","aggression","selection","special","composure"];
+const SKILL_KEYS=["composure","serve","return","drive","transition","reset","dink","aggression","selection","special"];
 const LEVELS_MIN=1.0,LEVELS_MAX=5.0;
 const app=document.getElementById("app");
 let db=null,fs=null,auth=null,view="loading",unsubs=[],me=null,canEdit=false,students=[],currentId=null,loaded=false,lang=pickLang(),T=I18N[lang];
