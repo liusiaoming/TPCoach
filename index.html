@@ -164,6 +164,16 @@ details.card:not([open]){padding-block:14px;gap:0}
 .when-t{font-family:var(--display);font-size:24px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
 .cal-btns{gap:8px}
 .btn-link{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;background:var(--surface)}
+input,select,textarea{font-size:16px}
+@media (pointer:coarse){
+  button,select,.btn-link,input:not([type=checkbox]){min-height:44px}
+  details.card>summary{min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+  .seg button{min-height:36px;padding-inline:14px}
+  .prep label{min-height:40px;align-items:center}
+  .rk-name{min-height:32px}
+  .acct-row button{min-height:36px}
+}
+.tag,.rk-badge,.mtag{font-size:12px}
 .legend{border-top:1px solid var(--line);padding-top:10px}
 .legend summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--court)}
 .legend dl{margin:10px 0 6px;display:flex;flex-direction:column;gap:8px}
@@ -301,6 +311,7 @@ const I18N={
   skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Aggression",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
 };
 Object.assign(I18N.zh,{
+  prefillHint:"已依上次上課時間預填（同星期、同時段），確認後按儲存。",
   nextAtF:"下次上課時間",durF:"課程長度",mins:m=>`${m} 分鐘`,placeF:"上課地點",placePh:"例：新店 ○○ 匹克球場",noTime:"教練尚未排定下次上課時間",
   calApple:"加入 iPhone／Apple 行事曆",calGoogle:"加入 Google 日曆",calHint:"會在前一天和上課前 1 小時提醒，內容附上次上課重點與下次目標。",
   lastLesson:"上次上課內容",lessonWord:"匹克球課",remindDay:"明天有匹克球課，記得看一下改進重點",remindHour:"1 小時後上課，記得帶球拍和水",
@@ -322,6 +333,7 @@ Object.assign(I18N.zh,{
   readFail:c=>`無法讀取紀錄（${c}）。請重新整理，或確認教練已加入你的 Email。`
 });
 Object.assign(I18N.ja,{
+  prefillHint:"前回のレッスン時間（同じ曜日・時間）で入力済みです。確認して保存してください。",
   nextAtF:"次回レッスン日時",durF:"レッスン時間",mins:m=>`${m} 分`,placeF:"場所",placePh:"例：新店 ○○ ピックルボールコート",noTime:"次回レッスンの日時はまだ未定です",
   calApple:"iPhone／Apple カレンダーに追加",calGoogle:"Google カレンダーに追加",calHint:"前日とレッスン1時間前に通知されます。前回の内容と次回の目標も入っています。",
   lastLesson:"前回のレッスン内容",lessonWord:"ピックルボールレッスン",remindDay:"明日はピックルボールのレッスンです。改善ポイントを確認しましょう",remindHour:"1時間後にレッスンです。パドルと水を忘れずに",
@@ -343,6 +355,7 @@ Object.assign(I18N.ja,{
   readFail:c=>`記録を読み込めませんでした（${c}）。再読み込みするか、コーチがメールアドレスを登録しているか確認してください。`
 });
 Object.assign(I18N.en,{
+  prefillHint:"Filled in from the last lesson time (same weekday and time). Check it, then save.",
   nextAtF:"Next lesson time",durF:"Length",mins:m=>`${m} min`,placeF:"Location",placePh:"e.g. Xindian pickleball court",noTime:"Your coach hasn't scheduled the next lesson yet",
   calApple:"Add to iPhone / Apple Calendar",calGoogle:"Add to Google Calendar",calHint:"Reminds you the day before and 1 hour before, with last lesson's notes and your next goal.",
   lastLesson:"Last lesson",lessonWord:"Pickleball lesson",remindDay:"Pickleball lesson tomorrow. Review your focus points",remindHour:"Lesson in 1 hour. Bring your paddle and water",
@@ -408,11 +421,11 @@ document.getElementById("app").addEventListener("input",markDirty);document.getE
 const clean=form=>{if(form)form.querySelectorAll("[id]").forEach(el=>dirty.delete(el.id))};
 async function busy(form,fn){const b=form&&form.querySelector('button[type=submit]');if(b&&b.disabled)return;if(b)b.disabled=true;try{return await fn()}finally{if(b)b.disabled=false}}
 function curveSvg(pts){
-  const W=420,H=230,L=40,Rp=22,Tp=24,B=30,iw=W-L-Rp,ih=H-Tp-B;
+  const k=Math.min(1.5,Math.max(1,chartScale(420))),W=420,H=Math.round(230*Math.min(1.2,k)),L=Math.round(40*k),Rp=22,Tp=26,B=Math.round(30*k),iw=W-L-Rp,ih=H-Tp-B;
   const t0=pts[0].d.getTime(),t1=pts[pts.length-1].d.getTime(),span=Math.max(1,t1-t0);
   const X=d=>pts.length===1?L+iw/2:L+iw*(d.getTime()-t0)/span, Y=v=>Tp+ih*(1-(Math.max(SK_LOW,Math.min(SK_MAX,v))-SK_LOW)/(SK_MAX-SK_LOW));
   let g="";
-  SK_LEVELS.forEach(lv=>{const y=Y(lv);g+=`<line x1="${L}" y1="${y}" x2="${W-Rp}" y2="${y}" stroke="var(--line)" stroke-width="1" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--muted)">${fmtSk(lv)}</text>`});
+  SK_LEVELS.forEach(lv=>{const y=Y(lv);g+=`<line x1="${L}" y1="${y}" x2="${W-Rp}" y2="${y}" stroke="var(--line)" stroke-width="1" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="${Math.round(12*k)}" fill="var(--muted)">${fmtSk(lv)}</text>`});
   const xy=pts.map(p=>[X(p.d),Y(p.v)]);
   if(xy.length>1){g+=`<polygon points="${xy[0][0]},${Y(SK_LOW)} ${xy.map(q=>q.join(",")).join(" ")} ${xy[xy.length-1][0]},${Y(SK_LOW)}" fill="var(--court)" fill-opacity=".12"/>`;
     g+=`<polyline points="${xy.map(q=>q.join(",")).join(" ")}" fill="none" stroke="var(--court)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`}
@@ -420,8 +433,8 @@ function curveSvg(pts){
   pts.forEach((p,i)=>{const [x,y]=xy[i],last=i===pts.length-1;
     g+=`<circle cx="${x}" cy="${y}" r="${last?6:4}" fill="${last?"var(--ball)":"var(--surface)"}" stroke="var(--court)" stroke-width="2"/>`;
     if(showAll||i===0||last){const anc=pts.length===1?"middle":(i===0?"start":(last?"end":"middle"));
-      g+=`<text x="${x}" y="${H-10}" text-anchor="${anc}" font-size="13" fill="var(--muted)">${fmtDay(p.d)}</text>`;
-      g+=`<text x="${x}" y="${y-11}" text-anchor="${anc}" font-size="14" font-weight="700" fill="var(--ink)">${p.v.toFixed(2)}</text>`}});
+      g+=`<text x="${x}" y="${H-10}" text-anchor="${anc}" font-size="${Math.round(13*k)}" fill="var(--muted)">${fmtDay(p.d)}</text>`;
+      g+=`<text x="${x}" y="${y-11}" text-anchor="${anc}" font-size="${Math.round(14*k)}" font-weight="700" fill="var(--ink)">${p.v.toFixed(2)}</text>`}});
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.curve}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
 }
 function curveCard(s){
@@ -443,14 +456,16 @@ function curveCard(s){
   </section>`;
 }
 
+// viewBox width ÷ the width a chart will actually get on screen (card = page minus gutters and card padding)
+function chartScale(vb=470){const w=Math.min(innerWidth,1180)-32-36;const col=innerWidth>=840?(w-16)/2:Math.min(w,innerWidth>=600?684:w);return vb/Math.max(240,col)}
 function radar(sk){
-  const W=470,H=400,cx=235,cy=200,R=104,n=SKILL_KEYS.length;
+  const nar=chartScale()>1.1,W=470,H=nar?420:400,cx=235,cy=H/2,R=nar?88:104,n=SKILL_KEYS.length,F1=nar?19:15,F2=nar?17:14,GAP=nar?20:17;
   const ang=i=>-Math.PI/2+i*2*Math.PI/n,pt=(i,r)=>[cx+Math.cos(ang(i))*r,cy+Math.sin(ang(i))*r];
   let g="";
   const rr=lv=>R*(lv-SK_MIN)/(SK_MAX-SK_MIN);
   SK_LEVELS.forEach(lv=>{g+=`<polygon points="${SKILL_KEYS.map((_,i)=>pt(i,rr(lv)).join(",")).join(" ")}" fill="none" stroke="var(--line)" stroke-width="${lv%0.5===0?1.2:0.6}" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/>`});
   SKILL_KEYS.forEach((_,i)=>{const [x,y]=pt(i,R);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`});
-  [3.0,3.5,4.0].forEach(lv=>{g+=`<text x="${cx+4}" y="${cy-rr(lv)+12}" font-size="10" fill="var(--muted)">${lv.toFixed(1)}</text>`});
+  [3.0,3.5,4.0].forEach(lv=>{g+=`<text x="${cx+4}" y="${cy-rr(lv)+(nar?15:12)}" font-size="${nar?14:10}" fill="var(--muted)">${lv.toFixed(1)}</text>`});
   const vals=SKILL_KEYS.map(k=>skillVal(sk[k])??SK_MIN);
   g+=`<polygon points="${vals.map((v,i)=>pt(i,rr(v)).join(",")).join(" ")}" fill="var(--court)" fill-opacity=".22" stroke="var(--court)" stroke-width="2" stroke-linejoin="round"/>`;
   SKILL_KEYS.forEach((k,i)=>{
@@ -459,8 +474,8 @@ function radar(sk){
     const [lx,ly]=pt(i,R+20),c=Math.cos(ang(i)),anchor=Math.abs(c)<.2?"middle":(c>0?"start":"end");
     const sn=Math.sin(ang(i)),dy=sn<-.5?-10:(sn>.5?10:0);
     const sub=fix?(val!==null?`${T.needFix} ${fmtSk(val)}`:T.needFix):(val!==null?fmtSk(val):T.notRated);
-    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="15" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
-        <text x="${lx}" y="${ly+dy+17}" text-anchor="${anchor}" font-size="14" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
+    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="${F1}" font-weight="700" fill="var(--ink)">${T.skills[k]}</text>
+        <text x="${lx}" y="${ly+dy+GAP}" text-anchor="${anchor}" font-size="${F2}" font-weight="700" fill="${fix?"var(--warn)":(val!==null?"var(--court)":"var(--muted)")}">${sub}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${T.radar}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
 }
@@ -488,6 +503,15 @@ function duprCard(){
   </details>`;
 }
 
+const PLACE="TPC";
+const toLocal=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+function lastSlot(){try{return JSON.parse(localStorage.getItem("lastSlot")||"{}")||{}}catch(e){return {}}}
+// previous lesson time, moved forward a week at a time until it is in the future; else the coach's last-used weekday and time
+function suggestNext(s){const now=new Date();
+  if(s.nextAt){const d=new Date(s.nextAt);if(!isNaN(d)){while(d<now)d.setDate(d.getDate()+7);return toLocal(d)}}
+  const l=lastSlot();if(l.t&&l.dow!=null){const [h,m]=l.t.split(":").map(Number);const d=new Date(now);d.setHours(h,m,0,0);
+    let add=(l.dow-d.getDay()+7)%7;if(add===0&&d<=now)add=7;d.setDate(d.getDate()+add);return toLocal(d)}
+  return ""}
 function lessonStart(s){const d=new Date(s.nextAtUtc||s.nextAt);return isNaN(d)?null:d}
 function fmtLesson(s){const d=lessonStart(s);if(!d)return "";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
   const day=d.toLocaleDateString(T.locale,{month:"numeric",day:"numeric",weekday:"short"});
@@ -506,14 +530,14 @@ function lessonText(s){
 function calTitle(s){return `TPCoach ${T.lessonWord}｜${s.name||""}`}
 const utc=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
 function gcalUrl(s){const d=lessonStart(s);if(!d)return "#";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
-  const q=new URLSearchParams({action:"TEMPLATE",text:calTitle(s),dates:`${utc(d)}/${utc(e)}`,details:lessonText(s).slice(0,1500),location:s.nextPlace||""});
+  const q=new URLSearchParams({action:"TEMPLATE",text:calTitle(s),dates:`${utc(d)}/${utc(e)}`,details:lessonText(s).slice(0,1500),location:s.nextPlace||PLACE});
   return "https://calendar.google.com/calendar/render?"+q.toString()}
 function icsFile(s){const d=lessonStart(s);if(!d)return null;const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
   const x=t=>String(t).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
   const fold=l=>{const out=[];let cur="",n=0;for(const ch of l){const b=new TextEncoder().encode(ch).length;if(n+b>73){out.push(cur);cur=" "+ch;n=1+b}else{cur+=ch;n+=b}}out.push(cur);return out.join("\r\n")};
   const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TPCoach//Lesson//ZH","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
     `UID:tpcoach-${s.id}-${utc(d)}@liusiaoming.github.io`,`DTSTAMP:${utc(new Date())}`,`DTSTART:${utc(d)}`,`DTEND:${utc(e)}`,
-    `SUMMARY:${x(calTitle(s))}`,`DESCRIPTION:${x(lessonText(s))}`,s.nextPlace?`LOCATION:${x(s.nextPlace)}`:"",`URL:${location.origin+location.pathname}`,
+    `SUMMARY:${x(calTitle(s))}`,`DESCRIPTION:${x(lessonText(s))}`,`LOCATION:${x(s.nextPlace||PLACE)}`,`URL:${location.origin+location.pathname}`,
     "BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:-P1D",`DESCRIPTION:${x(T.remindDay)}`,"END:VALARM",
     "BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:-PT1H",`DESCRIPTION:${x(T.remindHour)}`,"END:VALARM",
     "END:VEVENT","END:VCALENDAR"].filter(Boolean);
@@ -525,7 +549,7 @@ function nextCard(s){
   const prep=(s.prep||[]).filter(Boolean),ticks=loadTicks(s.id,s.nextGoal||"");
   return `<section class="card" aria-label="${T.next}">
     <h2>${T.next}</h2>
-    ${s.nextAt?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span>${s.nextPlace?`<span class="muted">${esc(s.nextPlace)}</span>`:""}</div>
+    ${s.nextAt&&lessonStart(s)&&lessonStart(s).getTime()+(+s.nextDur||60)*6e4>Date.now()?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span><span class="muted">${esc(s.nextPlace||PLACE)}</span></div>
       <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s))}" target="_blank" rel="noopener">${T.calGoogle}</a></div>
       <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
     <div class="goal">${esc(s.nextGoal||T.noGoal)}</div>
@@ -600,9 +624,9 @@ function basicCard(s){
 function infoCard(s){
   return `<details class="card" id="ed-info"><summary>${T.goalTitle}${s.nextAt||s.nextGoal?` <span class="muted sum-sub">${esc([s.nextAt?fmtLesson(s):"",s.nextGoal||""].filter(Boolean).join(" · "))}</span>`:""}</summary>
     <form id="f-info" class="grid">
-      <label class="field">${T.nextAtF}<input id="i-next-at" type="datetime-local" value="${esc(s.nextAt||"")}"></label>
-      <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
-      <label class="field" style="grid-column:1/-1">${T.placeF}<input id="i-place" value="${esc(s.nextPlace||"")}" placeholder="${T.placePh}"></label>
+      <label class="field">${T.nextAtF}<input id="i-next-at" type="datetime-local" value="${esc(suggestNext(s))}"></label>
+      <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||lastSlot().dur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
+      ${suggestNext(s)&&suggestNext(s)!==(s.nextAt||"")?`<p class="muted" style="margin:0;grid-column:1/-1;font-size:13px">${T.prefillHint}</p>`:""}
       <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
       <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" rows="3">${esc((s.prep||[]).join("\n"))}</textarea></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-info"></span></div>
@@ -744,7 +768,7 @@ function bind(){
   })});
   const fInfo=document.getElementById("f-info");
   fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
-    const na=val("i-next-at"),nd=na?new Date(na):null;const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:val("i-place").trim(),nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
+    const na=val("i-next-at"),nd=na?new Date(na):null;if(nd&&!isNaN(nd))try{localStorage.setItem("lastSlot",JSON.stringify({t:na.slice(11,16),dow:nd.getDay(),dur:+val("i-dur")||60}))}catch(e){}const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:PLACE,nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
     if(await save(s.id,d)){clean(fInfo);flash("m-info",T.saved)}
   })});
   const fSkill=document.getElementById("f-skill");
@@ -828,6 +852,7 @@ function start(){
     app.innerHTML=`<div class="card empty"><p class="muted">${T.loading}</p></div>`;
     start();
   });
+  let rz,lastW=innerWidth;window.addEventListener("resize",()=>{if(Math.abs(innerWidth-lastW)<2)return;lastW=innerWidth;clearTimeout(rz);rz=setTimeout(()=>{if(loaded&&view==="app")render()},200)});
   window.addEventListener("hashchange",()=>{if(!canEdit)return;currentId=hashId();if(loaded)render()});
 })();
 </script>
