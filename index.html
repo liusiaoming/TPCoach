@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>T1 匹克球學習歷程</title>
+<title>TPCoach</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
@@ -219,7 +219,7 @@ const COACH_EMAILS=["liusiaoming@gmail.com"];
 /* ================================================ */
 
 const I18N={
- zh:{locale:"zh-TW",title:"匹克球學習歷程",loading:"正在載入學習紀錄…",history:"學習歷程",updated:"更新於 ",
+ zh:{locale:"zh-TW",title:"TPCoach",loading:"正在載入學習紀錄…",history:"學習歷程",updated:"更新於 ",
   level:"目前程度",start:"起點",target:"目標",gap:g=>`距離目標還差 ${g} 級`,reached:"已達成本階段目標",gained:g=>`，已進步 ${g} 級`,
   overview:"能力總覽",rateDef:"每項依技能等級評分（3.0–4.0，每級 0.25）",overall:"總合評比",best:"最強項",needFix:"需修正",none:"無",notRated:"未評估",notRatedLong:"尚未評估",legendTitle:"等級說明",
   legend:{"3.0":"能穩定對打，發球、接發球大多進區；開始練丁克和第三拍，但還不穩定","3.5":"能控制方向與深度，懂得上網與搭檔移位；丁克較穩定，開始使用第三拍放小球","4.0":"失誤少，能依情況選擇放小球或抽球；網前能耐心丁克、重置來球，有團隊戰術觀念"},
@@ -237,7 +237,7 @@ const I18N={
   saveFail:"儲存失敗：",retry:"請稍後再試",addFail:"無法新增學員：",newName:"新學員",
   timeout:"載入逾時。請確認已登入 claude.ai，並重新開啟連結。",openIn:"請在 claude.ai 開啟此頁面並登入。",needLogin:"需要登入 claude.ai 才能查看學習紀錄。",readFail:c=>`無法讀取紀錄（${c}）。請確認教練已分享此頁面給你。`,
   skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"攻擊侵略性",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
- ja:{locale:"ja-JP",title:"ピックルボール学習記録",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
+ ja:{locale:"ja-JP",title:"TPCoach",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
   level:"現在のレベル",start:"開始",target:"目標",gap:g=>`目標まであと ${g}`,reached:"今期の目標を達成しました",gained:g=>`（${g} 向上）`,
   overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（3.0–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
   legend:{"3.0":"ラリーが安定し、サーブとリターンはほぼ入る。ディンクとサードショットを練習中だが、まだ安定しない","3.5":"コースと深さをコントロールでき、ネットへの前進やパートナーとの連携を理解している。ディンクが安定し、サードショットドロップを使い始める","4.0":"ミスが少なく、状況に応じてドロップとドライブを使い分ける。ネット際で粘り強くディンクし、速い球をリセットでき、チーム戦術の意識がある"},
@@ -255,7 +255,7 @@ const I18N={
   saveFail:"保存できませんでした：",retry:"しばらくしてからもう一度お試しください",addFail:"生徒を追加できませんでした：",newName:"新しい生徒",
   timeout:"読み込みがタイムアウトしました。claude.ai にログインしているか確認し、リンクを開き直してください。",openIn:"claude.ai でこのページを開き、ログインしてください。",needLogin:"学習記録を見るには claude.ai へのログインが必要です。",readFail:c=>`記録を読み込めませんでした（${c}）。コーチがこのページを共有しているか確認してください。`,
   skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"攻撃性",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
- en:{locale:"en-US",title:"Pickleball Progress",loading:"Loading your progress…",history:"Progress record",updated:"Updated ",
+ en:{locale:"en-US",title:"TPCoach",loading:"Loading your progress…",history:"Progress record",updated:"Updated ",
   level:"Current level",start:"Start",target:"Goal",gap:g=>`${g} to reach your goal`,reached:"Goal reached for this stage",gained:g=>` · up ${g} since you started`,
   overview:"Skill overview",rateDef:"Each skill is rated by level (3.0–4.0, in 0.25 steps)",overall:"Overall",best:"Strongest",needFix:"Needs work",none:"None",notRated:"Not rated",notRatedLong:"Not rated yet",legendTitle:"What the levels mean",
   legend:{"3.0":"Rallies consistently and gets most serves and returns in; learning dinks and third shots, still inconsistent","3.5":"Controls direction and depth, moves to the net and with a partner; dinks more reliably and starts using third-shot drops","4.0":"Makes few errors, chooses between drop and drive; dinks patiently, resets hard balls and plays as a team"},
@@ -280,7 +280,7 @@ Object.assign(I18N.zh,{
   logoutHint:"共用裝置使用後請按登出。",signOutBtn:"登出",
   notLinked:"教練還沒把你的帳號加入學習歷程",sendCode:"請把下面這個 Email 告訴教練，教練加入後重新整理即可看到。",
   noId:"無法取得你的帳號資訊，請重新登入。",
-  signInTitle:"T1 匹克球學習歷程",signInHint:"請用 Google 帳號登入，只會看到你自己的學習紀錄。",signInBtn:"使用 Google 登入",signInFail:"登入失敗：",
+  signInTitle:"TPCoach",signInHint:"請用 Google 帳號登入，只會看到你自己的學習紀錄。",signInBtn:"使用 Google 登入",signInFail:"登入失敗：",
   lineWarn:"你正在 LINE 內建瀏覽器中開啟，Google 不允許在這裡登入。請點右上角選單選擇「以預設瀏覽器開啟」，或按下方按鈕。",openExternal:"用瀏覽器開啟",
   setupNeeded:"尚未完成 Firebase 設定：請在 index.html 的設定區填入 FIREBASE_CONFIG。",
   emailF:"學員 Google Email（登入用）",emailPh:"例：student@gmail.com",emailBad:"Email 格式不正確",emailUsed:"這個 Email 已經用在其他學員",
@@ -293,7 +293,7 @@ Object.assign(I18N.ja,{
   logoutHint:"共有端末では使用後にログアウトしてください。",signOutBtn:"ログアウト",
   notLinked:"コーチがまだあなたのアカウントを登録していません",sendCode:"下のメールアドレスをコーチに伝えてください。登録後にページを再読み込みすると表示されます。",
   noId:"アカウント情報を取得できません。もう一度ログインしてください。",
-  signInTitle:"T1 ピックルボール学習記録",signInHint:"Google アカウントでログインしてください。自分の記録だけが表示されます。",signInBtn:"Google でログイン",signInFail:"ログインできませんでした：",
+  signInTitle:"TPCoach",signInHint:"Google アカウントでログインしてください。自分の記録だけが表示されます。",signInBtn:"Google でログイン",signInFail:"ログインできませんでした：",
   lineWarn:"LINE のアプリ内ブラウザで開いています。Google はここでのログインを許可していません。右上のメニューから「デフォルトのブラウザで開く」を選ぶか、下のボタンを押してください。",openExternal:"ブラウザで開く",
   setupNeeded:"Firebase の設定が未完了です。index.html の設定欄に FIREBASE_CONFIG を入力してください。",
   emailF:"生徒の Google メール（ログイン用）",emailPh:"例：student@gmail.com",emailBad:"メールアドレスの形式が正しくありません",emailUsed:"このメールアドレスは別の生徒に使われています",
@@ -306,7 +306,7 @@ Object.assign(I18N.en,{
   logoutHint:"Sign out when you're done on a shared device.",signOutBtn:"Sign out",
   notLinked:"Your coach hasn't added your account yet",sendCode:"Give your coach the email below. Once they add it, refresh this page.",
   noId:"Couldn't read your account. Please sign in again.",
-  signInTitle:"T1 Pickleball Progress",signInHint:"Sign in with Google. You'll only see your own progress.",signInBtn:"Sign in with Google",signInFail:"Couldn't sign in: ",
+  signInTitle:"TPCoach",signInHint:"Sign in with Google. You'll only see your own progress.",signInBtn:"Sign in with Google",signInFail:"Couldn't sign in: ",
   lineWarn:"You're in LINE's built-in browser, where Google doesn't allow sign-in. Use the menu at the top right to open in your default browser, or tap the button below.",openExternal:"Open in browser",
   setupNeeded:"Firebase isn't set up yet. Fill in FIREBASE_CONFIG in the settings block of index.html.",
   emailF:"Student's Google email (for sign-in)",emailPh:"e.g. student@gmail.com",emailBad:"That email doesn't look right",emailUsed:"That email is already used by another student",
