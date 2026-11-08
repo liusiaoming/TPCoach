@@ -139,6 +139,7 @@ input,select,textarea{border:1px solid var(--line);background:var(--bg);border-r
 .login{align-items:flex-start;padding-block:28px}
 .login h1{font-size:22px}
 .gbtn{font-size:16px;padding:10px 18px}
+.sum-sub{font-weight:400;font-size:13px;margin-left:6px}
 .legend{border-top:1px solid var(--line);padding-top:10px}
 .legend summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--court)}
 .legend dl{margin:10px 0 6px;display:flex;flex-direction:column;gap:8px}
@@ -276,6 +277,7 @@ const I18N={
   skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Aggression",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
 };
 Object.assign(I18N.zh,{
+  basicTitle:"學員基本資料",goalTitle:"下次目標與改進重點",
   timeout:"載入逾時，請檢查網路後重新整理。",notBound:"還沒填學員 Email，學員目前看不到這份紀錄",
   shareHint:"新增學員後，在「學員資料」填入學員登入用的 Google Email 並儲存。把網址傳給學員，學員用該 Google 帳號登入就只會看到自己的紀錄。",
   logoutHint:"共用裝置使用後請按登出。",signOutBtn:"登出",
@@ -289,6 +291,7 @@ Object.assign(I18N.zh,{
   readFail:c=>`無法讀取紀錄（${c}）。請重新整理，或確認教練已加入你的 Email。`
 });
 Object.assign(I18N.ja,{
+  basicTitle:"生徒の基本情報",goalTitle:"次回の目標と改善ポイント",
   timeout:"読み込みがタイムアウトしました。通信状況を確認して再読み込みしてください。",notBound:"生徒のメールが未入力のため、生徒はまだこの記録を見られません",
   shareHint:"生徒を追加したら「生徒情報」にログイン用の Google メールを入力して保存します。URL を送り、生徒がその Google アカウントでログインすると自分の記録だけが表示されます。",
   logoutHint:"共有端末では使用後にログアウトしてください。",signOutBtn:"ログアウト",
@@ -302,6 +305,7 @@ Object.assign(I18N.ja,{
   readFail:c=>`記録を読み込めませんでした（${c}）。再読み込みするか、コーチがメールアドレスを登録しているか確認してください。`
 });
 Object.assign(I18N.en,{
+  basicTitle:"Student details",goalTitle:"Next goal and focus points",
   timeout:"Loading timed out. Check your connection and refresh.",notBound:"No student email yet, so the student can't see this record",
   shareHint:"After adding a student, enter the Google email they sign in with under Student details and save. Send them the web address; once they sign in with that Google account they see only their own record.",
   logoutHint:"Sign out when you're done on a shared device.",signOutBtn:"Sign out",
@@ -496,18 +500,25 @@ function recCard(s){
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.addBtn}</button><span class="msg" id="m-rec"></span></div>
     </form></details>`;
 }
-function infoCard(s){
-  return `<details class="card" id="ed-info" open><summary>${T.editInfo}</summary>
-    <form id="f-info" class="grid">
+function basicCard(s){
+  return `<details class="card coach-ed" id="ed-basic" ${s.email?"":"open"}><summary>${T.basicTitle}${s.email?` <span class="muted sum-sub">${esc(s.email)}</span>`:""}</summary>
+    <form id="f-basic" class="grid">
       <label class="field" style="grid-column:1/-1">${T.name}<input id="i-name" value="${esc(s.name)}" required></label>
       <label class="field" style="grid-column:1/-1">${T.emailF}<input id="i-email" type="email" inputmode="email" autocomplete="off" value="${esc(s.email)}" placeholder="${T.emailPh}"></label>
       ${s.email?"":`<p class="muted warn-t" style="margin:0;grid-column:1/-1">${T.notBound}</p>`}
       <label class="field">${T.genderF}<select id="i-gender"><option value="">${T.unsetG}</option><option value="m" ${s.gender==="m"?"selected":""}>${T.male}</option><option value="f" ${s.gender==="f"?"selected":""}>${T.female}</option></select></label>
+      <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-basic"></span></div>
+    </form>
+    <div class="confirm" id="delzone"><button class="danger" type="button" id="b-delstu">${T.delStu}</button></div>
+  </details>`;
+}
+function infoCard(s){
+  return `<details class="card" id="ed-info" open><summary>${T.goalTitle}</summary>
+    <form id="f-info" class="grid">
       <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
       <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" rows="3">${esc((s.prep||[]).join("\n"))}</textarea></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-info"></span></div>
     </form>
-    <div class="confirm" id="delzone"><button class="danger" type="button" id="b-delstu">${T.delStu}</button></div>
   </details>`;
 }
 
@@ -565,7 +576,7 @@ function render(){
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
   let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
   const sy=window.scrollY;
-  const open={};["ed-rec","ed-info","ed-skill","rank"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
   let h=accountBar();
   if(canEdit)h+=coachBar()+rankCard(!s);
@@ -576,7 +587,7 @@ function render(){
   const upd=s.updatedAt?new Date(s.updatedAt).toLocaleDateString(T.locale):"";
   h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
   watchMsgs(s.id);
-  h+=canEdit?skillsCard(s)+curveCard(s)+skillsEditor(s)+recCard(s)+rowsCard(s)+infoCard(s)+nextCard(s)
+  h+=canEdit?basicCard(s)+skillsCard(s)+curveCard(s)+skillsEditor(s)+recCard(s)+rowsCard(s)+infoCard(s)+nextCard(s)
             :skillsCard(s)+curveCard(s)+nextCard(s)+rowsCard(s);
   app.innerHTML=h;
   if(open.rank!==undefined&&document.getElementById("rank"))document.getElementById("rank").open=open.rank;
@@ -620,7 +631,7 @@ function bind(){
   document.getElementById("b-new")?.addEventListener("click",async()=>{
     const ref=db.collection("students").doc(),id=ref.id;
     try{await ref.set({name:T.newName,email:"",nextGoal:"",prep:[],sessions:[],skills:{},evals:[],updatedAt:new Date().toISOString()});
-      currentId=id;location.hash=id;setTimeout(()=>{const d=document.getElementById("ed-info");if(d){d.open=true;document.getElementById("i-name").select()}},400)}
+      currentId=id;location.hash=id;setTimeout(()=>{const d=document.getElementById("ed-basic");if(d){d.open=true;d.scrollIntoView({block:"start"});document.getElementById("i-name").select()}},400)}
     catch(e){alertBox(T.addFail+(e&&e.message||""))}
   });
   if(!s)return;
@@ -630,13 +641,17 @@ function bind(){
       before:Math.max(0,Math.min(10,parseInt(val("r-before"))||0)),after:Math.max(0,Math.min(10,parseInt(val("r-after"))||0)),note:val("r-note").trim()};
     if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note"].forEach(i=>{dirty.delete(i);const el=document.getElementById(i);if(el)el.value=""});dirty.delete("r-date");flash("m-rec",T.added)}
   })});
+  const fBasic=document.getElementById("f-basic");
+  fBasic?.addEventListener("submit",ev=>{ev.preventDefault();busy(fBasic,async()=>{
+    const em=val("i-email").trim().toLowerCase();
+    if(em&&!EMAIL_RE.test(em)){flash("m-basic",T.emailBad);return}
+    if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-basic",T.emailUsed);return}
+    const d={name:val("i-name").trim()||T.newName,email:em,gender:val("i-gender")};
+    if(await save(s.id,d)){clean(fBasic);flash("m-basic",T.saved)}
+  })});
   const fInfo=document.getElementById("f-info");
   fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
-    const em=val("i-email").trim().toLowerCase();
-    if(em&&!EMAIL_RE.test(em)){flash("m-info",T.emailBad);return}
-    if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-info",T.emailUsed);return}
-    const d={name:val("i-name").trim()||T.newName,email:em,
-      gender:val("i-gender"),nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
+    const d={nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
     if(await save(s.id,d)){clean(fInfo);flash("m-info",T.saved)}
   })});
   const fSkill=document.getElementById("f-skill");
