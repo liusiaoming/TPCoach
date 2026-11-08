@@ -33,6 +33,16 @@ img{max-width:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:560px;margin:0 auto;padding-block:20px 48px;display:flex;flex-direction:column;gap:16px}
+.cols{display:flex;flex-direction:column;gap:16px;min-width:0}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* iPhone Duo unfolded portrait (~626pt) and small tablets: roomier single column */
+@media (min-width:600px){.wrap{max-width:720px}.radar-wrap{max-width:520px;margin-inline:auto;width:100%}}
+/* iPhone Duo unfolded landscape (~890pt), iPad, desktop: overview left, work right */
+@media (min-width:840px){
+  .wrap{max-width:1180px}
+  .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+  .radar-wrap{max-width:none}
+}
 h1,h2{margin:0;text-wrap:balance}
 h2{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -140,6 +150,20 @@ input,select,textarea{border:1px solid var(--line);background:var(--bg);border-r
 .login h1{font-size:22px}
 .gbtn{font-size:16px;padding:10px 18px}
 .sum-sub{font-weight:400;font-size:13px;margin-left:6px}
+.dupr>summary{cursor:pointer;font-weight:700}
+.dupr-list{margin:0 0 6px;display:flex;flex-direction:column;gap:10px}
+.dupr-list>div{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:baseline;padding-top:10px;border-top:1px solid var(--line)}
+.dupr-list dt{font-family:var(--display);font-size:24px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
+.dupr-list dd{margin:0;display:flex;flex-direction:column;gap:2px;min-width:0}
+.dupr-list dd span{font-size:14px;color:var(--muted)}
+.dupr a{color:var(--court)}
+.fold>.card{border:0;background:transparent;padding:0}
+details.card:not([open]){padding-block:14px;gap:0}
+.fold>.card>h2:first-child{display:none}
+.when{display:flex;flex-direction:column;gap:2px}
+.when-t{font-family:var(--display);font-size:24px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
+.cal-btns{gap:8px}
+.btn-link{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;background:var(--surface)}
 .legend{border-top:1px solid var(--line);padding-top:10px}
 .legend summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--court)}
 .legend dl{margin:10px 0 6px;display:flex;flex-direction:column;gap:8px}
@@ -223,7 +247,7 @@ const COACH_EMAILS=["liusiaoming@gmail.com"];
 const I18N={
  zh:{locale:"zh-TW",title:"TPCoach",loading:"正在載入學習紀錄…",history:"學習歷程",updated:"更新於 ",
   level:"目前程度",start:"起點",target:"目標",gap:g=>`距離目標還差 ${g} 級`,reached:"已達成本階段目標",gained:g=>`，已進步 ${g} 級`,
-  overview:"能力總覽",rateDef:"每項依技能等級評分（3.0–4.0，每級 0.25）",overall:"總合評比",best:"最強項",needFix:"需修正",none:"無",notRated:"未評估",notRatedLong:"尚未評估",legendTitle:"等級說明",
+  overview:"能力總覽",rateDef:"每項依技能等級評分（2.75–4.0，每級 0.25）",overall:"總合評比",best:"最強項",needFix:"需修正",none:"無",notRated:"未評估",notRatedLong:"尚未評估",legendTitle:"等級說明",
   legend:{"3.0":"能穩定對打，發球、接發球大多進區；開始練丁克和第三拍，但還不穩定","3.5":"能控制方向與深度，懂得上網與搭檔移位；丁克較穩定，開始使用第三拍放小球","4.0":"失誤少，能依情況選擇放小球或抽球；網前能耐心丁克、重置來球，有團隊戰術觀念"},
   between:"3.25、3.75 代表介於兩級之間",radar:"能力雷達圖",sep:"、",colon:"：",
   next:"下次上課",noGoal:"教練尚未設定",prepHint:"完成就打勾（只存在你的裝置）",improve:"改進重點",msgTitle:"留言給教練",msgHint:"寫下想學的技術、問題或備註，按「用 LINE 傳送」並選擇教練傳出。教練回覆後會顯示在下方。",mtypes:{ask:"想學的",q:"問題",note:"備註"},msgPh:"例：想學反手抽球、膝蓋有點痠",send:"送出",sent:"已送出",reply:"教練回覆",replyPh:"回覆學員…",replyBtn:"回覆",fromStu:"學員",fromLog:"教練代記錄",noMsg:"還沒有留言",lineTitle:"這個頁面目前無法直接送出留言，請改用 LINE 傳給教練：",lineBtn:"用 LINE 傳送",copyMsg:"複製內容",logTitle:"記錄學員從 LINE 傳來的留言",logBtn:"加入",delMsg:"刪除",msgFail:"送出失敗：",
@@ -241,7 +265,7 @@ const I18N={
   skills:{serve:"發球",return:"接發球",drive:"抽球",transition:"過渡區流暢度",reset:"重置能力",dink:"丁克",aggression:"攻擊侵略性",selection:"選球決策能力",special:"特殊技術球",composure:"沈著性"}},
  ja:{locale:"ja-JP",title:"TPCoach",loading:"学習記録を読み込み中…",history:"学習記録",updated:"更新日 ",
   level:"現在のレベル",start:"開始",target:"目標",gap:g=>`目標まであと ${g}`,reached:"今期の目標を達成しました",gained:g=>`（${g} 向上）`,
-  overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（3.0–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
+  overview:"能力の全体像",rateDef:"各項目をスキルレベルで評価（2.75–4.0、0.25刻み）",overall:"総合評価",best:"得意項目",needFix:"要修正",none:"なし",notRated:"未評価",notRatedLong:"未評価",legendTitle:"レベルの目安",
   legend:{"3.0":"ラリーが安定し、サーブとリターンはほぼ入る。ディンクとサードショットを練習中だが、まだ安定しない","3.5":"コースと深さをコントロールでき、ネットへの前進やパートナーとの連携を理解している。ディンクが安定し、サードショットドロップを使い始める","4.0":"ミスが少なく、状況に応じてドロップとドライブを使い分ける。ネット際で粘り強くディンクし、速い球をリセットでき、チーム戦術の意識がある"},
   between:"3.25・3.75 は2つのレベルの中間です",radar:"能力レーダーチャート",sep:"、",colon:"：",
   next:"次回のレッスン",noGoal:"コーチが設定中です",prepHint:"できたらチェック（この端末にのみ保存）",improve:"改善ポイント",msgTitle:"コーチへのメッセージ",msgHint:"習いたい技術、質問、メモを書いて「LINE で送る」を押し、コーチを選んで送信してください。コーチの返信は下に表示されます。",mtypes:{ask:"習いたいこと",q:"質問",note:"メモ"},msgPh:"例：バックハンドのドライブを習いたい、膝が少し痛い",send:"送信",sent:"送信しました",reply:"コーチの返信",replyPh:"生徒に返信…",replyBtn:"返信",fromStu:"生徒",fromLog:"コーチが代理記録",noMsg:"まだメッセージはありません",lineTitle:"このページからは直接送信できません。LINE でコーチに送ってください：",lineBtn:"LINE で送る",copyMsg:"内容をコピー",logTitle:"LINE で届いたメッセージを記録",logBtn:"追加",delMsg:"削除",msgFail:"送信できませんでした：",
@@ -259,7 +283,7 @@ const I18N={
   skills:{serve:"サーブ",return:"リターン",drive:"ドライブ",transition:"トランジション",reset:"リセット",dink:"ディンク",aggression:"攻撃性",selection:"ショット選択",special:"特殊ショット",composure:"冷静さ"}},
  en:{locale:"en-US",title:"TPCoach",loading:"Loading your progress…",history:"Progress record",updated:"Updated ",
   level:"Current level",start:"Start",target:"Goal",gap:g=>`${g} to reach your goal`,reached:"Goal reached for this stage",gained:g=>` · up ${g} since you started`,
-  overview:"Skill overview",rateDef:"Each skill is rated by level (3.0–4.0, in 0.25 steps)",overall:"Overall",best:"Strongest",needFix:"Needs work",none:"None",notRated:"Not rated",notRatedLong:"Not rated yet",legendTitle:"What the levels mean",
+  overview:"Skill overview",rateDef:"Each skill is rated by level (2.75–4.0, in 0.25 steps)",overall:"Overall",best:"Strongest",needFix:"Needs work",none:"None",notRated:"Not rated",notRatedLong:"Not rated yet",legendTitle:"What the levels mean",
   legend:{"3.0":"Rallies consistently and gets most serves and returns in; learning dinks and third shots, still inconsistent","3.5":"Controls direction and depth, moves to the net and with a partner; dinks more reliably and starts using third-shot drops","4.0":"Makes few errors, chooses between drop and drive; dinks patiently, resets hard balls and plays as a team"},
   between:"3.25 and 3.75 sit between two levels",radar:"Skill radar chart",sep:", ",colon:": ",
   next:"Next lesson",noGoal:"Your coach hasn't set this yet",prepHint:"Tick each one when done (saved on this device only)",improve:"Focus points",msgTitle:"Message your coach",msgHint:"Write what you want to learn, a question or a note, tap Send with LINE and choose your coach. Replies show up below.",mtypes:{ask:"Want to learn",q:"Question",note:"Note"},msgPh:"e.g. I'd like to learn the backhand drive; my knee is a bit sore",send:"Send",sent:"Sent",reply:"Coach reply",replyPh:"Reply to the student…",replyBtn:"Reply",fromStu:"Student",fromLog:"Logged by coach",noMsg:"No messages yet",lineTitle:"This page can't send your message directly. Send it to your coach on LINE:",lineBtn:"Send with LINE",copyMsg:"Copy text",logTitle:"Log a message the student sent on LINE",logBtn:"Add",delMsg:"Delete",msgFail:"Couldn't send: ",
@@ -277,6 +301,13 @@ const I18N={
   skills:{serve:"Serve",return:"Return",drive:"Drive",transition:"Transition",reset:"Reset",dink:"Dink",aggression:"Aggression",selection:"Shot selection",special:"Special shots",composure:"Composure"}}
 };
 Object.assign(I18N.zh,{
+  nextAtF:"下次上課時間",durF:"課程長度",mins:m=>`${m} 分鐘`,placeF:"上課地點",placePh:"例：新店 ○○ 匹克球場",noTime:"教練尚未排定下次上課時間",
+  calApple:"加入 iPhone／Apple 行事曆",calGoogle:"加入 Google 日曆",calHint:"會在前一天和上課前 1 小時提醒，內容附上次上課重點與下次目標。",
+  lastLesson:"上次上課內容",lessonWord:"匹克球課",remindDay:"明天有匹克球課，記得看一下改進重點",remindHour:"1 小時後上課，記得帶球拍和水",
+  noEmailYet:"尚未填 Email",countRec:n=>`${n} 筆`,countMsg:(n,u)=>u?`${n} 則・${u} 則未回覆`:`${n} 則`,
+  duprTitle:"DUPR 等級參考（全球標準）",duprIntro:"對照下表了解各等級的程度。本頁的單項評比（2.75–4.0）是教練依同一套標準評估；2.75、3.25、3.75 代表介於兩級之間。",
+  duprNote:"DUPR 正式分數由實際比賽結果計算（2.000–8.000），不是依技術打分；比賽越多、分數越準。",
+  dupr:[["2.0","初學","能打短回合，發球尚算穩定；以正手為主，還不懂廚房規則與第三拍。"],["2.5","初學到中級","能打中等長度回合，發球更穩，接發球後開始上網，但非受迫性失誤仍多。"],["3.0","中級","發球穩定、接發球能打深；接發後會上網，懂第三拍放小球，有意識地丁克但還不穩定。"],["3.5","中高級","第三拍放小球常能進廚房；丁克有目的、會攻擊高球；開始學站位輪轉與搭檔溝通。"],["4.0","進階","沒有明顯弱點；第三拍可靠，丁克有耐心與落點；加速時機好、防守紮實，可參加公開賽。"],["4.5","高階","站位輪轉熟練，攻守都會用旋轉；能在丁克中製造機會，重置穩定。"],["5.0+","專家／職業","各項球路接近職業水準，穩定參加高水準賽事。"]],
   basicTitle:"學員基本資料",goalTitle:"下次目標與改進重點",
   timeout:"載入逾時，請檢查網路後重新整理。",notBound:"還沒填學員 Email，學員目前看不到這份紀錄",
   shareHint:"新增學員後，在「學員資料」填入學員登入用的 Google Email 並儲存。把網址傳給學員，學員用該 Google 帳號登入就只會看到自己的紀錄。",
@@ -291,6 +322,13 @@ Object.assign(I18N.zh,{
   readFail:c=>`無法讀取紀錄（${c}）。請重新整理，或確認教練已加入你的 Email。`
 });
 Object.assign(I18N.ja,{
+  nextAtF:"次回レッスン日時",durF:"レッスン時間",mins:m=>`${m} 分`,placeF:"場所",placePh:"例：新店 ○○ ピックルボールコート",noTime:"次回レッスンの日時はまだ未定です",
+  calApple:"iPhone／Apple カレンダーに追加",calGoogle:"Google カレンダーに追加",calHint:"前日とレッスン1時間前に通知されます。前回の内容と次回の目標も入っています。",
+  lastLesson:"前回のレッスン内容",lessonWord:"ピックルボールレッスン",remindDay:"明日はピックルボールのレッスンです。改善ポイントを確認しましょう",remindHour:"1時間後にレッスンです。パドルと水を忘れずに",
+  noEmailYet:"メール未入力",countRec:n=>`${n} 件`,countMsg:(n,u)=>u?`${n} 件・未返信 ${u} 件`:`${n} 件`,
+  duprTitle:"DUPR レベルの目安（世界基準）",duprIntro:"下の表で各レベルの目安を確認できます。このページの項目別評価（2.75–4.0）はコーチが同じ基準で評価したもので、2.75・3.25・3.75 は2つのレベルの中間です。",
+  duprNote:"DUPR の正式レーティングは実際の試合結果から算出され（2.000–8.000）、技術の採点ではありません。試合数が多いほど正確になります。",
+  dupr:[["2.0","初心者","短いラリーができ、サーブはある程度安定。フォアハンド中心で、キッチンやサードショットはまだ理解していない。"],["2.5","初心者〜中級","中程度のラリーができ、サーブが安定。リターン後に前へ出始めるが、凡ミスはまだ多い。"],["3.0","中級","サーブが安定し、リターンを深く返せる。前に出てサードショットドロップを知っており、意図してディンクするがまだ不安定。"],["3.5","中上級","サードショットドロップがよくキッチンに入る。目的を持ってディンクし、浮いた球を攻撃。スタッキングやパートナーとの連携を学び始める。"],["4.0","上級","大きな弱点がない。サードショットが安定し、ディンクは粘り強くコースも良い。仕掛けのタイミングが良く守備も堅い。オープン大会に出場できる。"],["4.5","高上級","スタッキングが確実で、攻守にスピンを使える。ディンク戦でチャンスを作り、リセットが安定。"],["5.0+","エキスパート／プロ","全ショットがプロに近いレベルで安定し、高レベルの大会で戦える。"]],
   basicTitle:"生徒の基本情報",goalTitle:"次回の目標と改善ポイント",
   timeout:"読み込みがタイムアウトしました。通信状況を確認して再読み込みしてください。",notBound:"生徒のメールが未入力のため、生徒はまだこの記録を見られません",
   shareHint:"生徒を追加したら「生徒情報」にログイン用の Google メールを入力して保存します。URL を送り、生徒がその Google アカウントでログインすると自分の記録だけが表示されます。",
@@ -305,6 +343,13 @@ Object.assign(I18N.ja,{
   readFail:c=>`記録を読み込めませんでした（${c}）。再読み込みするか、コーチがメールアドレスを登録しているか確認してください。`
 });
 Object.assign(I18N.en,{
+  nextAtF:"Next lesson time",durF:"Length",mins:m=>`${m} min`,placeF:"Location",placePh:"e.g. Xindian pickleball court",noTime:"Your coach hasn't scheduled the next lesson yet",
+  calApple:"Add to iPhone / Apple Calendar",calGoogle:"Add to Google Calendar",calHint:"Reminds you the day before and 1 hour before, with last lesson's notes and your next goal.",
+  lastLesson:"Last lesson",lessonWord:"Pickleball lesson",remindDay:"Pickleball lesson tomorrow. Review your focus points",remindHour:"Lesson in 1 hour. Bring your paddle and water",
+  noEmailYet:"No email yet",countRec:n=>`${n} record${n===1?"":"s"}`,countMsg:(n,u)=>u?`${n} · ${u} unanswered`:`${n}`,
+  duprTitle:"DUPR levels (global standard)",duprIntro:"Use this table to see what each level looks like. The per-skill ratings on this page (2.75–4.0) are your coach's assessment against the same standard; 2.75, 3.25 and 3.75 sit between two levels.",
+  duprNote:"Official DUPR ratings are calculated from real match results (2.000–8.000), not from skill scoring; the more matches you play, the more accurate it gets.",
+  dupr:[["2.0","Beginner","Short rallies, fairly steady serve; mostly forehands, doesn't yet understand the kitchen or third shots."],["2.5","Beginner–intermediate","Medium rallies, more reliable serve, starts moving up after the return, still many unforced errors."],["3.0","Intermediate","Dependable serve and deep returns; moves forward, knows the third-shot drop, dinks with intent but not consistently."],["3.5","Intermediate–advanced","Third-shot drops often land in the kitchen; purposeful dinks, attacks pop-ups; learning stacking and partner communication."],["4.0","Advanced","No major weaknesses; reliable third shots, patient placed dinks, well-timed speed-ups and solid defense; can play open events."],["4.5","High advanced","Reliable stacking, uses spin on offense and defense, creates openings in dink rallies, resets consistently."],["5.0+","Expert / pro","Near-professional technique on every shot; competes at high-level tournaments."]],
   basicTitle:"Student details",goalTitle:"Next goal and focus points",
   timeout:"Loading timed out. Check your connection and refresh.",notBound:"No student email yet, so the student can't see this record",
   shareHint:"After adding a student, enter the Google email they sign in with under Student details and save. Send them the web address; once they sign in with that Google account they see only their own record.",
@@ -339,8 +384,8 @@ function newId(){const a="abcdefghijkmnpqrstuvwxyz23456789";let s="s-";for(let i
 function loadTicks(id,goal){try{const v=JSON.parse(localStorage.getItem("prep:"+id)||"null");return v&&v.goal===goal?v.ticks:[]}catch(e){return []}}
 function saveTicks(id,goal,ticks){try{localStorage.setItem("prep:"+id,JSON.stringify({goal,ticks}))}catch(e){}}
 function dots(n){let h="";for(let i=0;i<10;i++)h+=`<i class="${i<n?"on":""}"></i>`;return `<div class="dots" aria-label="${n} / 10">${h}</div>`}
-const SK_LEVELS=[3.0,3.25,3.5,3.75,4.0],SK_MIN=2.75,SK_MAX=4.0;
-function skillVal(v){if(!v)return null;const r=parseFloat(v.level);return isFinite(r)?Math.max(3,Math.min(SK_MAX,r)):null}
+const SK_LEVELS=[2.75,3.0,3.25,3.5,3.75,4.0],SK_MIN=2.5,SK_MAX=4.0,SK_LOW=2.75;
+function skillVal(v){if(!v)return null;const r=parseFloat(v.level);return isFinite(r)?Math.max(SK_LOW,Math.min(SK_MAX,r)):null}
 function isFix(v){return !!v&&(v.fix===true||v.mode==="fix")}
 function fmtSk(n){return n%0.5===0?n.toFixed(1):n.toFixed(2)}
 function overall(sk){const vals=SKILL_KEYS.map(k=>skillVal(sk[k])).filter(v=>v!==null);return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):null}
@@ -365,11 +410,11 @@ async function busy(form,fn){const b=form&&form.querySelector('button[type=submi
 function curveSvg(pts){
   const W=420,H=230,L=40,Rp=22,Tp=24,B=30,iw=W-L-Rp,ih=H-Tp-B;
   const t0=pts[0].d.getTime(),t1=pts[pts.length-1].d.getTime(),span=Math.max(1,t1-t0);
-  const X=d=>pts.length===1?L+iw/2:L+iw*(d.getTime()-t0)/span, Y=v=>Tp+ih*(1-(Math.max(3,Math.min(4,v))-3));
+  const X=d=>pts.length===1?L+iw/2:L+iw*(d.getTime()-t0)/span, Y=v=>Tp+ih*(1-(Math.max(SK_LOW,Math.min(SK_MAX,v))-SK_LOW)/(SK_MAX-SK_LOW));
   let g="";
   SK_LEVELS.forEach(lv=>{const y=Y(lv);g+=`<line x1="${L}" y1="${y}" x2="${W-Rp}" y2="${y}" stroke="var(--line)" stroke-width="1" ${lv%0.5===0?"":'stroke-dasharray="3 3"'}/><text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--muted)">${fmtSk(lv)}</text>`});
   const xy=pts.map(p=>[X(p.d),Y(p.v)]);
-  if(xy.length>1){g+=`<polygon points="${xy[0][0]},${Y(3)} ${xy.map(q=>q.join(",")).join(" ")} ${xy[xy.length-1][0]},${Y(3)}" fill="var(--court)" fill-opacity=".12"/>`;
+  if(xy.length>1){g+=`<polygon points="${xy[0][0]},${Y(SK_LOW)} ${xy.map(q=>q.join(",")).join(" ")} ${xy[xy.length-1][0]},${Y(SK_LOW)}" fill="var(--court)" fill-opacity=".12"/>`;
     g+=`<polyline points="${xy.map(q=>q.join(",")).join(" ")}" fill="none" stroke="var(--court)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`}
   const showAll=pts.length<=5;
   pts.forEach((p,i)=>{const [x,y]=xy[i],last=i===pts.length-1;
@@ -433,17 +478,56 @@ function skillsCard(s){
       <div><span class="muted">${T.needFix}</span><b class="${fixes.length?"warn":""}">${fixes.length?fixes.map(k=>T.skills[k]).join(T.sep):T.none}</b></div>
     </div>
     ${notes?`<ul class="sk-notes">${notes}</ul>`:""}
-    <details class="legend"><summary>${T.legendTitle}</summary>
-      <dl>${Object.entries(T.legend).map(([lv,d])=>`<div><dt>${lv}</dt><dd>${d}</dd></div>`).join("")}</dl>
-      <p class="muted" style="margin:0">${T.between}</p>
-    </details>
   </section>`;
 }
+function duprCard(){
+  return `<details class="card dupr" id="dupr"><summary>${T.duprTitle}</summary>
+    <p class="muted" style="margin:0">${T.duprIntro}</p>
+    <dl class="dupr-list">${T.dupr.map(([lv,name,d])=>`<div><dt>${lv}</dt><dd><b>${name}</b><span>${d}</span></dd></div>`).join("")}</dl>
+    <p class="muted" style="margin:0;font-size:12px">${T.duprNote} <a href="https://www.dupr.com" target="_blank" rel="noopener">dupr.com</a></p>
+  </details>`;
+}
 
+function lessonStart(s){const d=new Date(s.nextAtUtc||s.nextAt);return isNaN(d)?null:d}
+function fmtLesson(s){const d=lessonStart(s);if(!d)return "";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
+  const day=d.toLocaleDateString(T.locale,{month:"numeric",day:"numeric",weekday:"short"});
+  const hm=x=>x.toLocaleTimeString(T.locale,{hour:"2-digit",minute:"2-digit",hour12:false});return `${day} ${hm(d)}–${hm(e)}`}
+function lessonText(s){
+  const L=[];const url=location.origin+location.pathname;
+  if(s.nextGoal)L.push(`${T.goalF}${T.colon}${s.nextGoal}`);
+  const prep=(s.prep||[]).filter(Boolean);if(prep.length){L.push(`${T.improve}${T.colon}`);prep.forEach(p=>L.push("・"+p))}
+  const sk=s.skills||{},fixes=SKILL_KEYS.filter(k=>isFix(sk[k]));
+  if(fixes.length)L.push(`${T.needFix}${T.colon}${fixes.map(k=>T.skills[k]+((sk[k]||{}).note?`（${sk[k].note}）`:"")).join(T.sep)}`);
+  const rec=[...(s.sessions||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  if(rec.length){const d0=String(rec[0].date).slice(0,10);L.push("");L.push(`${T.lastLesson}（${d0}）${T.colon}`);
+    rec.filter(r=>String(r.date).slice(0,10)===d0).forEach(r=>L.push(`・${r.item} ${r.before}/10 → ${r.after}/10${r.note?`｜${r.note}`:""}`))}
+  const ov=overall(sk);if(ov!==null)L.push(`${T.overall}${T.colon}${ov}`);
+  L.push("");L.push(url);return L.join("\n")}
+function calTitle(s){return `TPCoach ${T.lessonWord}｜${s.name||""}`}
+const utc=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+function gcalUrl(s){const d=lessonStart(s);if(!d)return "#";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
+  const q=new URLSearchParams({action:"TEMPLATE",text:calTitle(s),dates:`${utc(d)}/${utc(e)}`,details:lessonText(s).slice(0,1500),location:s.nextPlace||""});
+  return "https://calendar.google.com/calendar/render?"+q.toString()}
+function icsFile(s){const d=lessonStart(s);if(!d)return null;const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
+  const x=t=>String(t).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+  const fold=l=>{const out=[];let cur="",n=0;for(const ch of l){const b=new TextEncoder().encode(ch).length;if(n+b>73){out.push(cur);cur=" "+ch;n=1+b}else{cur+=ch;n+=b}}out.push(cur);return out.join("\r\n")};
+  const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TPCoach//Lesson//ZH","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
+    `UID:tpcoach-${s.id}-${utc(d)}@liusiaoming.github.io`,`DTSTAMP:${utc(new Date())}`,`DTSTART:${utc(d)}`,`DTEND:${utc(e)}`,
+    `SUMMARY:${x(calTitle(s))}`,`DESCRIPTION:${x(lessonText(s))}`,s.nextPlace?`LOCATION:${x(s.nextPlace)}`:"",`URL:${location.origin+location.pathname}`,
+    "BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:-P1D",`DESCRIPTION:${x(T.remindDay)}`,"END:VALARM",
+    "BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:-PT1H",`DESCRIPTION:${x(T.remindHour)}`,"END:VALARM",
+    "END:VEVENT","END:VCALENDAR"].filter(Boolean);
+  return lines.map(fold).join("\r\n")+"\r\n"}
+function downloadIcs(s){const t=icsFile(s);if(!t)return;const blob=new Blob([t],{type:"text/calendar;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`TPCoach-${(s.nextAt||"").slice(0,10)}.ics`;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
 function nextCard(s){
   const prep=(s.prep||[]).filter(Boolean),ticks=loadTicks(s.id,s.nextGoal||"");
   return `<section class="card" aria-label="${T.next}">
     <h2>${T.next}</h2>
+    ${s.nextAt?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span>${s.nextPlace?`<span class="muted">${esc(s.nextPlace)}</span>`:""}</div>
+      <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s))}" target="_blank" rel="noopener">${T.calGoogle}</a></div>
+      <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
     <div class="goal">${esc(s.nextGoal||T.noGoal)}</div>
     ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${esc(p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
     ${msgBlock(s)}
@@ -474,6 +558,7 @@ function msgBlock(s){
   </div>`;
 }
 
+function fold(id,title,inner){return `<details class="card fold" id="${id}"><summary>${title}</summary>${inner}</details>`}
 function rowsCard(s){
   const rec=[...(s.sessions||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   if(!rec.length)return `<section class="card"><h2>${T.progressShort}</h2><p class="muted" style="margin:0">${T.noRec}</p></section>`;
@@ -490,7 +575,7 @@ function rowsCard(s){
 }
 
 function recCard(s){
-  return `<details class="card" id="ed-rec" open><summary>${T.addRec}</summary>
+  return `<details class="card" id="ed-rec"><summary>${T.addRec}</summary>
     <form id="f-rec" class="grid">
       <label class="field">${T.date}<input id="r-date" type="datetime-local" value="${localNow()}" required></label>
       <label class="field" style="grid-column:span 2">${T.item}<input id="r-item" placeholder="${T.itemPh}" required></label>
@@ -501,7 +586,7 @@ function recCard(s){
     </form></details>`;
 }
 function basicCard(s){
-  return `<details class="card coach-ed" id="ed-basic" ${s.email?"":"open"}><summary>${T.basicTitle}${s.email?` <span class="muted sum-sub">${esc(s.email)}</span>`:""}</summary>
+  return `<details class="card coach-ed" id="ed-basic"><summary>${T.basicTitle}${s.email?` <span class="muted sum-sub">${esc(s.email)}</span>`:` <span class="sum-sub warn-t">${T.noEmailYet}</span>`}</summary>
     <form id="f-basic" class="grid">
       <label class="field" style="grid-column:1/-1">${T.name}<input id="i-name" value="${esc(s.name)}" required></label>
       <label class="field" style="grid-column:1/-1">${T.emailF}<input id="i-email" type="email" inputmode="email" autocomplete="off" value="${esc(s.email)}" placeholder="${T.emailPh}"></label>
@@ -513,8 +598,11 @@ function basicCard(s){
   </details>`;
 }
 function infoCard(s){
-  return `<details class="card" id="ed-info" open><summary>${T.goalTitle}</summary>
+  return `<details class="card" id="ed-info"><summary>${T.goalTitle}${s.nextAt||s.nextGoal?` <span class="muted sum-sub">${esc([s.nextAt?fmtLesson(s):"",s.nextGoal||""].filter(Boolean).join(" · "))}</span>`:""}</summary>
     <form id="f-info" class="grid">
+      <label class="field">${T.nextAtF}<input id="i-next-at" type="datetime-local" value="${esc(s.nextAt||"")}"></label>
+      <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
+      <label class="field" style="grid-column:1/-1">${T.placeF}<input id="i-place" value="${esc(s.nextPlace||"")}" placeholder="${T.placePh}"></label>
       <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
       <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" rows="3">${esc((s.prep||[]).join("\n"))}</textarea></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-info"></span></div>
@@ -525,7 +613,7 @@ function infoCard(s){
 function skillsEditor(s){
   const sk=s.skills||{};
   const noneRated=!SKILL_KEYS.some(k=>skillVal(sk[k])!==null||isFix(sk[k]));
-  return `<details class="card coach-ed" id="ed-skill" ${noneRated?"open":""}><summary>${T.editSkill}</summary>
+  return `<details class="card coach-ed" id="ed-skill"><summary>${T.editSkill}</summary>
     <form id="f-skill" style="display:flex;flex-direction:column;gap:14px">
     ${SKILL_KEYS.map(k=>{const v=sk[k]||{},cur=skillVal(v);return `<div class="grid">
       <label class="field">${T.skills[k]} · ${T.levelSel}<select id="k-${k}-level"><option value="">${T.notRatedLong}</option>${SK_LEVELS.map(lv=>`<option value="${lv}" ${cur===lv?"selected":""}>${fmtSk(lv)}</option>`).join("")}</select></label>
@@ -576,10 +664,10 @@ function render(){
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
   let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
   const sy=window.scrollY;
-  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank","dupr","c-rows","c-next"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
   let h=accountBar();
-  if(canEdit)h+=coachBar()+rankCard(!s);
+  if(canEdit)h+=coachBar()+rankCard(false);
   if(!canEdit&&!s){h+=me&&me.email?`<div class="card"><h2>${T.notLinked}</h2><p style="margin:0">${T.sendCode}</p>
       <div class="codebox"><code id="my-code">${esc(me.email)}</code></div></div>`
       :`<div class="card empty"><p class="muted">${T.noId}</p></div>`;app.innerHTML=h;bind();return}
@@ -587,10 +675,14 @@ function render(){
   const upd=s.updatedAt?new Date(s.updatedAt).toLocaleDateString(T.locale):"";
   h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
   watchMsgs(s.id);
-  h+=canEdit?basicCard(s)+skillsCard(s)+curveCard(s)+skillsEditor(s)+recCard(s)+rowsCard(s)+infoCard(s)+nextCard(s)
-            :skillsCard(s)+curveCard(s)+nextCard(s)+rowsCard(s);
+  // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
+  const left=canEdit?basicCard(s)+skillsCard(s)+curveCard(s)+duprCard():skillsCard(s)+curveCard(s)+duprCard();
+  const right=canEdit?skillsEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
+      +fold("c-next",`${T.next}・${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,nextCard(s))
+    :nextCard(s)+rowsCard(s);
+  h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`;
   app.innerHTML=h;
-  if(open.rank!==undefined&&document.getElementById("rank"))document.getElementById("rank").open=open.rank;
+  for(const k of ["rank","dupr","c-rows","c-next"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
   if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
   if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el){if(el.type==="checkbox")el.checked=keep[id];else el.value=keep[id]}}
   else dirty.clear();
@@ -621,6 +713,7 @@ function bind(){
   document.querySelectorAll(".prep input").forEach(cb=>cb.addEventListener("change",()=>{
     saveTicks(s.id,s.nextGoal||"",[...document.querySelectorAll(".prep input")].filter(x=>x.checked).map(x=>+x.dataset.i))}));
   document.getElementById("b-signout")?.addEventListener("click",()=>{stopAll();signOut(auth)});
+  document.getElementById("b-ics")?.addEventListener("click",()=>{const st=students.find(x=>x.id===currentId);if(st)downloadIcs(st)});
   document.getElementById("curve-sel")?.addEventListener("change",e=>{curveKey=e.target.value;render()});
   if(s)bindMsgs(s);
   if(!canEdit)return;
@@ -651,7 +744,7 @@ function bind(){
   })});
   const fInfo=document.getElementById("f-info");
   fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
-    const d={nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
+    const na=val("i-next-at"),nd=na?new Date(na):null;const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:val("i-place").trim(),nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
     if(await save(s.id,d)){clean(fInfo);flash("m-info",T.saved)}
   })});
   const fSkill=document.getElementById("f-skill");
