@@ -15,6 +15,8 @@ body{margin:0;font-size:15px}
 img{max-width:100%}
 [hidden]{display:none!important}
 .sk-hint{display:block;font-size:13px;font-weight:400;color:var(--muted);line-height:1.4;margin:-2px 0 2px}
+.co-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.co-who{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
 .lv-desc{grid-column:1/-1;margin:-4px 0 0;font-size:13px;line-height:1.5;background:var(--bg);border-left:3px solid var(--court);border-radius:6px;padding:6px 10px}
 .lv-desc.empty{color:var(--muted);border-left-color:var(--line)}
 .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:-4px}
@@ -394,6 +396,8 @@ Object.assign(I18N.en,{
 });
 const SKILL_KEYS=["composure","serve","return","drive","transition","reset","dink","aggression","selection","special"];
 const KB={"zh":{"rubric":{"composure":["能完成大多數來回，但緊張或失誤時容易加快節奏、急著攻擊","大多時候能維持自己的節奏；被壓制時先防守，失誤後很快調整","關鍵分仍沉穩，能主動放慢或加快節奏，有固定的準備動作"],"serve":["10 球能發進 8 球，但落點偏淺、深度不穩","10 球進 9 球，7 球以上落在後半場，能發向對手反手","幾乎不失誤，大部分落點靠近底線，能變化落點、速度和旋轉"],"return":["能穩定回進，但常偏淺或回太快，來不及上網","回球大多深且穩，能用較慢的弧線爭取時間上網","慢又深，能回到對手弱點，並穩定站上廚房線"],"drive":["能把球抽過網，但常過高或太急，容易被截擊","抽球低且有力，知道什麼時候抽、什麼時候放小球","穩定抽低並控制落點和上旋，能為第五拍製造機會"],"transition":["能從底線往前移動，但常停在中場或衝太快，來球時容易不知所措","能邊打邊往前，來球時分腿墊步停住，分段上網","移動流暢，判斷該停或該進，能處理過渡區各種來球"],"reset":["能把慢速來球擋回，但被攻擊時多半回得過快或過高","中速來球能擋低回廚房，偶爾仍偏高","被重擊時仍能穩定洩力，把球放回廚房、重新取得平衡"],"dink":["能來回丁克，但不自信，常急著出手或打太高","丁克有耐心、能控制落點，開始運用斜線和直線變化","節奏轉換穩定，能用落點、旋轉和速度變化逼出對手高球"],"aggression":["能對明顯的高球出手，但常錯過時機或過早擊球，對方加速時來不及反應","能對高於網的球加速，面對加速多數擋得回","能預判對手加速並反擊或偷球，快手攻防佔上風"],"selection":["能分辨明顯該攻或該守的球，但回球選擇單一，紅綠燈判斷還不穩定","多數時候依紅綠燈原則判斷，回球開始有變化","判斷快又準，能依對手和情況選擇最佳回球，戰術多樣"],"special":["認識高吊球、ATP、Erne，偶爾嘗試","能在適當時機用高吊球，開始練 ATP 或 Erne","比賽中能有效運用 ATP、Erne 等得分手段（僅供參考）"]},"drills":{"composure":["失誤後固定準備動作","每次失誤後做同一套動作（深呼吸、看拍面、說「下一分」）再打下一球；比賽模擬從 7–9 落後開始打。","10 個關鍵分：保持沉穩完成幾次"],"serve":["深區目標發球","在對面後三分之一放目標，每 10 球記錄落點，再練發向反手。","10 球發到後三分之一"],"return":["慢又深接發","用較高的弧線回到後半場，回完立刻上網碰到廚房線。","10 球接發回到後半場"],"drive":["低抽過網","在網上方約一個拍面高做標示，抽球必須從標示下方通過。","10 球抽低過網（低於標示）"],"transition":["分段上網","第三拍後往前兩步 → 分腿墊步停住 → 處理來球，重複直到廚房線。","10 次從底線分段上到廚房線"],"reset":["過渡區重置","教練從網前用中速抽向學員，學員在過渡區把球擋回廚房。","10 球重置回廚房"],"dink":["斜線丁克 20 拍","斜線丁克連續 20 拍不失誤，再加入直線和節奏變化。","10 球丁克落在廚房內且不高"],"aggression":["高球加速＋反擊","丁克中遇到高於網的球就加速；另一人練習擋回或反擊。","10 次加速或反擊成功"],"selection":["紅綠燈喊聲","擊球前先喊紅（重置）、黃（丁克／放小球）、綠（攻擊），再出手。","10 球判斷正確"],"special":["ATP／Erne 情境","教練固定餵外側低平球，練習 ATP 或 Erne 的時機和步法。","10 次情境中成功完成"]}},"ja":{"rubric":{"composure":["ほとんどのラリーは続けられるが、緊張やミスでテンポが速くなり焦って攻めがち","ほとんどの場面で自分のテンポを保てる。押されたらまず守り、ミス後もすぐ立て直せる","大事なポイントでも落ち着いており、テンポを自在に変えられる。決まったルーティンがある"],"serve":["10球中8球入るが、落下点が浅く深さが安定しない","10球中9球入り、7球以上が後半に入る。相手のバックを狙える","ほぼミスがなく、ベースライン付近に集まる。コース・速さ・回転を変えられる"],"return":["安定して返せるが、浅い・速すぎることが多く前に出る時間がない","深く安定したリターンが多く、ゆっくりした弧で前に出る時間を作れる","遅く深く、相手の弱点に返し、安定してキッチンラインに立てる"],"drive":["ドライブはネットを越えるが、高すぎ・急ぎすぎでボレーされやすい","低く力強いドライブが打て、ドライブとドロップを使い分けられる","安定して低く打ち、コースとトップスピンを操れる。5球目のチャンスを作れる"],"transition":["ベースラインから前に出られるが、中途半端な位置で止まるか急ぎすぎ、返球に迷いやすい","打ちながら前に出て、スプリットステップで止まり、段階的に前進できる","動きがスムーズで、止まるか進むかを判断し、トランジションの球を処理できる"],"reset":["遅い球はブロックできるが、攻められると速すぎ・高すぎになりやすい","中くらいの速さの球は低くキッチンに返せるが、時々高くなる","強打されても安定して勢いを殺し、キッチンに戻して体勢を立て直せる"],"dink":["ディンクは続くが自信がなく、急いだり高くなったりする","忍耐強くコースをコントロールでき、クロスとストレートを使い始めている","テンポの切り替えが安定し、コース・回転・速さで相手の浮き球を引き出せる"],"aggression":["明らかな浮き球には打てるが、タイミングを逃す・早すぎることが多く、相手の加速に反応が遅れる","ネットより高い球を加速でき、相手の加速もほぼ返せる","相手の加速を読んでカウンターやポーチができ、ハンドバトルで優位に立てる"],"selection":["明らかに攻める球・守る球は分かるが、返球が単調で信号判断が不安定","ほとんどの場面で信号の原則で判断でき、返球に変化が出てきた","判断が速く正確で、相手と状況に応じた最善の返球と多彩な戦術を選べる"],"special":["ロブ・ATP・アーニーを知っており、時々試す","適切な場面でロブを使え、ATPやアーニーの練習を始めている","試合でATPやアーニーなどを効果的に使える（参考）"]},"drills":{"composure":["ミス後のルーティン","ミスの後に毎回同じ動作（深呼吸・面を見る・「次」と言う）をしてから次の球へ。7–9のビハインドから試合形式で練習。","大事な10ポイント：落ち着いてプレーできた数"],"serve":["深いエリアへのサーブ","相手コート後方3分の1にターゲットを置き、10球ごとに落下点を記録。次にバック狙い。","10球中、後方3分の1に入った数"],"return":["遅く深いリターン","高めの弧で後半に返し、すぐ前に出てキッチンラインまで行く。","10球中、後半に返せた数"],"drive":["低いドライブ","ネットの上にパドル1枚分の目印を作り、その下を通す。","10球中、目印より低く通った数"],"transition":["段階的に前へ","3球目の後に2歩前へ → スプリットステップで止まる → 返球、をキッチンラインまで繰り返す。","10回中、ミスなくキッチンラインまで行けた数"],"reset":["トランジションでのリセット","コーチがネット際から中速で打ち、生徒はトランジションエリアからキッチンに落とす。","10球中、キッチンにリセットできた数"],"dink":["クロスディンク20回","クロスでミスなく20回続け、次にストレートとテンポの変化を加える。","10球中、低くキッチンに入った数"],"aggression":["浮き球の加速＋カウンター","ディンク中にネットより高い球が来たら加速。相手はブロックかカウンターを練習。","10回中、加速またはカウンターが成功した数"],"selection":["信号コール","打つ前に赤（リセット）・黄（ディンク／ドロップ）・緑（攻撃）と声に出してから打つ。","10球中、判断が正しかった数"],"special":["ATP／アーニーの状況練習","コーチが外側に低い球を出し、ATPやアーニーのタイミングとフットワークを練習。","10回中、状況で成功した数"]}},"en":{"rubric":{"composure":["Can play most rallies, but speeds up and attacks in a rush when nervous or after errors","Keeps own pace most of the time; defends first when pressured, recovers quickly after errors","Calm on big points, can slow down or speed up at will, has a set routine between points"],"serve":["8 of 10 serves in, but landing short and depth is inconsistent","9 of 10 in, 7+ land in the back half; can target the opponent's backhand","Almost no errors, mostly near the baseline; varies placement, pace and spin"],"return":["Gets returns in but often short or too fast, no time to get to the net","Mostly deep and steady; uses a slower arc to buy time to move in","Slow and deep to the opponent's weakness; reliably reaches the kitchen line"],"drive":["Gets drives over the net, but often too high or rushed, easy to volley","Low, firm drives; knows when to drive and when to drop","Consistently low with control of placement and topspin; sets up the fifth shot"],"transition":["Can move in from the baseline, but stops mid-court or rushes and gets lost on the next ball","Moves in while hitting, split-steps on each ball, advances in stages","Smooth movement, knows when to stop or go, handles any transition ball"],"reset":["Can block slow balls back, but is usually too fast or too high when attacked","Blocks medium-pace balls low into the kitchen; sometimes still high","Absorbs pace even under hard attacks, drops the ball back and regains balance"],"dink":["Can dink but lacks confidence; rushes or pops it up","Patient dinking with placement control; starts mixing cross-court and line","Steady tempo changes; uses placement, spin and pace to force a pop-up"],"aggression":["Attacks obvious high balls, but often misses the moment or hits too early; late against speed-ups","Speeds up balls above the net and blocks most speed-ups","Reads speed-ups to counter or poach; wins most hands battles"],"selection":["Tells obvious attack and defend balls apart, but replies are one-note and traffic-light calls inconsistent","Follows traffic-light rules most of the time; replies start to vary","Fast, accurate decisions; picks the best reply for the opponent and situation"],"special":["Knows the lob, ATP and Erne; tries them now and then","Uses the lob at the right time; starting to practise ATP or Erne","Uses ATP, Erne and similar shots effectively in matches (reference only)"]},"drills":{"composure":["Reset routine after errors","After every error do the same routine (breathe, look at the paddle face, say 'next') before the next ball; play games starting from 7–9 down.","10 big points: how many played calmly"],"serve":["Deep target serves","Put targets in the back third; log where each of 10 serves lands, then aim at the backhand.","Serves landing in the back third, out of 10"],"return":["Slow and deep return","Return with a high arc into the back half, then move straight up to the kitchen line.","Returns landing in the back half, out of 10"],"drive":["Low drives","Mark a paddle's height above the net; every drive must pass under the mark.","Drives under the mark, out of 10"],"transition":["Move in by stages","After the third shot take two steps, split-step, play the ball; repeat until the kitchen line.","Clean trips to the kitchen line, out of 10"],"reset":["Transition-zone resets","Coach drives at medium pace from the net; the student drops it back into the kitchen from the transition zone.","Resets into the kitchen, out of 10"],"dink":["20-shot cross-court dinks","Dink cross-court 20 in a row, then add line dinks and tempo changes.","Low dinks landing in the kitchen, out of 10"],"aggression":["Speed-up + counter","During dinks, speed up any ball above the net; the partner practises blocking or countering.","Successful speed-ups or counters, out of 10"],"selection":["Traffic-light calls","Call red (reset), yellow (dink/drop) or green (attack) out loud before each shot.","Correct calls, out of 10"],"special":["ATP / Erne scenarios","Coach feeds low balls wide; practise the timing and footwork for ATP or Erne.","Successful attempts, out of 10"]}}};
+const MCUI={"zh":{"mgmt":"教練管理（僅管理者）","mgmtHint":"加入教練的 Google Email。教練用該帳號登入同一個網址，就只會看到自己負責的學員。","cName":"教練名稱","cEmail":"教練 Google Email","add":"加入教練","remove":"移除","removeAsk":"移除後，他的學員會轉回你名下。確定移除？","yes":"確定移除","cancel":"取消","owner":"管理者","stu":"位學員","coachOf":"負責教練","all":"全部教練","exists":"這個 Email 已經在名單裡","bad":"請輸入正確的 Email","added":"已加入","failed":"儲存失敗，請再試一次","roleAdmin":"管理者","roleCoach":"教練","link":"教練登入網址","none":"還沒有其他教練","moved":"學員已轉回你名下"},"ja":{"mgmt":"コーチ管理（管理者のみ）","mgmtHint":"コーチの Google メールを追加します。コーチは同じURLにそのアカウントでログインすると、担当の生徒だけが表示されます。","cName":"コーチ名","cEmail":"コーチの Google メール","add":"コーチを追加","remove":"削除","removeAsk":"削除すると、そのコーチの生徒はあなたの担当に戻ります。削除しますか？","yes":"削除する","cancel":"キャンセル","owner":"管理者","stu":"人の生徒","coachOf":"担当コーチ","all":"すべてのコーチ","exists":"このメールはすでに登録されています","bad":"正しいメールを入力してください","added":"追加しました","failed":"保存できませんでした。もう一度お試しください","roleAdmin":"管理者","roleCoach":"コーチ","link":"コーチのログインURL","none":"まだ他のコーチはいません","moved":"生徒をあなたの担当に戻しました"},"en":{"mgmt":"Coaches (admin only)","mgmtHint":"Add a coach's Google email. They sign in at the same link and only see the students assigned to them.","cName":"Coach name","cEmail":"Coach Google email","add":"Add coach","remove":"Remove","removeAsk":"Their students will move back to you. Remove this coach?","yes":"Remove","cancel":"Cancel","owner":"Admin","stu":"students","coachOf":"Coach","all":"All coaches","exists":"That email is already on the list","bad":"Enter a valid email","added":"Added","failed":"Couldn't save. Please try again","roleAdmin":"Admin","roleCoach":"Coach","link":"Coach sign-in link","none":"No other coaches yet","moved":"Students moved back to you"}};
+function mc(){return MCUI[lang]||MCUI.zh}
 const KUI={"zh":{"lvStd":"等級標準","below":"尚未穩定達到 3.0：","toward":"已達 {a}，正在邁向 {b}：","pick":"選擇等級後會顯示對應標準","chipHint":"點一下帶入說明","practice":"下一步練習","practiceSub":"依需修正和最低分項目自動建議，由教練確認","practiceNone":"完成技術評估後，會自動建議下一步練習。","now":"目前","target":"目標","targetStd":"下一級標準","drill":"練習","test":"10 球測驗","maxed":"已達 4.0，維持穩定並挑戰更高強度的比賽","toGoal":"帶入下次目標","toRec":"帶入上課紀錄","filled":"已帶入，記得按儲存","flagged":"需修正","video":"影片連結（選填）","videoPh":"貼上 YouTube 或 Google 雲端硬碟連結","videoBad":"影片連結需以 https:// 開頭","watch":"▶ 看影片","open":"開啟影片","hide":"收起影片","unrated":"未評估"},"ja":{"lvStd":"レベル基準","below":"まだ安定して 3.0 に届いていない：","toward":"{a} に到達、{b} を目指して：","pick":"レベルを選ぶと基準が表示されます","chipHint":"タップでコメントに追加","practice":"次の練習","practiceSub":"要修正と最も低い項目から自動で提案（コーチが確認）","practiceNone":"技術評価を行うと、次の練習が自動で提案されます。","now":"現在","target":"目標","targetStd":"次のレベルの基準","drill":"練習","test":"10球テスト","maxed":"4.0 に到達。安定を保ち、より強い相手との試合に挑戦","toGoal":"次回の目標に入れる","toRec":"レッスン記録に入れる","filled":"入力しました。保存を忘れずに","flagged":"要修正","video":"動画リンク（任意）","videoPh":"YouTube または Google ドライブのリンク","videoBad":"動画リンクは https:// で始めてください","watch":"▶ 動画を見る","open":"動画を開く","hide":"閉じる","unrated":"未評価"},"en":{"lvStd":"Level standards","below":"Not yet consistent at 3.0: ","toward":"At {a}, working toward {b}: ","pick":"Pick a level to see its standard","chipHint":"Tap to add to the comment","practice":"Next practice","practiceSub":"Suggested from needs-work and lowest skills; the coach confirms","practiceNone":"Rate skills and the next practice will be suggested here.","now":"Now","target":"Target","targetStd":"Next-level standard","drill":"Drill","test":"10-ball test","maxed":"At 4.0: stay consistent and take on stronger matches","toGoal":"Use as next goal","toRec":"Use in lesson record","filled":"Filled in. Remember to save","flagged":"Needs work","video":"Video link (optional)","videoPh":"Paste a YouTube or Google Drive link","videoBad":"Video link must start with https://","watch":"▶ Watch","open":"Open video","hide":"Hide video","unrated":"Not rated"}};
 function kb(){return KB[lang]||KB.zh}
 function ku(){return KUI[lang]||KUI.zh}
@@ -407,6 +411,20 @@ function focusSkills(s){const sk=s.skills||{},all=SKILL_KEYS.map((k,i)=>({k,i,v:
   const fx=all.filter(x=>x.fix).sort((a,b)=>(a.v??9)-(b.v??9)||a.i-b.i);
   const low=all.filter(x=>!x.fix&&x.v!==null&&x.v<4&&x.k!=="special").sort((a,b)=>a.v-b.v||a.i-b.i);
   return [...fx,...low].slice(0,2)}
+const ownerEmail=()=>(COACH_EMAILS[0]||"").toLowerCase();
+const coachOfStu=x=>(x&&x.coach)||ownerEmail();
+function coachName(email){if(!email)return "";if(me&&email===me.email&&isAdmin)return (me.name||email)+" ("+mc().owner+")";const c=coachDir.find(c=>c.email===email);return c?(c.name||c.email):email}
+function visible(){return isAdmin&&coachFilter?students.filter(x=>coachOfStu(x)===coachFilter):students}
+function coachMgmtCard(){if(!isAdmin)return "";const u=mc(),cnt=e=>students.filter(x=>coachOfStu(x)===e).length;
+  const rows=coachDir.length?coachDir.map(c=>`<div class="co-row"><div class="co-who"><b>${esc(c.name||c.email)}</b><span class="muted">${esc(c.email)} · ${cnt(c.email)} ${u.stu}</span></div><button type="button" class="danger" data-rmcoach="${esc(c.email)}">${u.remove}</button></div>`).join(""):`<p class="muted" style="margin:0">${u.none}</p>`;
+  return fold("coachm",`${u.mgmt} <span class="muted sum-sub">${coachDir.length}</span>`,`<p class="muted" style="margin:0">${u.mgmtHint}</p>
+    <div class="co-row"><div class="co-who"><b>${esc(me.name||me.email)}</b><span class="muted">${esc(me.email)} · ${u.owner} · ${cnt(me.email)} ${u.stu}</span></div></div>
+    ${rows}<div id="co-confirm"></div>
+    <form id="f-coach" class="grid"><label class="field">${u.cName}<input id="c-name" autocomplete="off"></label>
+      <label class="field" style="grid-column:span 2">${u.cEmail}<input id="c-email" type="text" inputmode="email" autocomplete="off" placeholder="coach@gmail.com"></label>
+      <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${u.add}</button><span class="msg" id="m-coach"></span></div></form>
+    <p class="muted" style="margin:0">${u.link}${T.colon}<span style="user-select:all">${esc(location.origin+location.pathname)}</span></p>`)}
+async function saveCoaches(list){await setDoc(doc(fs,"config","coaches"),{list,emails:list.map(c=>c.email),updatedAt:new Date().toISOString()})}
 function practiceCard(s){const u=ku(),sk=s.skills||{},f=focusSkills(s);
   const rated=SKILL_KEYS.some(k=>skillVal(sk[k])!==null||isFix(sk[k]));
   const body=!rated?`<p class="muted" style="margin:0">${u.practiceNone}</p>`:(!f.length?`<p style="margin:0">${u.maxed}</p>`:f.map(x=>{
@@ -419,6 +437,7 @@ function practiceCard(s){const u=ku(),sk=s.skills||{},f=focusSkills(s);
   return `<section class="card" id="practice" aria-label="${u.practice}"><div><h2>${u.practice}</h2><p class="muted" style="margin:0">${u.practiceSub}</p></div>${body}${canEdit?`<span class="msg" id="m-pr"></span>`:""}</section>`}
 const LEVELS_MIN=1.0,LEVELS_MAX=5.0;
 const app=document.getElementById("app");
+let isAdmin=false,coachDir=[],coachFilter="";
 let db=null,fs=null,auth=null,view="loading",unsubs=[],me=null,canEdit=false,students=[],currentId=null,loaded=false,lang=pickLang(),T=I18N[lang];
 
 function pickLang(){try{const s=localStorage.getItem("lang");if(I18N[s])return s}catch(e){}const n=(navigator.language||"zh").toLowerCase();return n.startsWith("ja")?"ja":(n.startsWith("en")?"en":"zh")}
@@ -455,7 +474,7 @@ function evalsOf(s){let e=(s.evals||[]).filter(x=>x&&x.t).slice().sort((a,b)=>St
   return e}
 let curveKey="overall";
 const dirty=new Set();
-const NO_TRACK=new Set(["pick","curve-sel"]);
+const NO_TRACK=new Set(["pick","curve-sel","cfilter"]);
 const markDirty=e=>{const t=e.target;if(t&&t.id&&!NO_TRACK.has(t.id)&&!t.classList.contains("prep-cb"))dirty.add(t.id)};
 document.getElementById("app").addEventListener("input",markDirty);document.getElementById("app").addEventListener("change",markDirty);
 const clean=form=>{if(form)form.querySelectorAll("[id]").forEach(el=>dirty.delete(el.id))};
@@ -658,6 +677,7 @@ function basicCard(s){
       <label class="field" style="grid-column:1/-1">${T.name}<input id="i-name" value="${esc(s.name)}" required></label>
       <label class="field" style="grid-column:1/-1">${T.emailF}<input id="i-email" type="email" inputmode="email" autocomplete="off" value="${esc(s.email)}" placeholder="${T.emailPh}"></label>
       ${s.email?"":`<p class="muted warn-t" style="margin:0;grid-column:1/-1">${T.notBound}</p>`}
+      ${isAdmin&&coachDir.length?`<label class="field">${mc().coachOf}<select id="i-coach">${[ownerEmail(),...coachDir.map(c=>c.email)].map(e=>`<option value="${esc(e)}" ${e===coachOfStu(s)?"selected":""}>${esc(coachName(e))}</option>`).join("")}</select></label>`:""}
       <label class="field">${T.genderF}<select id="i-gender"><option value="">${T.unsetG}</option><option value="m" ${s.gender==="m"?"selected":""}>${T.male}</option><option value="f" ${s.gender==="f"?"selected":""}>${T.female}</option></select></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-basic"></span></div>
     </form>
@@ -695,10 +715,10 @@ function skillsEditor(s){
 
 function accountBar(){
   const nm=me&&me.name?esc(me.name):"";
-  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?T.roleCoach:T.roleStu}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
+  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?(isAdmin?mc().roleAdmin:mc().roleCoach):T.roleStu}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
 }
 function rankCard(open){
-  const rows=students.map(x=>{const ov=overall(x.skills||{});const ev=evalsOf(x).filter(e=>isFinite(+e.overall)&&!isNaN(new Date(e.t)));
+  const rows=visible().map(x=>{const ov=overall(x.skills||{});const ev=evalsOf(x).filter(e=>isFinite(+e.overall)&&!isNaN(new Date(e.t)));
     const f=ev[0],l=ev[ev.length-1];
     return{id:x.id,name:x.name,g:x.gender,ov:ov===null?null:+ov,n:(x.evals||[]).length,last:l?String(l.t):"",
       gain:ev.length>=2?+(+l.overall-+f.overall).toFixed(2):null,days:ev.length>=2?(new Date(l.t)-new Date(f.t))/864e5:null,from:f&&new Date(f.t),to:l&&new Date(l.t)}});
@@ -722,7 +742,8 @@ function rankCard(open){
 function coachBar(){
   return `<div class="card"><div class="coachbar">
     <span class="tag">${T.coach}</span>
-    <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${students.map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${s.email?"":` · ${T.unbound}`}</option>`).join("")}</select>
+    ${isAdmin&&coachDir.length?`<select id="cfilter" aria-label="${mc().coachOf}" style="flex:0 1 auto;width:auto"><option value="">${mc().all}</option>${[ownerEmail(),...coachDir.map(c=>c.email)].map(e=>`<option value="${esc(e)}" ${e===coachFilter?"selected":""}>${esc(coachName(e))}</option>`).join("")}</select>`:""}
+    <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${visible().map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${s.email?"":` · ${T.unbound}`}${isAdmin&&coachDir.length&&!coachFilter&&coachOfStu(s)!==me.email?` · ${esc(coachName(coachOfStu(s)))}`:""}</option>`).join("")}</select>
     <button id="b-new" type="button">${T.newStu}</button>
   </div><p class="muted" style="margin:0">${T.shareHint}</p></div>`;
 }
@@ -733,10 +754,10 @@ function render(){
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
   let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
   const sy=window.scrollY;
-  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank","dupr","c-rows","c-next"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank","dupr","c-rows","c-next","coachm"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
   let h=accountBar();
-  if(canEdit)h+=coachBar()+rankCard(false);
+  if(canEdit)h+=coachBar()+rankCard(false)+coachMgmtCard();
   if(!canEdit&&!s){h+=me&&me.email?`<div class="card"><h2>${T.notLinked}</h2><p style="margin:0">${T.sendCode}</p>
       <div class="codebox"><code id="my-code">${esc(me.email)}</code></div></div>`
       :`<div class="card empty"><p class="muted">${T.noId}</p></div>`;app.innerHTML=h;bind();return}
@@ -751,7 +772,7 @@ function render(){
     :nextCard(s)+rowsCard(s);
   h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
   app.innerHTML=h;
-  for(const k of ["rank","dupr","c-rows","c-next"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
+  for(const k of ["rank","dupr","c-rows","c-next","coachm"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
   if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
   if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el){if(el.type==="checkbox")el.checked=keep[id];else el.value=keep[id]}}
   else dirty.clear();
@@ -790,12 +811,23 @@ function bind(){
     else{box.innerHTML="";box.hidden=true;b.textContent=ku().watch}}));
   if(!canEdit)return;
   document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{currentId=b.dataset.open;location.hash=currentId;render();scrollTo(0,0)}));
+  document.getElementById("cfilter")?.addEventListener("change",e=>{coachFilter=e.target.value;if(currentId&&!visible().some(x=>x.id===currentId)){currentId=null;location.hash=""}render()});
+  const fCoach=document.getElementById("f-coach");
+  fCoach?.addEventListener("submit",ev=>{ev.preventDefault();busy(fCoach,async()=>{const u=mc(),em=val("c-email").trim().toLowerCase(),nm=val("c-name").trim();
+    if(!EMAIL_RE.test(em)){flash("m-coach",u.bad);return}
+    if(em===ownerEmail()||coachDir.some(c=>c.email===em)){flash("m-coach",u.exists);return}
+    try{await saveCoaches([...coachDir,{email:em,name:nm||em}]);["c-email","c-name"].forEach(i=>{dirty.delete(i);const el=document.getElementById(i);if(el)el.value=""});flash("m-coach",u.added)}catch(e){flash("m-coach",u.failed)}})});
+  document.querySelectorAll("[data-rmcoach]").forEach(b=>b.addEventListener("click",()=>{const u=mc(),em=b.dataset.rmcoach,z=document.getElementById("co-confirm");
+    z.innerHTML=`<div class="confirm"><span>${esc(coachName(em))}${T.colon}${u.removeAsk}</span><button class="danger" type="button" id="co-yes">${u.yes}</button><button type="button" id="co-no">${u.cancel}</button></div>`;
+    document.getElementById("co-no").onclick=()=>{z.innerHTML=""};
+    document.getElementById("co-yes").onclick=async()=>{try{for(const x of students.filter(x=>x.coach===em))await db.collection("students").doc(x.id).update({coach:ownerEmail()});
+      await saveCoaches(coachDir.filter(c=>c.email!==em));if(coachFilter===em)coachFilter="";}catch(e){alertBox(u.failed)}}}));
   const pick=document.getElementById("pick");
   pick&&pick.addEventListener("change",()=>{currentId=pick.value||null;location.hash=currentId||"";render()});
   document.getElementById("b-rate")?.addEventListener("click",()=>{const d=document.getElementById("ed-skill");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});document.getElementById("k-serve-level")?.focus({preventScroll:true})}});
   document.getElementById("b-new")?.addEventListener("click",async()=>{
     const ref=db.collection("students").doc(),id=ref.id;
-    try{await ref.set({name:T.newName,email:"",nextGoal:"",prep:[],sessions:[],skills:{},evals:[],updatedAt:new Date().toISOString()});
+    try{await ref.set({name:T.newName,email:"",coach:isAdmin&&coachFilter?coachFilter:me.email,nextGoal:"",prep:[],sessions:[],skills:{},evals:[],updatedAt:new Date().toISOString()});
       currentId=id;location.hash=id;setTimeout(()=>{const d=document.getElementById("ed-basic");if(d){d.open=true;d.scrollIntoView({block:"start"});document.getElementById("i-name").select()}},400)}
     catch(e){alertBox(T.addFail+(e&&e.message||""))}
   });
@@ -825,7 +857,7 @@ function bind(){
     const em=val("i-email").trim().toLowerCase();
     if(em&&!EMAIL_RE.test(em)){flash("m-basic",T.emailBad);return}
     if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-basic",T.emailUsed);return}
-    const d={name:val("i-name").trim()||T.newName,email:em,gender:val("i-gender")};
+    const d={name:val("i-name").trim()||T.newName,email:em,gender:val("i-gender")};if(isAdmin&&document.getElementById("i-coach"))d.coach=val("i-coach");
     if(await save(s.id,d)){clean(fBasic);flash("m-basic",T.saved)}
   })});
   const fInfo=document.getElementById("f-info");
@@ -888,11 +920,13 @@ function start(){
   const fail=err=>{clearTimeout(timer);msg(T.readFail(esc(err&&err.code||"error")))};
   if(canEdit){
     currentId=hashId();
-    unsubs.push(db.collection("students").onSnapshot(snap=>{
+    unsubs.push(onSnapshot(doc(fs,"config","coaches"),d=>{const v=d.exists()?d.data():{};coachDir=(v.list||[]).filter(c=>c&&c.email).map(c=>({email:String(c.email).toLowerCase(),name:c.name||""}));if(loaded)render()},()=>{}));
+    const got=snap=>{
       clearTimeout(timer);loaded=true;
       students=snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
       render();
-    },fail));
+    };
+    unsubs.push(isAdmin?db.collection("students").onSnapshot(got,fail):onSnapshot(query(collection(fs,"students"),where("coach","==",me.email)),q=>got(wrapSnap(q)),fail));
   }else{
     unsubs.push(onSnapshot(query(collection(fs,"students"),where("email","==",me.email)),q=>{
       clearTimeout(timer);loaded=true;
@@ -909,11 +943,14 @@ function start(){
   const coaches=COACH_EMAILS.map(x=>x.toLowerCase());
   onAuthStateChanged(auth,user=>{
     stopAll();
-    if(!user){me=null;canEdit=false;showLogin();return}
+    if(!user){me=null;canEdit=false;isAdmin=false;showLogin();return}
     me={id:user.uid,name:user.displayName||"",email:(user.email||"").toLowerCase()};
-    canEdit=coaches.includes(me.email);
+    isAdmin=coaches.includes(me.email);canEdit=isAdmin;coachFilter="";coachDir=[];
     app.innerHTML=`<div class="card empty"><p class="muted">${T.loading}</p></div>`;
-    start();
+    if(isAdmin){start();return}
+    const uid=user.uid;
+    getDoc(doc(fs,"config","coaches")).then(d=>{const v=d.exists()?d.data():{};return (v.emails||[]).map(x=>String(x).toLowerCase()).includes(me.email)}).catch(()=>false)
+      .then(ok=>{if(!auth.currentUser||auth.currentUser.uid!==uid)return;canEdit=ok;start()});
   });
   let rz,lastW=innerWidth;window.addEventListener("resize",()=>{if(Math.abs(innerWidth-lastW)<2)return;lastW=innerWidth;clearTimeout(rz);rz=setTimeout(()=>{if(loaded&&view==="app")render()},200)});
   window.addEventListener("hashchange",()=>{if(!canEdit)return;currentId=hashId();if(loaded)render()});
