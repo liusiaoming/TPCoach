@@ -21,6 +21,19 @@ img{max-width:100%}
 .dt{display:flex;gap:6px}
 .dt input{flex:1 1 0;min-width:0}
 .dt input[type=date]{flex-grow:1.4}
+.att-pick-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.att-pick{cursor:pointer}
+.att-chips{display:flex;flex-wrap:wrap;gap:6px}
+.att-chip{display:inline-flex;align-items:center;gap:4px;font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 4px 2px 10px}
+.att-chip button{min-height:0;padding:0 6px;border:0;background:none;color:var(--muted)}
+.att-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.att-img{display:block;aspect-ratio:1;border-radius:8px;background:var(--bg);border:1px solid var(--line);overflow:hidden;cursor:pointer}
+.att-ph{display:flex;height:100%;align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
+.vid video{position:absolute;inset:0;width:100%;height:100%;background:#000}
+.att-img img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block;background:#000}
+.att-vid{grid-column:1/-1;display:flex;flex-direction:column;gap:6px}
+.next-view{display:flex;flex-direction:column;gap:10px}
+.msgbox:first-child{border-top:0;padding-top:0}
 .lv-desc{grid-column:1/-1;margin:-4px 0 0;font-size:13px;line-height:1.5;background:var(--bg);border-left:3px solid var(--court);border-radius:6px;padding:6px 10px}
 .lv-desc.empty{color:var(--muted);border-left-color:var(--line)}
 .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:-4px}
@@ -341,7 +354,7 @@ Object.assign(I18N.zh,{
   duprTitle:"DUPR 等級參考（全球標準）",duprIntro:"對照下表了解各等級的程度。本頁的單項評比（2.75–4.0）是教練依同一套標準評估；2.75、3.25、3.75 代表介於兩級之間。",
   duprNote:"DUPR 正式分數由實際比賽結果計算（2.000–8.000），不是依技術打分；比賽越多、分數越準。",
   dupr:[["2.0","初學","能打短回合，發球尚算穩定；以正手為主，還不懂廚房規則與第三拍。"],["2.5","初學到中級","能打中等長度回合，發球更穩，接發球後開始上網，但非受迫性失誤仍多。"],["3.0","中級","發球穩定、接發球能打深；接發後會上網，懂第三拍放小球，有意識地丁克但還不穩定。"],["3.5","中高級","第三拍放小球常能進廚房；丁克有目的、會攻擊高球；開始學站位輪轉與搭檔溝通。"],["4.0","進階","沒有明顯弱點；第三拍可靠，丁克有耐心與落點；加速時機好、防守紮實，可參加公開賽。"],["4.5","高階","站位輪轉熟練，攻守都會用旋轉；能在丁克中製造機會，重置穩定。"],["5.0+","專家／職業","各項球路接近職業水準，穩定參加高水準賽事。"]],
-  basicTitle:"學員基本資料",goalTitle:"下次目標與改進重點",
+  basicTitle:"學員基本資料",goalTitle:"下次時間與改進重點",
   timeout:"載入逾時，請檢查網路後重新整理。",notBound:"還沒填學員 Email，學員目前看不到這份紀錄",
   shareHint:"新增學員後，在「學員資料」填入學員登入用的 Google Email 並儲存。把網址傳給學員，學員用該 Google 帳號登入就只會看到自己的紀錄。",
   logoutHint:"共用裝置使用後請按登出。",signOutBtn:"登出",
@@ -363,7 +376,7 @@ Object.assign(I18N.ja,{
   duprTitle:"DUPR レベルの目安（世界基準）",duprIntro:"下の表で各レベルの目安を確認できます。このページの項目別評価（2.75–4.0）はコーチが同じ基準で評価したもので、2.75・3.25・3.75 は2つのレベルの中間です。",
   duprNote:"DUPR の正式レーティングは実際の試合結果から算出され（2.000–8.000）、技術の採点ではありません。試合数が多いほど正確になります。",
   dupr:[["2.0","初心者","短いラリーができ、サーブはある程度安定。フォアハンド中心で、キッチンやサードショットはまだ理解していない。"],["2.5","初心者〜中級","中程度のラリーができ、サーブが安定。リターン後に前へ出始めるが、凡ミスはまだ多い。"],["3.0","中級","サーブが安定し、リターンを深く返せる。前に出てサードショットドロップを知っており、意図してディンクするがまだ不安定。"],["3.5","中上級","サードショットドロップがよくキッチンに入る。目的を持ってディンクし、浮いた球を攻撃。スタッキングやパートナーとの連携を学び始める。"],["4.0","上級","大きな弱点がない。サードショットが安定し、ディンクは粘り強くコースも良い。仕掛けのタイミングが良く守備も堅い。オープン大会に出場できる。"],["4.5","高上級","スタッキングが確実で、攻守にスピンを使える。ディンク戦でチャンスを作り、リセットが安定。"],["5.0+","エキスパート／プロ","全ショットがプロに近いレベルで安定し、高レベルの大会で戦える。"]],
-  basicTitle:"生徒の基本情報",goalTitle:"次回の目標と改善ポイント",
+  basicTitle:"生徒の基本情報",goalTitle:"次回の日時と改善ポイント",
   timeout:"読み込みがタイムアウトしました。通信状況を確認して再読み込みしてください。",notBound:"生徒のメールが未入力のため、生徒はまだこの記録を見られません",
   shareHint:"生徒を追加したら「生徒情報」にログイン用の Google メールを入力して保存します。URL を送り、生徒がその Google アカウントでログインすると自分の記録だけが表示されます。",
   logoutHint:"共有端末では使用後にログアウトしてください。",signOutBtn:"ログアウト",
@@ -385,7 +398,7 @@ Object.assign(I18N.en,{
   duprTitle:"DUPR levels (global standard)",duprIntro:"Use this table to see what each level looks like. The per-skill ratings on this page (2.75–4.0) are your coach's assessment against the same standard; 2.75, 3.25 and 3.75 sit between two levels.",
   duprNote:"Official DUPR ratings are calculated from real match results (2.000–8.000), not from skill scoring; the more matches you play, the more accurate it gets.",
   dupr:[["2.0","Beginner","Short rallies, fairly steady serve; mostly forehands, doesn't yet understand the kitchen or third shots."],["2.5","Beginner–intermediate","Medium rallies, more reliable serve, starts moving up after the return, still many unforced errors."],["3.0","Intermediate","Dependable serve and deep returns; moves forward, knows the third-shot drop, dinks with intent but not consistently."],["3.5","Intermediate–advanced","Third-shot drops often land in the kitchen; purposeful dinks, attacks pop-ups; learning stacking and partner communication."],["4.0","Advanced","No major weaknesses; reliable third shots, patient placed dinks, well-timed speed-ups and solid defense; can play open events."],["4.5","High advanced","Reliable stacking, uses spin on offense and defense, creates openings in dink rallies, resets consistently."],["5.0+","Expert / pro","Near-professional technique on every shot; competes at high-level tournaments."]],
-  basicTitle:"Student details",goalTitle:"Next goal and focus points",
+  basicTitle:"Student details",goalTitle:"Next lesson & focus points",
   timeout:"Loading timed out. Check your connection and refresh.",notBound:"No student email yet, so the student can't see this record",
   shareHint:"After adding a student, enter the Google email they sign in with under Student details and save. Send them the web address; once they sign in with that Google account they see only their own record.",
   logoutHint:"Sign out when you're done on a shared device.",signOutBtn:"Sign out",
@@ -423,6 +436,29 @@ async function ensureTr(s){if(!canEdit||!s||msgFor!==s.id||!msgsReady||!/^https:
   catch(e){setTimeout(()=>need.forEach(t=>trBusy.delete(hashT(t))),60000)}}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".tr-tog");if(!b)return;const sp=b.previousElementSibling,u=TRUI[lang]||TRUI.zh,on=b.dataset.on==="1";
   if(sp)sp.textContent=on?b.dataset.o:b.dataset.x;b.dataset.on=on?"0":"1";b.textContent=on?u.trans:u.orig});
+const UPUI={"zh":{"loading":"載入中…","pick":"📎 照片／影片","hint":"最多 3 個檔案；影片上限 30MB，太大請先剪短或貼 YouTube 連結","big":"影片太大（上限 30MB），請剪短或改貼 YouTube 連結","many":"最多 3 個檔案","up":"上傳中","fail":"上傳失敗，請再試一次","bad":"只能上傳照片或影片","play":"▶ 播放影片","hide":"收起影片","rm":"移除","edit":"修改時間與重點"},"ja":{"loading":"読み込み中…","pick":"📎 写真／動画","hint":"最大3ファイル。動画は30MBまで。大きい場合は短くするか YouTube リンクを貼ってください","big":"動画が大きすぎます（30MBまで）。短くするか YouTube リンクを使ってください","many":"最大3ファイルまで","up":"アップロード中","fail":"アップロードできませんでした。もう一度お試しください","bad":"写真か動画のみアップロードできます","play":"▶ 動画を再生","hide":"閉じる","rm":"削除","edit":"日時と重点を編集"},"en":{"loading":"Loading…","pick":"📎 Photo / video","hint":"Up to 3 files; videos up to 30MB. Trim longer clips or paste a YouTube link","big":"Video too large (30MB max). Trim it or paste a YouTube link","many":"Up to 3 files","up":"Uploading","fail":"Upload failed. Please try again","bad":"Only photos or videos can be uploaded","play":"▶ Play video","hide":"Hide video","rm":"Remove","edit":"Edit time & focus points"}};
+function up(){return UPUI[lang]||UPUI.zh}
+const DRIVE_ID=/^[A-Za-z0-9_-]{10,120}$/;
+let pendingFiles=[];
+const attCache=new Map(),attLoading=new Map();
+function attHtml(m){const a=Array.isArray(m.att)?m.att.filter(x=>x&&DRIVE_ID.test(String(x.id||""))).slice(0,3):[];if(!a.length)return "";
+  return `<div class="att-row">${a.map(x=>x.k==="vid"?`<div class="att-vid"><button type="button" class="vid-btn" data-vfid="${x.id}" data-mid="${esc(m.id)}">${up().play}</button><div class="vid" hidden></div></div>`
+    :(attCache.has(x.id)?`<a class="att-img" href="${attCache.get(x.id)}" target="_blank" rel="noopener"><img src="${attCache.get(x.id)}" alt=""></a>`
+      :`<a class="att-img" data-fid="${x.id}" data-mid="${esc(m.id)}"><span class="att-ph">${up().loading}</span></a>`)).join("")}</div>`}
+function fetchAtt(sid,mid,id){if(attCache.has(id))return Promise.resolve(attCache.get(id));if(attLoading.has(id))return attLoading.get(id);
+  const pr=(async()=>{const token=await auth.currentUser.getIdToken();const r=await fetch(NOTIFY_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"file",sid,mid,id,token})});
+    const j=await r.json();if(!j||!j.ok||!j.data)throw new Error(up().fail);const bin=atob(j.data),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([u8],{type:j.mime||"application/octet-stream"}));attCache.set(id,url);return url})();
+  attLoading.set(id,pr);pr.catch(()=>attLoading.delete(id));return pr}
+function loadAtts(s){if(!/^https:/.test(NOTIFY_URL)||!auth||!auth.currentUser)return;document.querySelectorAll("a.att-img[data-fid]").forEach(a=>{const id=a.dataset.fid;
+  fetchAtt(s.id,a.dataset.mid,id).then(url=>{a.removeAttribute("data-fid");a.href=url;a.target="_blank";a.rel="noopener";a.innerHTML=`<img src="${url}" alt="">`}).catch(()=>{const ph=a.querySelector(".att-ph");if(ph)ph.textContent=up().fail})})}
+function pendingHtml(){return pendingFiles.map((f,i)=>`<span class="att-chip">${esc(f.name.length>24?f.name.slice(0,21)+"…":f.name)} <button type="button" data-rmfile="${i}" aria-label="${up().rm}">✕</button></span>`).join("")}
+async function shrinkImage(f){try{const bmp=await createImageBitmap(f);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+  const b=await new Promise(r=>c.toBlob(r,"image/jpeg",.85));return b?new File([b],(f.name||"photo").replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"}):f}catch(e){return f}}
+function b64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.onerror=rej;r.readAsDataURL(blob)})}
+async function uploadFile(sid,f){const isV=/^video\//.test(f.type);const g=isV?f:await shrinkImage(f);if(isV&&g.size>30*1024*1024)throw new Error(up().big);
+  const token=await auth.currentUser.getIdToken();const r=await fetch(NOTIFY_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"upload",sid,token,name:g.name||"file",mime:g.type||(isV?"video/mp4":"image/jpeg"),data:await b64(g)})});
+  const j=await r.json();if(!j||!j.ok||!DRIVE_ID.test(String(j.id||"")))throw new Error(up().fail);return {k:isV?"vid":"img",id:j.id}}
 const MCUI={"zh":{"mgmt":"教練管理（僅管理者）","mgmtHint":"加入教練的 Google Email。教練用該帳號登入同一個網址，就只會看到自己負責的學員。","cName":"教練名稱","cEmail":"教練 Google Email","add":"加入教練","remove":"移除","removeAsk":"移除後，他的學員會轉回你名下。確定移除？","yes":"確定移除","cancel":"取消","owner":"管理者","stu":"位學員","coachOf":"負責教練","all":"全部教練","exists":"這個 Email 已經在名單裡","bad":"請輸入正確的 Email","added":"已加入","failed":"儲存失敗，請再試一次","roleAdmin":"管理者","roleCoach":"教練","link":"教練登入網址","none":"還沒有其他教練","moved":"學員已轉回你名下"},"ja":{"mgmt":"コーチ管理（管理者のみ）","mgmtHint":"コーチの Google メールを追加します。コーチは同じURLにそのアカウントでログインすると、担当の生徒だけが表示されます。","cName":"コーチ名","cEmail":"コーチの Google メール","add":"コーチを追加","remove":"削除","removeAsk":"削除すると、そのコーチの生徒はあなたの担当に戻ります。削除しますか？","yes":"削除する","cancel":"キャンセル","owner":"管理者","stu":"人の生徒","coachOf":"担当コーチ","all":"すべてのコーチ","exists":"このメールはすでに登録されています","bad":"正しいメールを入力してください","added":"追加しました","failed":"保存できませんでした。もう一度お試しください","roleAdmin":"管理者","roleCoach":"コーチ","link":"コーチのログインURL","none":"まだ他のコーチはいません","moved":"生徒をあなたの担当に戻しました"},"en":{"mgmt":"Coaches (admin only)","mgmtHint":"Add a coach's Google email. They sign in at the same link and only see the students assigned to them.","cName":"Coach name","cEmail":"Coach Google email","add":"Add coach","remove":"Remove","removeAsk":"Their students will move back to you. Remove this coach?","yes":"Remove","cancel":"Cancel","owner":"Admin","stu":"students","coachOf":"Coach","all":"All coaches","exists":"That email is already on the list","bad":"Enter a valid email","added":"Added","failed":"Couldn't save. Please try again","roleAdmin":"Admin","roleCoach":"Coach","link":"Coach sign-in link","none":"No other coaches yet","moved":"Students moved back to you"}};
 function mc(){return MCUI[lang]||MCUI.zh}
 const KUI={"zh":{"lvStd":"等級標準","below":"尚未穩定達到 3.0：","toward":"已達 {a}，正在邁向 {b}：","pick":"選擇等級後會顯示對應標準","chipHint":"點一下帶入說明","practice":"下一步練習","practiceSub":"依需修正和最低分項目自動建議，由教練確認","practiceNone":"完成技術評估後，會自動建議下一步練習。","now":"目前","target":"目標","targetStd":"下一級標準","drill":"練習","test":"10 球測驗","maxed":"已達 4.0，維持穩定並挑戰更高強度的比賽","toGoal":"帶入下次目標","toRec":"帶入上課紀錄","filled":"已帶入，記得按儲存","flagged":"需修正","video":"影片連結（選填）","videoPh":"貼上 YouTube 或 Google 雲端硬碟連結","videoBad":"影片連結需以 https:// 開頭","watch":"▶ 看影片","open":"開啟影片","hide":"收起影片","unrated":"未評估"},"ja":{"lvStd":"レベル基準","below":"まだ安定して 3.0 に届いていない：","toward":"{a} に到達、{b} を目指して：","pick":"レベルを選ぶと基準が表示されます","chipHint":"タップでコメントに追加","practice":"次の練習","practiceSub":"要修正と最も低い項目から自動で提案（コーチが確認）","practiceNone":"技術評価を行うと、次の練習が自動で提案されます。","now":"現在","target":"目標","targetStd":"次のレベルの基準","drill":"練習","test":"10球テスト","maxed":"4.0 に到達。安定を保ち、より強い相手との試合に挑戦","toGoal":"次回の目標に入れる","toRec":"レッスン記録に入れる","filled":"入力しました。保存を忘れずに","flagged":"要修正","video":"動画リンク（任意）","videoPh":"YouTube または Google ドライブのリンク","videoBad":"動画リンクは https:// で始めてください","watch":"▶ 動画を見る","open":"動画を開く","hide":"閉じる","unrated":"未評価"},"en":{"lvStd":"Level standards","below":"Not yet consistent at 3.0: ","toward":"At {a}, working toward {b}: ","pick":"Pick a level to see its standard","chipHint":"Tap to add to the comment","practice":"Next practice","practiceSub":"Suggested from needs-work and lowest skills; the coach confirms","practiceNone":"Rate skills and the next practice will be suggested here.","now":"Now","target":"Target","targetStd":"Next-level standard","drill":"Drill","test":"10-ball test","maxed":"At 4.0: stay consistent and take on stronger matches","toGoal":"Use as next goal","toRec":"Use in lesson record","filled":"Filled in. Remember to save","flagged":"Needs work","video":"Video link (optional)","videoPh":"Paste a YouTube or Google Drive link","videoBad":"Video link must start with https://","watch":"▶ Watch","open":"Open video","hide":"Hide video","unrated":"Not rated"}};
@@ -637,37 +673,36 @@ function icsFile(s){const d=lessonStart(s);if(!d)return null;const e=new Date(d.
 function downloadIcs(s){const t=icsFile(s);if(!t)return;const blob=new Blob([t],{type:"text/calendar;charset=utf-8"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`TPCoach-${(s.nextAt||"").slice(0,10)}.ics`;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
-function nextCard(s){
+function nextCard(s){return `<section class="card" aria-label="${T.goalTitle}"><h2>${T.goalTitle}</h2>${nextInfo(s)}</section>`}
+function msgCard(s){return `<section class="card" aria-label="${T.msgTitle}">${msgBlock(s)}</section>`}
+function nextInfo(s){
   const prep=(s.prep||[]).filter(Boolean),ticks=loadTicks(s.id,s.nextGoal||"");
-  return `<section class="card" aria-label="${T.next}">
-    <h2>${T.next}</h2>
-    ${s.nextAt&&lessonStart(s)&&lessonStart(s).getTime()+(+s.nextDur||60)*6e4>Date.now()?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span><span class="muted">${esc(s.nextPlace||PLACE)}</span></div>
+  return `${s.nextAt&&lessonStart(s)&&lessonStart(s).getTime()+(+s.nextDur||60)*6e4>Date.now()?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span><span class="muted">${esc(s.nextPlace||PLACE)}</span></div>
       <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s,canEdit))}" target="_blank" rel="noopener">${canEdit&&EMAIL_RE.test(String(s.email||""))?calI().inv:T.calGoogle}</a></div>
       <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>${canEdit?`<p class="muted" style="margin:0;font-size:12px">${EMAIL_RE.test(String(s.email||""))?calI().invHint:calI().noMail}</p>`:""}`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
     <div class="goal">${s.nextGoal?tx(s,s.nextGoal):esc(T.noGoal)}</div>
-    ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${tx(s,p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
-    ${msgBlock(s)}
-  </section>`;
+    ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${tx(s,p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}`;
 }
 let msgs=[],msgFor=null,msgUnsub=null,msgCanWrite=null,msgsReady=false;
-function watchMsgs(id){if(msgFor===id||!db)return;if(msgUnsub)msgUnsub();msgFor=id;msgs=[];msgsReady=false;
+function watchMsgs(id){if(msgFor===id||!db)return;if(msgUnsub)msgUnsub();msgFor=id;msgs=[];msgsReady=false;pendingFiles=[];
   msgUnsub=db.collection(`students/${id}/msgs`).onSnapshot(sn=>{msgs=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.t).localeCompare(String(b.t)));msgsReady=true;render()},()=>{msgs=[];msgsReady=true})}
 function lineText(s,type,text){return `[${T.msgTitle}] ${s.name||""}\n${T.mtypes[type]||""}${T.colon}${text}`}
 function msgBlock(s){
   const items=msgs.slice().reverse().map(m=>`<li class="msg-item">
       <div class="msg-meta"><span class="mtag mtag-${esc(m.type)}">${esc(T.mtypes[m.type]||m.type)}</span><span class="muted">${esc(fmtWhen(m.t))} · ${m.from==="coach"?T.fromLog:T.fromStu}</span></div>
-      <p class="msg-text">${tx(s,m.text)}</p>
+      ${m.text?`<p class="msg-text">${tx(s,m.text)}</p>`:""}${attHtml(m)}
       ${m.reply?`<div class="msg-reply"><b>${T.reply}</b><p>${tx(s,m.reply)}</p><span class="muted">${esc(fmtWhen(m.replyT))}</span></div>`:""}
       ${canEdit?`<div class="actions"><input id="rp-${esc(m.id)}" placeholder="${T.replyPh}" value="" style="flex:1 1 180px;width:auto"><button type="button" class="primary" data-reply="${esc(m.id)}">${T.replyBtn}</button><button type="button" class="danger" data-delmsg="${esc(m.id)}">${T.delMsg}</button></div>`:""}
     </li>`).join("");
   const opts=Object.entries(T.mtypes).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   return `<div class="msgbox">
-    <h2>${T.msgTitle}</h2>
+    ${canEdit?"":`<h2>${T.msgTitle}</h2>`}
     ${canEdit?"":`<p class="muted" style="margin:0">${T.msgHint}</p>`}
     <form id="f-msg" class="msg-form">
       ${canEdit?`<p class="muted" style="margin:0;font-weight:700">${T.logTitle}</p>`:""}
       <select id="m-type" aria-label="${T.msgTitle}">${opts}</select>
-      <textarea id="m-text" rows="3" placeholder="${T.msgPh}" required></textarea>
+      <textarea id="m-text" rows="3" placeholder="${T.msgPh}"></textarea>
+      ${/^https:/.test(NOTIFY_URL)?`<div class="att-pick-row"><label class="btn-link att-pick">${up().pick}<input type="file" id="m-file" accept="image/*,video/*" multiple hidden></label><span class="att-chips" id="m-files">${pendingHtml()}</span></div><p class="muted" style="margin:0;font-size:12px">${up().hint}</p>`:""}
       <div class="actions"><button class="primary" type="submit">${canEdit?T.logBtn:T.send}</button><span class="msg" id="m-msg"></span></div>
     </form>
     ${items?`<ul class="msg-list">${items}</ul>`:`<p class="muted" style="margin:0">${T.noMsg}</p>`}
@@ -718,6 +753,8 @@ function basicCard(s){
 }
 function infoCard(s){
   return `<details class="card" id="ed-info"><summary>${T.goalTitle}${s.nextAt||s.nextGoal?` <span class="muted sum-sub">${esc([s.nextAt?fmtLesson(s):"",s.nextGoal||""].filter(Boolean).join(" · "))}</span>`:""}</summary>
+    <div class="next-view">${nextInfo(s)}</div>
+    <p class="muted" style="margin:0;font-weight:700;border-top:1px solid var(--line);padding-top:12px">${up().edit}</p>
     <form id="f-info" class="grid">
       <label class="field" style="grid-column:1/-1">${T.nextAtF}${dtFields("i-next-at",suggestNext(s))}</label>
       <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||lastSlot().dur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
@@ -800,8 +837,8 @@ function render(){
   // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
   const left=canEdit?basicCard(s)+skillsCard(s)+practiceCard(s)+curveCard(s):skillsCard(s)+practiceCard(s)+curveCard(s);
   const right=canEdit?skillsEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
-      +fold("c-next",`${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,nextCard(s))
-    :nextCard(s)+rowsCard(s);
+      +fold("c-next",`${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,msgBlock(s))
+    :nextCard(s)+msgCard(s)+rowsCard(s);
   h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
   app.innerHTML=h;
   for(const k of ["rank","dupr","c-rows","c-next","coachm"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
@@ -816,9 +853,18 @@ function render(){
 
 function bindMsgs(s){
   const f=document.getElementById("f-msg");if(!f)return;
-  f.addEventListener("submit",ev=>{ev.preventDefault();busy(f,async()=>{const text=val("m-text").trim().slice(0,1000);if(!text)return;
+  const fi=document.getElementById("m-file"),fl=document.getElementById("m-files");
+  const redrawFiles=()=>{if(fl){fl.innerHTML=pendingHtml();fl.querySelectorAll("[data-rmfile]").forEach(b=>b.addEventListener("click",()=>{pendingFiles.splice(+b.dataset.rmfile,1);redrawFiles()}))}};
+  redrawFiles();
+  fi?.addEventListener("change",()=>{const add=[...fi.files];fi.value="";
+    if(add.some(x=>!/^(image|video)\//.test(x.type))){flash("m-msg",up().bad);return}
+    if(add.some(x=>/^video\//.test(x.type)&&x.size>30*1024*1024)){flash("m-msg",up().big);return}
+    if(pendingFiles.length+add.length>3){flash("m-msg",up().many);return}
+    pendingFiles.push(...add);redrawFiles()});
+  f.addEventListener("submit",ev=>{ev.preventDefault();busy(f,async()=>{const text=val("m-text").trim().slice(0,1000);if(!text&&!pendingFiles.length)return;
     const m={type:val("m-type"),text,t:new Date().toISOString(),from:canEdit?"coach":"student"};
-    try{const ref=db.collection(`students/${s.id}/msgs`).doc();await ref.set(m);if(!canEdit)notifyCoach(s.id,ref.id);dirty.delete("m-text");dirty.delete("m-type");const ta=document.getElementById("m-text");if(ta)ta.value="";flash("m-msg",T.sent)}
+    try{if(pendingFiles.length){const att=[];for(let i=0;i<pendingFiles.length;i++){flash("m-msg",`${up().up} ${i+1}/${pendingFiles.length}…`);att.push(await uploadFile(s.id,pendingFiles[i]))}m.att=att}
+      const ref=db.collection(`students/${s.id}/msgs`).doc();await ref.set(m);pendingFiles=[];if(!canEdit)notifyCoach(s.id,ref.id);dirty.delete("m-text");dirty.delete("m-type");const ta=document.getElementById("m-text");if(ta)ta.value="";flash("m-msg",T.sent)}
     catch(e){alertBox(T.msgFail+(e&&e.message||T.retry))}})});
   if(!canEdit)return;
   document.querySelectorAll("[data-reply]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.reply,t=val("rp-"+id).trim();if(!t)return;
@@ -842,6 +888,12 @@ function bind(){
   document.querySelectorAll("[data-vid]").forEach(b=>b.addEventListener("click",()=>{const box=document.getElementById("vid-"+b.dataset.vid);if(!box)return;
     if(box.hidden){box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?rel=0&playsinline=1" title="video" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;box.hidden=false;b.textContent=ku().hide}
     else{box.innerHTML="";box.hidden=true;b.textContent=ku().watch}}));
+  if(s)loadAtts(s);
+  document.querySelectorAll("[data-vfid]").forEach(b=>b.addEventListener("click",async()=>{const box=b.nextElementSibling;if(!box||!s)return;
+    if(!box.hidden){box.innerHTML="";box.hidden=true;b.textContent=up().play;return}
+    b.disabled=true;b.textContent=up().loading;
+    try{const url=await fetchAtt(s.id,b.dataset.mid,b.dataset.vfid);box.innerHTML=`<video src="${url}" controls playsinline></video>`;box.hidden=false;b.textContent=up().hide}
+    catch(e){b.textContent=up().fail}finally{b.disabled=false}}));
   if(!canEdit)return;
   document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{currentId=b.dataset.open;location.hash=currentId;render();scrollTo(0,0)}));
   document.getElementById("cfilter")?.addEventListener("change",e=>{coachFilter=e.target.value;if(currentId&&!visible().some(x=>x.id===currentId)){currentId=null;location.hash=""}render()});
