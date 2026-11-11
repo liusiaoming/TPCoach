@@ -18,6 +18,9 @@ img{max-width:100%}
 .co-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .co-who{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
 .tr-tog{margin-left:6px;font-size:12px;padding:1px 8px;min-height:0;border-radius:999px;color:var(--muted);vertical-align:baseline}
+.dt{display:flex;gap:6px}
+.dt input{flex:1 1 0;min-width:0}
+.dt input[type=date]{flex-grow:1.4}
 .lv-desc{grid-column:1/-1;margin:-4px 0 0;font-size:13px;line-height:1.5;background:var(--bg);border-left:3px solid var(--court);border-radius:6px;padding:6px 10px}
 .lv-desc.empty{color:var(--muted);border-left-color:var(--line)}
 .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:-4px}
@@ -475,6 +478,8 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function num(v,d){const n=parseFloat(v);return isFinite(n)?n:d}
 function fmtLv(n){return Number(n).toFixed(1)}
 function hashId(){const h=location.hash.slice(1);return /^[A-Za-z0-9_-]{6,40}$/.test(h)?h:null}
+function dtFields(id,v,req){v=String(v||"");return `<span class="dt"><input id="${id}-d" type="date" value="${esc(v.slice(0,10))}"${req?" required":""} aria-label="date"><input id="${id}-t" type="time" step="300" value="${esc(v.slice(11,16))}"${req?" required":""} aria-label="time"></span>`}
+function dtVal(id){const d=val(id+"-d"),t=val(id+"-t");return d&&t?`${d}T${t}`:(d?`${d}T00:00`:"")}
 const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function newId(){const a="abcdefghijkmnpqrstuvwxyz23456789";let s="s-";for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
 function loadTicks(id,goal){try{const v=JSON.parse(localStorage.getItem("prep:"+id)||"null");return v&&v.goal===goal?v.ticks:[]}catch(e){return []}}
@@ -613,8 +618,11 @@ function lessonText(s){
   L.push("");L.push(url);return L.join("\n")}
 function calTitle(s){return `TPCoach ${T.lessonWord}｜${s.name||""}`}
 const utc=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
-function gcalUrl(s){const d=lessonStart(s);if(!d)return "#";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
+const CALI={"zh":{"inv":"加入 Google 日曆並邀請學員","invHint":"Google 日曆開啟後，學員已在「邀請對象」裡。按「儲存」→「傳送」，學員就會收到邀請信，接受後課程會出現在他的日曆。","noMail":"先在學員資料填入學員 Email，就能同時邀請學員。"},"ja":{"inv":"Google カレンダーに追加して生徒を招待","invHint":"Google カレンダーが開くと、生徒はすでに「ゲスト」に入っています。「保存」→「送信」で招待メールが届き、承諾するとレッスンが生徒のカレンダーに表示されます。","noMail":"生徒情報にメールを入れると、生徒も同時に招待できます。"},"en":{"inv":"Add to Google Calendar & invite student","invHint":"The student is already listed as a guest. Tap Save → Send and they'll get an invitation; once they accept, the lesson shows in their calendar.","noMail":"Add the student's email in their details to invite them too."}};
+function calI(){return CALI[lang]||CALI.zh}
+function gcalUrl(s,invite){const d=lessonStart(s);if(!d)return "#";const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
   const q=new URLSearchParams({action:"TEMPLATE",text:calTitle(s),dates:`${utc(d)}/${utc(e)}`,details:lessonText(s).slice(0,1500),location:s.nextPlace||PLACE});
+  if(invite&&EMAIL_RE.test(String(s.email||"")))q.set("add",String(s.email).toLowerCase());
   return "https://calendar.google.com/calendar/render?"+q.toString()}
 function icsFile(s){const d=lessonStart(s);if(!d)return null;const e=new Date(d.getTime()+(+s.nextDur||60)*6e4);
   const x=t=>String(t).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
@@ -634,8 +642,8 @@ function nextCard(s){
   return `<section class="card" aria-label="${T.next}">
     <h2>${T.next}</h2>
     ${s.nextAt&&lessonStart(s)&&lessonStart(s).getTime()+(+s.nextDur||60)*6e4>Date.now()?`<div class="when"><span class="when-t">${esc(fmtLesson(s))}</span><span class="muted">${esc(s.nextPlace||PLACE)}</span></div>
-      <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s))}" target="_blank" rel="noopener">${T.calGoogle}</a></div>
-      <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
+      <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s,canEdit))}" target="_blank" rel="noopener">${canEdit&&EMAIL_RE.test(String(s.email||""))?calI().inv:T.calGoogle}</a></div>
+      <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>${canEdit?`<p class="muted" style="margin:0;font-size:12px">${EMAIL_RE.test(String(s.email||""))?calI().invHint:calI().noMail}</p>`:""}`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
     <div class="goal">${s.nextGoal?tx(s,s.nextGoal):esc(T.noGoal)}</div>
     ${prep.length?`<p class="muted" style="margin:0;font-weight:700">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${tx(s,p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
     ${msgBlock(s)}
@@ -686,7 +694,7 @@ function rowsCard(s){
 function recCard(s){
   return `<details class="card" id="ed-rec"><summary>${T.addRec}</summary>
     <form id="f-rec" class="grid">
-      <label class="field">${T.date}<input id="r-date" type="datetime-local" value="${localNow()}" required></label>
+      <label class="field" style="grid-column:1/-1">${T.date}${dtFields("r-date",localNow(),true)}</label>
       <label class="field" style="grid-column:span 2">${T.item}<input id="r-item" placeholder="${T.itemPh}" required></label>
       <label class="field">${T.beforeN}<input id="r-before" type="number" min="0" max="10" required></label>
       <label class="field">${T.afterN}<input id="r-after" type="number" min="0" max="10" required></label>
@@ -711,7 +719,7 @@ function basicCard(s){
 function infoCard(s){
   return `<details class="card" id="ed-info"><summary>${T.goalTitle}${s.nextAt||s.nextGoal?` <span class="muted sum-sub">${esc([s.nextAt?fmtLesson(s):"",s.nextGoal||""].filter(Boolean).join(" · "))}</span>`:""}</summary>
     <form id="f-info" class="grid">
-      <label class="field">${T.nextAtF}<input id="i-next-at" type="datetime-local" value="${esc(suggestNext(s))}"></label>
+      <label class="field" style="grid-column:1/-1">${T.nextAtF}${dtFields("i-next-at",suggestNext(s))}</label>
       <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||lastSlot().dur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
       ${suggestNext(s)&&suggestNext(s)!==(s.nextAt||"")?`<p class="muted" style="margin:0;grid-column:1/-1;font-size:13px">${T.prefillHint}</p>`:""}
       <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
@@ -792,7 +800,7 @@ function render(){
   // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
   const left=canEdit?basicCard(s)+skillsCard(s)+practiceCard(s)+curveCard(s):skillsCard(s)+practiceCard(s)+curveCard(s);
   const right=canEdit?skillsEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
-      +fold("c-next",`${T.next}・${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,nextCard(s))
+      +fold("c-next",`${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,nextCard(s))
     :nextCard(s)+rowsCard(s);
   h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
   app.innerHTML=h;
@@ -873,9 +881,9 @@ function bind(){
   const fRec=document.getElementById("f-rec");
   fRec?.addEventListener("submit",ev=>{ev.preventDefault();busy(fRec,async()=>{
     let vu=val("r-video").trim();if(vu&&!/^[a-z]+:\/\//i.test(vu)&&/^[\w-]+(\.[\w-]+)+(\/|$)/.test(vu))vu="https://"+vu;if(vu&&!/^https:\/\/\S+$/i.test(vu)){flash("m-rec",ku().videoBad);return}
-    const r={rid:Math.random().toString(36).slice(2,9),date:val("r-date"),item:val("r-item").trim(),
+    const r={rid:Math.random().toString(36).slice(2,9),date:dtVal("r-date"),item:val("r-item").trim(),
       before:Math.max(0,Math.min(10,parseInt(val("r-before"))||0)),after:Math.max(0,Math.min(10,parseInt(val("r-after"))||0)),note:val("r-note").trim()};if(vu)r.video=vu;
-    if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note","r-video"].forEach(i=>{dirty.delete(i);const el=document.getElementById(i);if(el)el.value=""});dirty.delete("r-date");flash("m-rec",T.added)}
+    if(await save(s.id,{sessions:[...(s.sessions||[]),r]})){["r-item","r-before","r-after","r-note","r-video"].forEach(i=>{dirty.delete(i);const el=document.getElementById(i);if(el)el.value=""});dirty.delete("r-date-d");dirty.delete("r-date-t");flash("m-rec",T.added)}
   })});
   const fBasic=document.getElementById("f-basic");
   fBasic?.addEventListener("submit",ev=>{ev.preventDefault();busy(fBasic,async()=>{
@@ -887,7 +895,7 @@ function bind(){
   })});
   const fInfo=document.getElementById("f-info");
   fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
-    const na=val("i-next-at"),nd=na?new Date(na):null;if(nd&&!isNaN(nd))try{localStorage.setItem("lastSlot",JSON.stringify({t:na.slice(11,16),dow:nd.getDay(),dur:+val("i-dur")||60}))}catch(e){}const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:PLACE,nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
+    const na=dtVal("i-next-at"),nd=na?new Date(na):null;if(nd&&!isNaN(nd))try{localStorage.setItem("lastSlot",JSON.stringify({t:na.slice(11,16),dow:nd.getDay(),dur:+val("i-dur")||60}))}catch(e){}const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:PLACE,nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
     if(await save(s.id,d)){clean(fInfo);flash("m-info",T.saved)}
   })});
   const fSkill=document.getElementById("f-skill");
