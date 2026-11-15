@@ -34,6 +34,7 @@ img{max-width:100%}
 .att-vid{grid-column:1/-1;display:flex;flex-direction:column;gap:6px}
 .next-view{display:flex;flex-direction:column;gap:10px}
 .msgbox:first-child{border-top:0;padding-top:0}
+textarea.grow{min-height:96px;resize:vertical;line-height:1.5;overflow:hidden}
 .lv-desc{grid-column:1/-1;margin:-4px 0 0;font-size:13px;line-height:1.5;background:var(--bg);border-left:3px solid var(--court);border-radius:6px;padding:6px 10px}
 .lv-desc.empty{color:var(--muted);border-left-color:var(--line)}
 .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:-4px}
@@ -434,6 +435,9 @@ async function ensureTr(s){if(!canEdit||!s||msgFor!==s.id||!msgsReady||!/^https:
     Object.entries(cur).forEach(([k,v])=>{if(live.has(k))keep[k]=v});
     await db.collection("students").doc(s.id).update({tr:{...keep,...upd}})}
   catch(e){setTimeout(()=>need.forEach(t=>trBusy.delete(hashT(t))),60000)}}
+const growTa=t=>{t.style.height="auto";t.style.height=Math.min(t.scrollHeight+2,480)+"px";t.style.overflowY=t.scrollHeight>478?"auto":"hidden"};
+document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.grow"))growTa(e.target)});
+new MutationObserver(()=>document.querySelectorAll("textarea.grow").forEach(t=>{if(!t.dataset.g){t.dataset.g=1;requestAnimationFrame(()=>growTa(t))}})).observe(document.documentElement,{childList:true,subtree:true});
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".tr-tog");if(!b)return;const sp=b.previousElementSibling,u=TRUI[lang]||TRUI.zh,on=b.dataset.on==="1";
   if(sp)sp.textContent=on?b.dataset.o:b.dataset.x;b.dataset.on=on?"0":"1";b.textContent=on?u.trans:u.orig});
 const UPUI={"zh":{"loading":"載入中…","pick":"📎 照片／影片","hint":"最多 3 個檔案；影片上限 30MB，太大請先剪短或貼 YouTube 連結","big":"影片太大（上限 30MB），請剪短或改貼 YouTube 連結","many":"最多 3 個檔案","up":"上傳中","fail":"上傳失敗，請再試一次","bad":"只能上傳照片或影片","play":"▶ 播放影片","hide":"收起影片","rm":"移除","edit":"修改時間與重點"},"ja":{"loading":"読み込み中…","pick":"📎 写真／動画","hint":"最大3ファイル。動画は30MBまで。大きい場合は短くするか YouTube リンクを貼ってください","big":"動画が大きすぎます（30MBまで）。短くするか YouTube リンクを使ってください","many":"最大3ファイルまで","up":"アップロード中","fail":"アップロードできませんでした。もう一度お試しください","bad":"写真か動画のみアップロードできます","play":"▶ 動画を再生","hide":"閉じる","rm":"削除","edit":"日時と重点を編集"},"en":{"loading":"Loading…","pick":"📎 Photo / video","hint":"Up to 3 files; videos up to 30MB. Trim longer clips or paste a YouTube link","big":"Video too large (30MB max). Trim it or paste a YouTube link","many":"Up to 3 files","up":"Uploading","fail":"Upload failed. Please try again","bad":"Only photos or videos can be uploaded","play":"▶ Play video","hide":"Hide video","rm":"Remove","edit":"Edit time & focus points"}};
@@ -692,7 +696,7 @@ function msgBlock(s){
       <div class="msg-meta"><span class="mtag mtag-${esc(m.type)}">${esc(T.mtypes[m.type]||m.type)}</span><span class="muted">${esc(fmtWhen(m.t))} · ${m.from==="coach"?T.fromLog:T.fromStu}</span></div>
       ${m.text?`<p class="msg-text">${tx(s,m.text)}</p>`:""}${attHtml(m)}
       ${m.reply?`<div class="msg-reply"><b>${T.reply}</b><p>${tx(s,m.reply)}</p><span class="muted">${esc(fmtWhen(m.replyT))}</span></div>`:""}
-      ${canEdit?`<div class="actions"><input id="rp-${esc(m.id)}" placeholder="${T.replyPh}" value="" style="flex:1 1 180px;width:auto"><button type="button" class="primary" data-reply="${esc(m.id)}">${T.replyBtn}</button><button type="button" class="danger" data-delmsg="${esc(m.id)}">${T.delMsg}</button></div>`:""}
+      ${canEdit?`<textarea id="rp-${esc(m.id)}" class="grow" rows="3" placeholder="${T.replyPh}">${esc(m.reply||"")}</textarea><div class="actions"><button type="button" class="primary" data-reply="${esc(m.id)}">${T.replyBtn}</button><button type="button" class="danger" data-delmsg="${esc(m.id)}">${T.delMsg}</button></div>`:""}
     </li>`).join("");
   const opts=Object.entries(T.mtypes).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   return `<div class="msgbox">
@@ -701,7 +705,7 @@ function msgBlock(s){
     <form id="f-msg" class="msg-form">
       ${canEdit?`<p class="muted" style="margin:0;font-weight:700">${T.logTitle}</p>`:""}
       <select id="m-type" aria-label="${T.msgTitle}">${opts}</select>
-      <textarea id="m-text" rows="3" placeholder="${T.msgPh}"></textarea>
+      <textarea id="m-text" class="grow" rows="4" placeholder="${T.msgPh}"></textarea>
       ${/^https:/.test(NOTIFY_URL)?`<div class="att-pick-row"><label class="btn-link att-pick">${up().pick}<input type="file" id="m-file" accept="image/*,video/*" multiple hidden></label><span class="att-chips" id="m-files">${pendingHtml()}</span></div><p class="muted" style="margin:0;font-size:12px">${up().hint}</p>`:""}
       <div class="actions"><button class="primary" type="submit">${canEdit?T.logBtn:T.send}</button><span class="msg" id="m-msg"></span></div>
     </form>
@@ -760,7 +764,7 @@ function infoCard(s){
       <label class="field">${T.durF}<select id="i-dur">${[60,90,120].map(m=>`<option value="${m}" ${(+s.nextDur||lastSlot().dur||60)===m?"selected":""}>${T.mins(m)}</option>`).join("")}</select></label>
       ${suggestNext(s)&&suggestNext(s)!==(s.nextAt||"")?`<p class="muted" style="margin:0;grid-column:1/-1;font-size:13px">${T.prefillHint}</p>`:""}
       <label class="field" style="grid-column:1/-1">${T.goalF}<input id="i-goal" value="${esc(s.nextGoal)}"></label>
-      <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" rows="3">${esc((s.prep||[]).join("\n"))}</textarea></label>
+      <label class="field" style="grid-column:1/-1">${T.prepF}<textarea id="i-prep" class="grow" rows="4">${esc((s.prep||[]).join("\n"))}</textarea></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-info"></span></div>
     </form>
   </details>`;
