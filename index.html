@@ -463,6 +463,16 @@ function b64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onl
 async function uploadFile(sid,f){const isV=/^video\//.test(f.type);const g=isV?f:await shrinkImage(f);if(isV&&g.size>30*1024*1024)throw new Error(up().big);
   const token=await auth.currentUser.getIdToken();const r=await fetch(NOTIFY_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"upload",sid,token,name:g.name||"file",mime:g.type||(isV?"video/mp4":"image/jpeg"),data:await b64(g)})});
   const j=await r.json();if(!j||!j.ok||!DRIVE_ID.test(String(j.id||"")))throw new Error(up().fail);return {k:isV?"vid":"img",id:j.id}}
+const IVUI={"zh":{"sent":"已寄出邀請信到 {e}","joined":"✅ 學員已於 {d} 登入","wait":"⏳ 學員尚未登入","invited":"邀請信已於 {d} 寄出","resend":"重寄邀請信","resent":"已重寄邀請信","fail":"邀請信寄送失敗，請稍後再試"},"ja":{"sent":"{e} に招待メールを送りました","joined":"✅ 生徒は {d} にログインしました","wait":"⏳ 生徒はまだログインしていません","invited":"招待メールは {d} に送信済み","resend":"招待メールを再送","resent":"招待メールを再送しました","fail":"招待メールを送れませんでした。後でもう一度お試しください"},"en":{"sent":"Invitation sent to {e}","joined":"✅ Student signed in on {d}","wait":"⏳ Student hasn't signed in yet","invited":"Invitation sent on {d}","resend":"Resend invitation","resent":"Invitation resent","fail":"Couldn't send the invitation. Please try again later"}};
+function iv(){return IVUI[lang]||IVUI.zh}
+function shortDate(t){const d=new Date(t);return isNaN(d)?"":`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
+let ivNote=null;
+function inviteHtml(s){if(!s.email)return "";const u=iv();const note=ivNote&&ivNote.sid===s.id&&Date.now()-ivNote.t<15000?`<p class="msg" style="margin:0;grid-column:1/-1">${esc(ivNote.text)}</p>`:"";
+  if(s.joinedAt)return note+`<p class="muted" style="margin:0;grid-column:1/-1">${u.joined.replace("{d}",esc(shortDate(s.joinedAt)))}</p>`;
+  return note+`<div class="actions" style="grid-column:1/-1"><span class="muted warn-t">${u.wait}${s.invitedAt?` · ${u.invited.replace("{d}",esc(shortDate(s.invitedAt)))}`:""}</span>${/^https:/.test(NOTIFY_URL)?`<button type="button" id="b-invite">${u.resend}</button>`:""}</div>`}
+async function sendInvite(s,email){if(!/^https:/.test(NOTIFY_URL)||!auth||!auth.currentUser)return false;
+  try{const token=await auth.currentUser.getIdToken();const r=await fetch(NOTIFY_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"invite",sid:s.id,email,token,coach:String(me&&me.name||"").slice(0,40),site:location.origin+location.pathname})});
+    const j=await r.json();if(!j||!j.ok)return false;await db.collection("students").doc(s.id).update({invitedAt:new Date().toISOString()});return true}catch(e){return false}}
 const MCUI={"zh":{"mgmt":"教練管理（僅管理者）","mgmtHint":"加入教練的 Google Email。教練用該帳號登入同一個網址，就只會看到自己負責的學員。","cName":"教練名稱","cEmail":"教練 Google Email","add":"加入教練","remove":"移除","removeAsk":"移除後，他的學員會轉回你名下。確定移除？","yes":"確定移除","cancel":"取消","owner":"管理者","stu":"位學員","coachOf":"負責教練","all":"全部教練","exists":"這個 Email 已經在名單裡","bad":"請輸入正確的 Email","added":"已加入","failed":"儲存失敗，請再試一次","roleAdmin":"管理者","roleCoach":"教練","link":"教練登入網址","none":"還沒有其他教練","moved":"學員已轉回你名下"},"ja":{"mgmt":"コーチ管理（管理者のみ）","mgmtHint":"コーチの Google メールを追加します。コーチは同じURLにそのアカウントでログインすると、担当の生徒だけが表示されます。","cName":"コーチ名","cEmail":"コーチの Google メール","add":"コーチを追加","remove":"削除","removeAsk":"削除すると、そのコーチの生徒はあなたの担当に戻ります。削除しますか？","yes":"削除する","cancel":"キャンセル","owner":"管理者","stu":"人の生徒","coachOf":"担当コーチ","all":"すべてのコーチ","exists":"このメールはすでに登録されています","bad":"正しいメールを入力してください","added":"追加しました","failed":"保存できませんでした。もう一度お試しください","roleAdmin":"管理者","roleCoach":"コーチ","link":"コーチのログインURL","none":"まだ他のコーチはいません","moved":"生徒をあなたの担当に戻しました"},"en":{"mgmt":"Coaches (admin only)","mgmtHint":"Add a coach's Google email. They sign in at the same link and only see the students assigned to them.","cName":"Coach name","cEmail":"Coach Google email","add":"Add coach","remove":"Remove","removeAsk":"Their students will move back to you. Remove this coach?","yes":"Remove","cancel":"Cancel","owner":"Admin","stu":"students","coachOf":"Coach","all":"All coaches","exists":"That email is already on the list","bad":"Enter a valid email","added":"Added","failed":"Couldn't save. Please try again","roleAdmin":"Admin","roleCoach":"Coach","link":"Coach sign-in link","none":"No other coaches yet","moved":"Students moved back to you"}};
 function mc(){return MCUI[lang]||MCUI.zh}
 const KUI={"zh":{"lvStd":"等級標準","below":"尚未穩定達到 3.0：","toward":"已達 {a}，正在邁向 {b}：","pick":"選擇等級後會顯示對應標準","chipHint":"點一下帶入說明","practice":"下一步練習","practiceSub":"依需修正和最低分項目自動建議，由教練確認","practiceNone":"完成技術評估後，會自動建議下一步練習。","now":"目前","target":"目標","targetStd":"下一級標準","drill":"練習","test":"10 球測驗","maxed":"已達 4.0，維持穩定並挑戰更高強度的比賽","toGoal":"帶入下次目標","toRec":"帶入上課紀錄","filled":"已帶入，記得按儲存","flagged":"需修正","video":"影片連結（選填）","videoPh":"貼上 YouTube 或 Google 雲端硬碟連結","videoBad":"影片連結需以 https:// 開頭","watch":"▶ 看影片","open":"開啟影片","hide":"收起影片","unrated":"未評估"},"ja":{"lvStd":"レベル基準","below":"まだ安定して 3.0 に届いていない：","toward":"{a} に到達、{b} を目指して：","pick":"レベルを選ぶと基準が表示されます","chipHint":"タップでコメントに追加","practice":"次の練習","practiceSub":"要修正と最も低い項目から自動で提案（コーチが確認）","practiceNone":"技術評価を行うと、次の練習が自動で提案されます。","now":"現在","target":"目標","targetStd":"次のレベルの基準","drill":"練習","test":"10球テスト","maxed":"4.0 に到達。安定を保ち、より強い相手との試合に挑戦","toGoal":"次回の目標に入れる","toRec":"レッスン記録に入れる","filled":"入力しました。保存を忘れずに","flagged":"要修正","video":"動画リンク（任意）","videoPh":"YouTube または Google ドライブのリンク","videoBad":"動画リンクは https:// で始めてください","watch":"▶ 動画を見る","open":"動画を開く","hide":"閉じる","unrated":"未評価"},"en":{"lvStd":"Level standards","below":"Not yet consistent at 3.0: ","toward":"At {a}, working toward {b}: ","pick":"Pick a level to see its standard","chipHint":"Tap to add to the comment","practice":"Next practice","practiceSub":"Suggested from needs-work and lowest skills; the coach confirms","practiceNone":"Rate skills and the next practice will be suggested here.","now":"Now","target":"Target","targetStd":"Next-level standard","drill":"Drill","test":"10-ball test","maxed":"At 4.0: stay consistent and take on stronger matches","toGoal":"Use as next goal","toRec":"Use in lesson record","filled":"Filled in. Remember to save","flagged":"Needs work","video":"Video link (optional)","videoPh":"Paste a YouTube or Google Drive link","videoBad":"Video link must start with https://","watch":"▶ Watch","open":"Open video","hide":"Hide video","unrated":"Not rated"}};
@@ -504,7 +514,7 @@ function practiceCard(s){const u=ku(),sk=s.skills||{},f=focusSkills(s);
   return `<section class="card" id="practice" aria-label="${u.practice}"><div><h2>${u.practice}</h2><p class="muted" style="margin:0">${u.practiceSub}</p></div>${body}${canEdit?`<span class="msg" id="m-pr"></span>`:""}</section>`}
 const LEVELS_MIN=1.0,LEVELS_MAX=5.0;
 const app=document.getElementById("app");
-let isAdmin=false,coachDir=[],coachFilter="";
+let isAdmin=false,coachDir=[],coachFilter="",joinMarked=false;
 let db=null,fs=null,auth=null,view="loading",unsubs=[],me=null,canEdit=false,students=[],currentId=null,loaded=false,lang=pickLang(),T=I18N[lang];
 
 function pickLang(){try{const s=localStorage.getItem("lang");if(I18N[s])return s}catch(e){}const n=(navigator.language||"zh").toLowerCase();return n.startsWith("ja")?"ja":(n.startsWith("en")?"en":"zh")}
@@ -748,6 +758,7 @@ function basicCard(s){
       <label class="field" style="grid-column:1/-1">${T.name}<input id="i-name" value="${esc(s.name)}" required></label>
       <label class="field" style="grid-column:1/-1">${T.emailF}<input id="i-email" type="email" inputmode="email" autocomplete="off" value="${esc(s.email)}" placeholder="${T.emailPh}"></label>
       ${s.email?"":`<p class="muted warn-t" style="margin:0;grid-column:1/-1">${T.notBound}</p>`}
+      ${inviteHtml(s)}
       ${isAdmin&&coachDir.length?`<label class="field">${mc().coachOf}<select id="i-coach">${[ownerEmail(),...coachDir.map(c=>c.email)].map(e=>`<option value="${esc(e)}" ${e===coachOfStu(s)?"selected":""}>${esc(coachName(e))}</option>`).join("")}</select></label>`:""}
       <label class="field">${T.genderF}<select id="i-gender"><option value="">${T.unsetG}</option><option value="m" ${s.gender==="m"?"selected":""}>${T.male}</option><option value="f" ${s.gender==="f"?"selected":""}>${T.female}</option></select></label>
       <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${T.save}</button><span class="msg" id="m-basic"></span></div>
@@ -947,8 +958,11 @@ function bind(){
     if(em&&!EMAIL_RE.test(em)){flash("m-basic",T.emailBad);return}
     if(em&&students.some(x=>x.id!==s.id&&(x.email||"")===em)){flash("m-basic",T.emailUsed);return}
     const d={name:val("i-name").trim()||T.newName,email:em,gender:val("i-gender")};if(isAdmin&&document.getElementById("i-coach"))d.coach=val("i-coach");
-    if(await save(s.id,d)){clean(fBasic);flash("m-basic",T.saved)}
+    const isNew=!!em&&em!==String(s.email||"").toLowerCase();if(isNew)d.joinedAt="";
+    if(await save(s.id,d)){clean(fBasic);flash("m-basic",T.saved);
+      if(isNew){const ok=await sendInvite({...s,email:em},em);ivNote={sid:s.id,t:Date.now(),text:ok?iv().sent.replace("{e}",em):iv().fail};render()}}
   })});
+  document.getElementById("b-invite")?.addEventListener("click",async e=>{const b=e.currentTarget;b.disabled=true;const ok=await sendInvite(s,s.email);ivNote={sid:s.id,t:Date.now(),text:ok?iv().resent:iv().fail};b.disabled=false;render()});
   const fInfo=document.getElementById("f-info");
   fInfo?.addEventListener("submit",ev=>{ev.preventDefault();busy(fInfo,async()=>{
     const na=dtVal("i-next-at"),nd=na?new Date(na):null;if(nd&&!isNaN(nd))try{localStorage.setItem("lastSlot",JSON.stringify({t:na.slice(11,16),dow:nd.getDay(),dur:+val("i-dur")||60}))}catch(e){}const d={nextAt:na,nextAtUtc:nd&&!isNaN(nd)?nd.toISOString():"",nextDur:+val("i-dur")||60,nextPlace:PLACE,nextGoal:val("i-goal").trim(),prep:val("i-prep").split("\n").map(x=>x.trim()).filter(Boolean)};
@@ -1020,6 +1034,7 @@ function start(){
     unsubs.push(onSnapshot(query(collection(fs,"students"),where("email","==",me.email)),q=>{
       clearTimeout(timer);loaded=true;
       students=q.docs.map(d=>({id:d.id,...d.data()}));currentId=students[0]?students[0].id:null;
+      const st=students[0];if(st&&!st.joinedAt&&!joinMarked){joinMarked=true;updateDoc(doc(fs,"students",st.id),{joinedAt:new Date().toISOString()}).catch(()=>{})}
       render();
     },fail));
   }
