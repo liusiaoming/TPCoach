@@ -181,6 +181,7 @@ input,select,textarea{border:1px solid var(--line);background:var(--bg);border-r
 .rk-sec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
 .acct-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .acct-row button{font-size:12px;padding:3px 10px}
+.acct-row .pend-badge{background:#e5484d;color:#fff;border:0;border-radius:999px;font-weight:700;padding:2px 9px;margin-left:6px;cursor:pointer;vertical-align:1px}
 .login{align-items:flex-start;padding-block:28px}
 .login h1{font-size:22px}
 .gbtn{font-size:16px;padding:10px 18px}
@@ -467,6 +468,14 @@ const IVUI={"zh":{"sent":"已寄出邀請信到 {e}","joined":"✅ 學員已於 
 function iv(){return IVUI[lang]||IVUI.zh}
 function shortDate(t){const d=new Date(t);return isNaN(d)?"":`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
 let ivNote=null;
+const PDUI={zh:"{n} 則學員留言待回覆，點一下查看",ja:"未返信のメッセージ {n} 件（タップで表示）",en:"{n} unanswered student messages, tap to view"};
+let pend={},pendSubs={};
+function pendOf(id){return pend[id]||0}
+function pendTotal(){return visible().reduce((n,x)=>n+pendOf(x.id),0)}
+function watchPending(){if(!canEdit||!db)return;const ids=new Set(students.map(x=>x.id));
+  ids.forEach(id=>{if(pendSubs[id])return;pendSubs[id]=db.collection(`students/${id}/msgs`).onSnapshot(sn=>{const n=sn.docs.filter(d=>{const m=d.data();return !m.reply&&m.from!=="coach"}).length;if(pend[id]!==n){pend[id]=n;if(loaded)render()}},()=>{})});
+  Object.keys(pendSubs).forEach(id=>{if(!ids.has(id)){try{pendSubs[id]()}catch(e){}delete pendSubs[id];delete pend[id]}})}
+function stopPending(){Object.values(pendSubs).forEach(u=>{try{u()}catch(e){}});pendSubs={};pend={};document.title="TPCoach"}
 function inviteHtml(s){if(!s.email)return "";const u=iv();const note=ivNote&&ivNote.sid===s.id&&Date.now()-ivNote.t<15000?`<p class="msg" style="margin:0;grid-column:1/-1">${esc(ivNote.text)}</p>`:"";
   if(s.joinedAt)return note+`<p class="muted" style="margin:0;grid-column:1/-1">${u.joined.replace("{d}",esc(shortDate(s.joinedAt)))}</p>`;
   return note+`<div class="actions" style="grid-column:1/-1"><span class="muted warn-t">${u.wait}${s.invitedAt?` · ${u.invited.replace("{d}",esc(shortDate(s.invitedAt)))}`:""}</span>${/^https:/.test(NOTIFY_URL)?`<button type="button" id="b-invite">${u.resend}</button>`:""}</div>`}
@@ -799,7 +808,7 @@ function skillsEditor(s){
 
 function accountBar(){
   const nm=me&&me.name?esc(me.name):"";
-  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?(isAdmin?mc().roleAdmin:mc().roleCoach):T.roleStu}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
+  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?(isAdmin?mc().roleAdmin:mc().roleCoach):T.roleStu}${canEdit&&pendTotal()?`<button type="button" id="b-pend" class="pend-badge" title="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}" aria-label="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}">💬 ${pendTotal()}</button>`:""}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
 }
 function rankCard(open){
   const rows=visible().map(x=>{const ov=overall(x.skills||{});const ev=evalsOf(x).filter(e=>isFinite(+e.overall)&&!isNaN(new Date(e.t)));
@@ -827,12 +836,13 @@ function coachBar(){
   return `<div class="card"><div class="coachbar">
     <span class="tag">${T.coach}</span>
     ${isAdmin&&coachDir.length?`<select id="cfilter" aria-label="${mc().coachOf}" style="flex:0 1 auto;width:auto"><option value="">${mc().all}</option>${[ownerEmail(),...coachDir.map(c=>c.email)].map(e=>`<option value="${esc(e)}" ${e===coachFilter?"selected":""}>${esc(coachName(e))}</option>`).join("")}</select>`:""}
-    <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${visible().map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${s.email?"":` · ${T.unbound}`}${isAdmin&&coachDir.length&&!coachFilter&&coachOfStu(s)!==me.email?` · ${esc(coachName(coachOfStu(s)))}`:""}</option>`).join("")}</select>
+    <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${visible().map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${pendOf(s.id)?` · 💬${pendOf(s.id)}`:""}${s.email?"":` · ${T.unbound}`}${isAdmin&&coachDir.length&&!coachFilter&&coachOfStu(s)!==me.email?` · ${esc(coachName(coachOfStu(s)))}`:""}</option>`).join("")}</select>
     <button id="b-new" type="button">${T.newStu}</button>
   </div><p class="muted" style="margin:0">${T.shareHint}</p></div>`;
 }
 
 function render(){
+  if(canEdit&&me)document.title=pendTotal()?`(${pendTotal()}) TPCoach`:"TPCoach";
   // keep only what the user has edited but not saved, plus focus, caret and scroll
   const keep={};dirty.forEach(id=>{const el=document.getElementById(id);if(el)keep[id]=el.type==="checkbox"?el.checked:el.value});
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
@@ -924,6 +934,8 @@ function bind(){
       await saveCoaches(coachDir.filter(c=>c.email!==em));if(coachFilter===em)coachFilter="";}catch(e){alertBox(u.failed)}}}));
   const pick=document.getElementById("pick");
   pick&&pick.addEventListener("change",()=>{currentId=pick.value||null;location.hash=currentId||"";render()});
+  document.getElementById("b-pend")?.addEventListener("click",()=>{const cur=visible().find(x=>x.id===currentId&&pendOf(x.id));const t=cur||visible().find(x=>pendOf(x.id));if(!t)return;currentId=t.id;location.hash=t.id;render();
+    const d=document.getElementById("c-next");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})}});
   document.getElementById("b-rate")?.addEventListener("click",()=>{const d=document.getElementById("ed-skill");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});document.getElementById("k-serve-level")?.focus({preventScroll:true})}});
   document.getElementById("b-new")?.addEventListener("click",async()=>{
     const ref=db.collection("students").doc(),id=ref.id;
@@ -999,7 +1011,7 @@ function makeDb(){return{collection(path){return{
   doc(id){const r=id?doc(fs,path,id):doc(collection(fs,path));return{id:r.id,
     get:async()=>wrapDoc(await getDoc(r)),set:d=>setDoc(r,d),update:d=>updateDoc(r,d),delete:()=>deleteDoc(r),
     onSnapshot(cb,err){return onSnapshot(r,d=>cb(wrapDoc(d)),err)}}}}}}}
-function stopAll(){unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];if(msgUnsub){try{msgUnsub()}catch(e){}}msgUnsub=null;msgFor=null;msgs=[];msgsReady=false;students=[];currentId=null;loaded=false;render.lastId=null}
+function stopAll(){stopPending();unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];if(msgUnsub){try{msgUnsub()}catch(e){}}msgUnsub=null;msgFor=null;msgs=[];msgsReady=false;students=[];currentId=null;loaded=false;render.lastId=null}
 const inLine=/\bLine\//i.test(navigator.userAgent);
 function showLogin(err){
   view="login";
@@ -1027,7 +1039,7 @@ function start(){
     const got=snap=>{
       clearTimeout(timer);loaded=true;
       students=snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      render();
+      watchPending();render();
     };
     unsubs.push(isAdmin?db.collection("students").onSnapshot(got,fail):onSnapshot(query(collection(fs,"students"),where("coach","==",me.email)),q=>got(wrapSnap(q)),fail));
   }else{
