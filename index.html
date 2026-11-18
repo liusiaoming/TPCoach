@@ -537,7 +537,7 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function num(v,d){const n=parseFloat(v);return isFinite(n)?n:d}
 function fmtLv(n){return Number(n).toFixed(1)}
 function hashId(){const h=location.hash.slice(1);return /^[A-Za-z0-9_-]{6,40}$/.test(h)?h:null}
-function dtFields(id,v,req){v=String(v||"");return `<span class="dt"><input id="${id}-d" type="date" value="${esc(v.slice(0,10))}"${req?" required":""} aria-label="date"><input id="${id}-t" type="time" step="300" value="${esc(v.slice(11,16))}"${req?" required":""} aria-label="time"></span>`}
+function dtFields(id,v,req){v=String(v||"");return `<span class="dt"><input id="${id}-d" type="date" value="${esc(v.slice(0,10))}"${req?" required":""} aria-label="date"><input id="${id}-t" type="time" value="${esc(v.slice(11,16))}"${req?" required":""} aria-label="time"></span>`}
 function dtVal(id){const d=val(id+"-d"),t=val(id+"-t");return d&&t?`${d}T${t}`:(d?`${d}T00:00`:"")}
 const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function newId(){const a="abcdefghijkmnpqrstuvwxyz23456789";let s="s-";for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
