@@ -898,7 +898,10 @@ function bindMsgs(s){
 }
 function flash(id,t){const el=document.getElementById(id);if(el){el.textContent=t;setTimeout(()=>{if(el)el.textContent=""},2500)}}
 function alertBox(t){const d=document.createElement("div");d.className="card";d.style.color="var(--warn)";d.textContent=t;app.prepend(d);setTimeout(()=>d.remove(),4000)}
-async function save(id,data){try{await db.collection("students").doc(id).update({...data,updatedAt:new Date().toISOString()});return true}catch(e){alertBox(T.saveFail+(e&&e.message||T.retry));return false}}
+const logTimers={};
+function queueLog(id){if(!canEdit||!/^https:/.test(NOTIFY_URL)||!auth||!auth.currentUser)return;const st=students.find(x=>x.id===id);if(!st||(st.coach&&st.coach!==ownerEmail()))return;
+  clearTimeout(logTimers[id]);logTimers[id]=setTimeout(async()=>{delete logTimers[id];try{const token=await auth.currentUser.getIdToken();await fetch(NOTIFY_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({action:"log",sid:id,token})})}catch(e){}},5000)}
+async function save(id,data){try{await db.collection("students").doc(id).update({...data,updatedAt:new Date().toISOString()});queueLog(id);return true}catch(e){alertBox(T.saveFail+(e&&e.message||T.retry));return false}}
 function val(id){return document.getElementById(id)?.value??""}
 
 function bind(){
