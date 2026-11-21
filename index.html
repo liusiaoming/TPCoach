@@ -434,7 +434,7 @@ async function ensureTr(s){if(!canEdit||!s||msgFor!==s.id||!msgsReady||!/^https:
     if(!Object.keys(upd).length)return;
     const cur=((students.find(x=>x.id===s.id)||s).tr)||{},live=new Set(trTexts(s).map(hashT)),keep={};
     Object.entries(cur).forEach(([k,v])=>{if(live.has(k))keep[k]=v});
-    await db.collection("students").doc(s.id).update({tr:{...keep,...upd}})}
+    await db.collection("students").doc(s.id).update({tr:{...keep,...upd}});queueLog(s.id)}
   catch(e){setTimeout(()=>need.forEach(t=>trBusy.delete(hashT(t))),60000)}}
 const growTa=t=>{t.style.height="auto";t.style.height=Math.min(t.scrollHeight+2,480)+"px";t.style.overflowY=t.scrollHeight>478?"auto":"hidden"};
 document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.grow"))growTa(e.target)});
