@@ -14,6 +14,8 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;font-size:15px}
 img{max-width:100%}
 [hidden]{display:none!important}
+.sk-head{grid-column:1/-1;margin:0;font-size:17px;font-weight:800;color:var(--ink);border-left:4px solid var(--court);padding-left:10px;line-height:1.3}
+.sk-block+.sk-block{border-top:1px solid var(--line);padding-top:14px}
 .sk-hint{display:block;font-size:13px;font-weight:400;color:var(--muted);line-height:1.4;margin:-2px 0 2px}
 .co-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .co-who{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
@@ -952,8 +954,9 @@ function skillsEditor(s){
   const noneRated=!SKILL_KEYS.some(k=>skillVal(sk[k])!==null||isFix(sk[k]));
   return `<details class="card coach-ed" id="ed-skill"><summary>${T.editSkill}</summary>
     <form id="f-skill" style="display:flex;flex-direction:column;gap:14px">
-    ${SKILL_KEYS.map(k=>{const v=sk[k]||{},cur=skillVal(v);return `<div class="grid">
-      <label class="field">${T.skills[k]} · ${T.levelSel}<select id="k-${k}-level"><option value="">${T.notRatedLong}</option>${SK_LEVELS.map(lv=>`<option value="${lv}" ${cur===lv?"selected":""}>${fmtSk(lv)}</option>`).join("")}</select></label>
+    ${SKILL_KEYS.map(k=>{const v=sk[k]||{},cur=skillVal(v);return `<div class="grid sk-block">
+      <h3 class="sk-head">${T.skills[k]}</h3>
+      <label class="field">${T.levelSel}<select id="k-${k}-level"><option value="">${T.notRatedLong}</option>${SK_LEVELS.map(lv=>`<option value="${lv}" ${cur===lv?"selected":""}>${fmtSk(lv)}</option>`).join("")}</select></label>
       <label class="fixbox"><input type="checkbox" id="k-${k}-fix" ${isFix(v)?"checked":""}><span>${T.fixBox}</span></label>
       <p class="lv-desc${cur===null?" empty":""}" id="k-${k}-desc">${cur===null?ku().pick:esc(lvDesc(k,cur))}</p>
       <label class="field" style="grid-column:1/-1">${T.skNote}<input id="k-${k}-note" value="${esc(v.note)}"></label>
