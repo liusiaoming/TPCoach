@@ -41,6 +41,28 @@ textarea.grow{min-height:96px;resize:vertical;line-height:1.5;overflow:hidden}
 .chips .muted{font-size:12px;width:100%}
 .chip{font-size:13px;padding:4px 12px;border-radius:999px;background:var(--bg)}
 .chip.on{border-color:var(--court);color:var(--court)}
+.pro-seg{display:flex;gap:4px}
+.pro-seg button{min-width:36px;min-height:36px;padding:0;border-radius:8px;font-weight:700}
+.pro-seg button[aria-pressed="true"]{background:var(--court);border-color:var(--court);color:var(--surface)}
+.pro-cat{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pro-cat legend{font-weight:700;padding:0 6px}
+.pro-row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center}
+.pro-lab{font-size:14px}
+.pro-note{grid-column:1/-1;font-size:13px}
+.pro-live{margin:0;font-weight:700;color:var(--court)}
+.pro-sum{display:flex;flex-wrap:wrap;gap:10px 24px}
+.pro-sum>div{display:flex;flex-direction:column;gap:2px}
+.pro-big{font-size:34px;line-height:1;font-family:var(--display)}
+.pro-rank{font-size:20px;color:var(--court)}
+.pro-up{color:var(--court);font-size:13px}
+.pro-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.pro-charts figure{margin:0}
+.pro-charts figcaption{font-size:13px;font-weight:700;margin-bottom:4px}
+.pro-key{font-size:12px;font-weight:400;white-space:nowrap}
+.pro-key::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);margin:0 4px 0 6px;vertical-align:-1px}
+.pro-lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.pro-lists h3{font-size:14px;margin:0 0 6px}
+.pro-lists ul{margin:0;padding-left:18px;font-size:14px;line-height:1.6}
 .pr-item{display:flex;flex-direction:column;gap:6px;background:var(--bg);border-radius:10px;padding:12px;border-left:3px solid var(--court)}
 .pr-head{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
 .pr-lv{margin-left:auto;font-family:var(--display);font-size:17px;font-weight:700;color:var(--court);font-variant-numeric:tabular-nums}
@@ -732,6 +754,141 @@ function msgBlock(s){
   </div>`;
 }
 
+// ===== PRO 技術評估（1–5 分，正反手分開評分）=====
+const PRO=[
+ {k:"start",n:["開局兩拍","Serve & Return","サーブ＆リターン"],items:[
+  {k:"srvDepth",n:["發球深度與穩定","Serve depth & consistency","サーブの深さと安定"]},
+  {k:"srvVar",n:["發球變化（旋轉、落點）","Serve variety (spin, placement)","サーブの変化（回転・コース）"]},
+  {k:"retF",n:["正手接發球","Forehand return","フォアのリターン"],p:"ret",side:"f"},
+  {k:"retB",n:["反手接發球","Backhand return","バックのリターン"],p:"ret",side:"b"},
+  {k:"retIn",n:["接發後上網到位","Return and get to the kitchen","リターン後のネットダッシュ"]}]},
+ {k:"third",n:["第三拍與過渡","Third Shot & Transition","3球目とトランジション"],items:[
+  {k:"dropF",n:["正手第三拍吊球","Forehand third-shot drop","フォアの3球目ドロップ"],p:"drop",side:"f"},
+  {k:"dropB",n:["反手第三拍吊球","Backhand third-shot drop","バックの3球目ドロップ"],p:"drop",side:"b"},
+  {k:"drive3",n:["第三拍抽擊","Third-shot drive","3球目ドライブ"]},
+  {k:"split",n:["分段上網（分腿墊步）","Split-step approach","スプリットステップで前進"]},
+  {k:"tReset",n:["過渡區重置","Transition-zone reset","トランジションでのリセット"]}]},
+ {k:"kitchen",n:["廚房區對抗","Kitchen Play","キッチンでの攻防"],items:[
+  {k:"dinkF",n:["正手丁克","Forehand dink","フォアのディンク"],p:"dink",side:"f"},
+  {k:"dinkB",n:["反手丁克","Backhand dink","バックのディンク"],p:"dink",side:"b"},
+  {k:"dinkVar",n:["丁克耐心與變化","Dink patience & variety","ディンクの我慢と変化"]},
+  {k:"volF",n:["正手截擊","Forehand volley","フォアのボレー"],p:"vol",side:"f"},
+  {k:"volB",n:["反手截擊","Backhand volley","バックのボレー"],p:"vol",side:"b"},
+  {k:"hands",n:["近網快手對抗","Hands battles at the net","ネット前の速い打ち合い"]}]},
+ {k:"defense",n:["防守與重置","Defense & Reset","守備とリセット"],items:[
+  {k:"resetF",n:["正手落地重置","Forehand reset off the bounce","フォアのバウンド後リセット"],p:"reset",side:"f"},
+  {k:"resetB",n:["反手落地重置","Backhand reset off the bounce","バックのバウンド後リセット"],p:"reset",side:"b"},
+  {k:"block",n:["防守擋球與反擊","Block & counter","ブロックとカウンター"]},
+  {k:"lobDef",n:["回追挑高球","Lob retrieval","ロブの回収"]}]},
+ {k:"attack",n:["進攻與得分","Attack","攻撃と得点"],items:[
+  {k:"spdF",n:["正手加速","Forehand speed-up","フォアのスピードアップ"],p:"spd",side:"f"},
+  {k:"spdB",n:["反手加速","Backhand speed-up","バックのスピードアップ"],p:"spd",side:"b"},
+  {k:"smash",n:["高壓扣殺","Overhead smash","スマッシュ"]},
+  {k:"lobAtk",n:["進攻挑高球","Offensive lob","攻撃的ロブ"]},
+  {k:"adv",n:["進階技術（Erne、ATP）","Advanced shots (Erne, ATP)","上級ショット（アーニー・ATP）"]}]},
+ {k:"game",n:["比賽能力","Match Play","試合力"],items:[
+  {k:"choice",n:["選球決策","Shot selection","ショット選択"]},
+  {k:"pos",n:["站位與搭檔配合","Positioning & teamwork","ポジションと連携"]},
+  {k:"mind",n:["心理與節奏","Composure & tempo","メンタルとリズム"]},
+  {k:"move",n:["步伐與體能","Footwork & fitness","フットワークと体力"]}]}
+];
+const PRO_ITEMS=PRO.flatMap(c=>c.items.map(it=>({...it,cat:c.k})));
+const PRO_PAIRS=[["ret",["接發球","Return","リターン"]],["drop",["第三拍吊球","Third-shot drop","3球目ドロップ"]],["dink",["丁克","Dink","ディンク"]],["vol",["截擊","Volley","ボレー"]],["reset",["落地重置","Reset","リセット"]],["spd",["加速","Speed-up","スピードアップ"]]];
+const PROUI={
+ zh:{title:"PRO 技術評估",edit:"PRO 技術評估（逐項 1–5 分）",items:n=>`${n} 項`,scale:["剛開始學","偶爾成功","練習中穩定","比賽中穩定","得分武器"],
+  scaleHint:"1 剛開始學 · 2 偶爾成功 · 3 練習中穩定 · 4 比賽中穩定 · 5 得分武器",hand:"慣用手",right:"右手",left:"左手",bh:"反手握法",one:"單手",two:"雙手",
+  note:"觀察／備註",save:"儲存 PRO 評估",saved:"已儲存 PRO 評估",overall:"綜合平均",rating:"評級",rated:(a,b)=>`已評 ${a} / ${b} 項`,
+  ranks:["入門","初級","中級","中高級","高級"],catRadar:"分類雷達",fbRadar:"正反手對照",fh:"正手",bh2:"反手",prev:"上次",
+  best:"強項",work:"優先加強",gap:"正反手落差",gapNone:"正反手大致平衡",gapLine:(n,f,b)=>`${n}：正手 ${f}、反手 ${b}`,
+  date:"評估日期",vs:d=>`與 ${d} 相比`,none:"還沒有 PRO 評估",clear:"清除"},
+ en:{title:"PRO Assessment",edit:"PRO Assessment (each item 1–5)",items:n=>`${n} items`,scale:["Just learning","Sometimes","Steady in drills","Steady in games","Weapon"],
+  scaleHint:"1 Just learning · 2 Sometimes · 3 Steady in drills · 4 Steady in games · 5 Weapon",hand:"Dominant hand",right:"Right",left:"Left",bh:"Backhand grip",one:"One-handed",two:"Two-handed",
+  note:"Observation / note",save:"Save PRO assessment",saved:"PRO assessment saved",overall:"Overall",rating:"Level",rated:(a,b)=>`${a} / ${b} rated`,
+  ranks:["Starter","Beginner","Intermediate","Upper-intermediate","Advanced"],catRadar:"By category",fbRadar:"Forehand vs backhand",fh:"Forehand",bh2:"Backhand",prev:"Last time",
+  best:"Strengths",work:"Work on first",gap:"Forehand/backhand gap",gapNone:"Forehand and backhand are balanced",gapLine:(n,f,b)=>`${n}: forehand ${f}, backhand ${b}`,
+  date:"Assessed",vs:d=>`vs ${d}`,none:"No PRO assessment yet",clear:"Clear"},
+ ja:{title:"PRO 技術評価",edit:"PRO 技術評価（各項目 1–5）",items:n=>`${n} 項目`,scale:["習い始め","時々できる","練習で安定","試合で安定","得点源"],
+  scaleHint:"1 習い始め · 2 時々できる · 3 練習で安定 · 4 試合で安定 · 5 得点源",hand:"利き手",right:"右",left:"左",bh:"バックハンド",one:"片手",two:"両手",
+  note:"観察／メモ",save:"PRO 評価を保存",saved:"PRO 評価を保存しました",overall:"総合平均",rating:"レベル",rated:(a,b)=>`${a} / ${b} 項目を評価`,
+  ranks:["入門","初級","中級","中上級","上級"],catRadar:"カテゴリー別",fbRadar:"フォア・バック比較",fh:"フォア",bh2:"バック",prev:"前回",
+  best:"強み",work:"優先して強化",gap:"フォアとバックの差",gapNone:"フォアとバックはほぼ同じ",gapLine:(n,f,b)=>`${n}：フォア ${f}・バック ${b}`,
+  date:"評価日",vs:d=>`${d} と比較`,none:"PRO 評価はまだありません",clear:"クリア"}};
+function pu(){return PROUI[lang]||PROUI.zh}
+function li(){return lang==="en"?1:(lang==="ja"?2:0)}
+const proName=it=>it.n[li()];
+function proCatAvg(sc){const o={};PRO.forEach(c=>{const v=c.items.map(it=>sc[it.k]).filter(x=>x>=1);o[c.k]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null});return o}
+function proOverall(sc){const v=PRO_ITEMS.map(it=>sc[it.k]).filter(x=>x>=1);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}
+function proRank(ov){if(ov==null)return "";const r=pu().ranks;return ov<2?r[0]:ov<2.75?r[1]:ov<3.5?r[2]:ov<4.25?r[3]:r[4]}
+const f1=v=>v==null?"–":(Math.round(v*10)/10).toFixed(1);
+function proRadar(axes,series,label){
+  const W=470,H=410,cx=235,cy=205,R=108,n=axes.length,ang=i=>-Math.PI/2+i*2*Math.PI/n,pt=(i,r)=>[cx+Math.cos(ang(i))*r,cy+Math.sin(ang(i))*r],rr=v=>R*(Math.max(0,v)/5);
+  let g="";
+  [1,2,3,4,5].forEach(lv=>{g+=`<polygon points="${axes.map((_,i)=>pt(i,rr(lv)).join(",")).join(" ")}" fill="none" stroke="var(--line)" stroke-width="${lv%2?0.7:1.2}"/>`});
+  axes.forEach((_,i)=>{const [x,y]=pt(i,R);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)"/>`});
+  [1,3,5].forEach(lv=>{g+=`<text x="${cx+4}" y="${cy-rr(lv)+12}" font-size="10" fill="var(--muted)">${lv}</text>`});
+  series.forEach(se=>{if(!se.v.some(x=>x!=null))return;
+    g+=`<polygon points="${se.v.map((v,i)=>pt(i,rr(v??0)).join(",")).join(" ")}" fill="${se.c}" fill-opacity="${se.ghost?0:.18}" stroke="${se.c}" stroke-width="${se.ghost?1.5:2.2}" ${se.ghost?'stroke-dasharray="5 4"':""} stroke-linejoin="round"/>`;
+    if(!se.ghost)se.v.forEach((v,i)=>{if(v!=null){const [x,y]=pt(i,rr(v));g+=`<circle cx="${x}" cy="${y}" r="4" fill="${se.c}"/>`}})});
+  axes.forEach((a,i)=>{const [lx,ly]=pt(i,R+22),c=Math.cos(ang(i)),s=Math.sin(ang(i)),anchor=Math.abs(c)<.2?"middle":(c>0?"start":"end"),dy=s<-.5?-8:(s>.5?14:4);
+    g+=`<text x="${lx}" y="${ly+dy}" text-anchor="${anchor}" font-size="17" font-weight="700" fill="var(--ink)">${esc(a.t)}</text>`;
+    if(a.sub)g+=`<text x="${lx}" y="${ly+dy+19}" text-anchor="${anchor}" font-size="16" font-weight="700" fill="var(--court)">${esc(a.sub)}</text>`});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
+}
+const PRO_BH="#5fb3d9";
+function proCard(s){
+  const p=s.pro;if(!p||!p.sc||proOverall(p.sc)==null)return "";
+  const u=pu(),sc=p.sc,cat=proCatAvg(sc),ov=proOverall(sc),hist=(s.proHist||[]).filter(h=>h&&h.t),prev=hist.length>1?hist[hist.length-2]:null;
+  const d=new Date(p.t).toLocaleDateString(T.locale),dv=prev&&ov!=null&&prev.ov!=null?ov-prev.ov:null;
+  const catSvg=proRadar(PRO.map(c=>({t:c.n[li()],sub:f1(cat[c.k])})),[...(prev&&prev.cat?[{v:PRO.map(c=>prev.cat[c.k]??null),c:"var(--muted)",ghost:true}]:[]),{v:PRO.map(c=>cat[c.k]),c:"var(--court)"}],u.catRadar);
+  const pv=(pk,side)=>{const it=PRO_ITEMS.find(x=>x.p===pk&&x.side===side);return it?sc[it.k]??null:null};
+  const fbSvg=proRadar(PRO_PAIRS.map(([k,n])=>({t:n[li()]})),[{v:PRO_PAIRS.map(([k])=>pv(k,"f")),c:"var(--court)"},{v:PRO_PAIRS.map(([k])=>pv(k,"b")),c:PRO_BH}],u.fbRadar);
+  const rated=PRO_ITEMS.filter(it=>sc[it.k]>=1).map(it=>({it,v:sc[it.k]}));
+  const best=[...rated].sort((a,b)=>b.v-a.v).slice(0,3),work=[...rated].sort((a,b)=>a.v-b.v).filter(x=>!best.includes(x)).slice(0,3);
+  const gaps=PRO_PAIRS.map(([k,n])=>({n:n[li()],f:pv(k,"f"),b:pv(k,"b")})).filter(x=>x.f!=null&&x.b!=null&&Math.abs(x.f-x.b)>=1);
+  const li2=(arr)=>arr.map(x=>`<li>${esc(proName(x.it))} <b>${x.v}</b>${p.nt&&p.nt[x.it.k]?`<span class="muted"> · ${esc(p.nt[x.it.k])}</span>`:""}</li>`).join("");
+  return `<section class="card pro-card" id="c-pro" aria-label="${u.title}">
+    <h2 style="margin:0">${u.title}</h2>
+    <div class="pro-sum"><div><span class="muted">${u.overall}</span><span><b class="pro-big">${f1(ov)}</b> <span class="muted">/ 5</span></span></div>
+      <div><span class="muted">${u.rating}</span><b class="pro-rank">${proRank(ov)}</b></div>
+      <div><span class="muted">${u.date}</span><b>${d}</b>${dv!=null&&Math.abs(dv)>=.05?`<span class="${dv>0?"pro-up":"warn-t"}">${dv>0?"▲":"▼"} ${Math.abs(dv).toFixed(1)} ${u.vs(new Date(prev.t).toLocaleDateString(T.locale))}</span>`:""}</div></div>
+    <div class="pro-charts"><figure><figcaption>${u.catRadar}${prev?` <span class="muted">— ${u.prev}</span>`:""}</figcaption>${catSvg}</figure>
+      <figure><figcaption>${u.fbRadar} <span class="pro-key" style="--c:var(--court)">${u.fh}</span> <span class="pro-key" style="--c:${PRO_BH}">${u.bh2}</span></figcaption>${fbSvg}</figure></div>
+    <div class="pro-lists"><div><h3>${u.best}</h3><ul>${li2(best)}</ul></div><div><h3>${u.work}</h3><ul>${li2(work)}</ul></div>
+      <div><h3>${u.gap}</h3>${gaps.length?`<ul>${gaps.map(x=>`<li>${esc(u.gapLine(x.n,x.f,x.b))}</li>`).join("")}</ul>`:`<p class="muted" style="margin:0">${u.gapNone}</p>`}</div></div>
+  </section>`;
+}
+function proEditor(s){
+  const u=pu(),p=s.pro||{},sc=p.sc||{},nt=p.nt||{},n=PRO_ITEMS.length;
+  const seg=it=>`<div class="pro-seg" role="group" aria-label="${esc(proName(it))}">${[1,2,3,4,5].map(v=>`<button type="button" data-pro="${it.k}" data-v="${v}" aria-pressed="${sc[it.k]===v}" title="${esc(u.scale[v-1])}">${v}</button>`).join("")}</div>`;
+  return `<details class="card coach-ed" id="ed-pro"><summary>${u.edit} <span class="muted sum-sub" id="pro-count">${u.rated(PRO_ITEMS.filter(it=>sc[it.k]>=1).length,n)}</span></summary>
+   <form id="f-pro" style="display:flex;flex-direction:column;gap:14px">
+    <div class="grid"><label class="field">${u.hand}<select id="pro-hand"><option value=""></option><option value="R" ${p.hand==="R"?"selected":""}>${u.right}</option><option value="L" ${p.hand==="L"?"selected":""}>${u.left}</option></select></label>
+     <label class="field">${u.bh}<select id="pro-bh"><option value=""></option><option value="1" ${p.bh==="1"?"selected":""}>${u.one}</option><option value="2" ${p.bh==="2"?"selected":""}>${u.two}</option></select></label></div>
+    <p class="muted" style="margin:0">${u.scaleHint}</p>
+    ${PRO.map(c=>`<fieldset class="pro-cat"><legend>${esc(c.n[li()])} <span class="muted" id="pro-avg-${c.k}"></span></legend>
+      ${c.items.map(it=>`<div class="pro-row"><span class="pro-lab">${esc(proName(it))}</span>${seg(it)}<input type="hidden" id="pv-${it.k}" value="${sc[it.k]||""}">
+        <input class="pro-note" id="pn-${it.k}" value="${esc(nt[it.k]||"")}" placeholder="${u.note}" aria-label="${esc(proName(it))} ${u.note}"></div>`).join("")}</fieldset>`).join("")}
+    <p class="pro-live" id="pro-live"></p>
+    <div class="actions"><button class="primary" type="submit">${u.save}</button><span class="msg" id="m-pro"></span></div>
+   </form></details>`;
+}
+function proRead(){const sc={},nt={};PRO_ITEMS.forEach(it=>{const v=parseInt(document.getElementById("pv-"+it.k)?.value);if(v>=1&&v<=5)sc[it.k]=v;const t=(document.getElementById("pn-"+it.k)?.value||"").trim().slice(0,200);if(t)nt[it.k]=t});return {sc,nt}}
+function proLive(){const u=pu(),{sc}=proRead(),cat=proCatAvg(sc),ov=proOverall(sc);
+  PRO.forEach(c=>{const el=document.getElementById("pro-avg-"+c.k);if(el)el.textContent=cat[c.k]==null?"":"· "+f1(cat[c.k])});
+  const live=document.getElementById("pro-live");if(live)live.textContent=ov==null?"":`${u.overall} ${f1(ov)} · ${u.rating} ${proRank(ov)}`;
+  const cnt=document.getElementById("pro-count");if(cnt)cnt.textContent=u.rated(Object.keys(sc).length,PRO_ITEMS.length);
+  document.querySelectorAll("[data-pro]").forEach(b=>b.setAttribute("aria-pressed",String(String(sc[b.dataset.pro]||"")===b.dataset.v)))}
+function proBind(s){
+  const f=document.getElementById("f-pro");if(!f||!s)return;
+  proLive();
+  f.querySelectorAll("[data-pro]").forEach(b=>b.addEventListener("click",()=>{const h=document.getElementById("pv-"+b.dataset.pro);if(!h)return;
+    h.value=h.value===b.dataset.v?"":b.dataset.v;dirty.add(h.id);proLive()}));
+  f.addEventListener("submit",async e=>{e.preventDefault();const {sc,nt}=proRead();const now=new Date(),ov=proOverall(sc);
+    const pro={t:now.toISOString(),sc,nt,hand:val("pro-hand"),bh:val("pro-bh")};
+    const hist=[...(s.proHist||[])],pt={t:pro.t,ov:ov==null?null:Math.round(ov*100)/100,cat:Object.fromEntries(Object.entries(proCatAvg(sc)).map(([k,v])=>[k,v==null?null:Math.round(v*100)/100]))};
+    const last=hist[hist.length-1];if(last&&new Date(last.t).toDateString()===now.toDateString())hist[hist.length-1]=pt;else hist.push(pt);
+    if(await save(s.id,{pro,proHist:hist.slice(-24)})){clean(f);flash("m-pro",pu().saved)}});
+}
 function fold(id,title,inner){return `<details class="card fold" id="${id}"><summary>${title}</summary>${inner}</details>`}
 function rowsCard(s){
   const rec=[...(s.sessions||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
@@ -848,7 +1005,7 @@ function render(){
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
   let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
   const sy=window.scrollY;
-  const open={};["ed-basic","ed-rec","ed-info","ed-skill","rank","dupr","c-rows","c-next","coachm"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const open={};["ed-basic","ed-rec","ed-info","ed-skill","ed-pro","rank","dupr","c-rows","c-next","coachm"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
   let h=accountBar();
   if(canEdit)h+=coachBar()+rankCard(false)+coachMgmtCard();
@@ -860,8 +1017,8 @@ function render(){
   h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
   watchMsgs(s.id);
   // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
-  const left=canEdit?basicCard(s)+skillsCard(s)+practiceCard(s)+curveCard(s):skillsCard(s)+practiceCard(s)+curveCard(s);
-  const right=canEdit?skillsEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
+  const left=canEdit?basicCard(s)+skillsCard(s)+practiceCard(s)+curveCard(s)+proCard(s):skillsCard(s)+practiceCard(s)+curveCard(s)+proCard(s);
+  const right=canEdit?skillsEditor(s)+proEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
       +fold("c-next",`${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,msgBlock(s))
     :nextCard(s)+msgCard(s)+rowsCard(s);
   h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
@@ -871,7 +1028,7 @@ function render(){
   if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el){if(el.type==="checkbox")el.checked=keep[id];else el.value=keep[id]}}
   else dirty.clear();
   render.lastId=s.id;
-  bind();
+  bind();proBind(s);
   if(focusId){const el=document.getElementById(focusId);if(el){el.focus({preventScroll:true});if(sel)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
   if(Math.abs(window.scrollY-sy)>1)window.scrollTo(0,sy);
 }
