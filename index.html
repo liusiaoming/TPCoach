@@ -14,6 +14,38 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;font-size:15px}
 img{max-width:100%}
 [hidden]{display:none!important}
+.tabs{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--bg);padding:8px 0;margin:-4px 0 0;border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:15px;padding:8px 14px;border-radius:999px;min-height:40px;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--court);color:var(--bg)}
+.tab-badge{display:inline-block;background:#e5484d;color:#fff;border-radius:999px;font-size:11px;line-height:16px;padding:0 6px;margin-left:5px;vertical-align:2px}
+.tab-n{font-size:12px;opacity:.7;margin-left:4px}
+.pill.lose{border-color:var(--warn);color:var(--warn)}
+.play-ins{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+.play-ins-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.play-ins .chips{margin:0}
+.play-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.play-item{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.play-item.win{border-left-color:var(--court)}
+.play-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.play-res{font-weight:800;font-size:15px;color:var(--warn)}
+.play-item.win .play-res{color:var(--court)}
+.play-score{font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
+.play-date{margin-left:auto;font-size:13px}
+.play-who,.play-note,.play-cnote{margin:0}
+.play-item .chips{margin:0}
+.play-cnote{border-top:1px solid var(--line);padding-top:6px}
+.play-cnote b{color:var(--court);margin-right:6px}
+.play-fb summary{cursor:pointer;color:var(--court);font-size:13px;font-weight:700}
+.play-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.play-foot button{font-size:12px;padding:3px 10px}
+.play-sc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.play-sc input{width:72px;text-align:center;font-size:20px;font-weight:700}
+.play-lost{border:0;padding:0;margin:0;min-width:0}
+.play-lost legend{padding:0;margin-bottom:4px}
+.play-lost .chips{margin:0}
+.chip[aria-pressed="true"]{border-color:var(--warn);color:var(--warn);font-weight:700}
+.coach-in{border-top:1px solid var(--line);margin-top:10px;padding-top:12px;display:flex;flex-direction:column;gap:8px}
 .sk-head{grid-column:1/-1;margin:0;font-size:17px;font-weight:800;color:var(--ink);border-left:4px solid var(--court);padding-left:10px;line-height:1.3}
 .sk-block+.sk-block{border-top:1px solid var(--line);padding-top:14px}
 .sk-hint{display:block;font-size:13px;font-weight:400;color:var(--muted);line-height:1.4;margin:-2px 0 2px}
@@ -100,6 +132,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 @media (min-width:840px){
   .wrap{max-width:1180px}
   .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+  .cols.one{grid-template-columns:minmax(0,1fr)}
   .radar-wrap{max-width:none}
 }
 h1,h2{margin:0;text-wrap:balance}
@@ -522,7 +555,9 @@ function ytId(u){const m=/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([
 function focusSkills(s){const sk=s.skills||{},all=SKILL_KEYS.map((k,i)=>({k,i,v:skillVal(sk[k]),fix:isFix(sk[k])}));
   const fx=all.filter(x=>x.fix).sort((a,b)=>(a.v??9)-(b.v??9)||a.i-b.i);
   const low=all.filter(x=>!x.fix&&x.v!==null&&x.v<4&&x.k!=="special").sort((a,b)=>a.v-b.v||a.i-b.i);
-  return [...fx,...low].slice(0,2)}
+  const ps=typeof playSkills==="function"&&s.id===playFor?playSkills():[],used=new Set(fx.map(x=>x.k)),pl=ps.filter(k=>!used.has(k)).map(k=>({...all.find(x=>x.k===k),play:true}));
+  pl.forEach(x=>used.add(x.k));
+  return [...fx,...pl,...low.filter(x=>!used.has(x.k))].slice(0,pl.length?3:2)}
 const ownerEmail=()=>(COACH_EMAILS[0]||"").toLowerCase();
 const coachOfStu=x=>(x&&x.coach)||ownerEmail();
 function coachName(email){if(!email)return "";if(me&&email===me.email&&isAdmin)return (me.name||email)+" ("+mc().owner+")";const c=coachDir.find(c=>c.email===email);return c?(c.name||c.email):email}
@@ -541,7 +576,7 @@ function practiceCard(s){const u=ku(),sk=s.skills||{},f=focusSkills(s);
   const rated=SKILL_KEYS.some(k=>skillVal(sk[k])!==null||isFix(sk[k]));
   const body=!rated?`<p class="muted" style="margin:0">${u.practiceNone}</p>`:(!f.length?`<p style="margin:0">${u.maxed}</p>`:f.map(x=>{
     const d=kb().drills[x.k]||["","",""],ns=nextStd(x.k,x.v);
-    return `<div class="pr-item"><div class="pr-head"><b>${T.skills[x.k]}</b>${x.fix?`<span class="pill fix">${u.flagged}</span>`:""}<span class="pr-lv">${u.now} ${x.v===null?u.unrated:fmtSk(x.v)}${ns?` → ${fmtSk(ns.t)}`:""}</span></div>
+    return `<div class="pr-item"><div class="pr-head"><b>${T.skills[x.k]}</b>${x.fix?`<span class="pill fix">${u.flagged}</span>`:""}${x.play?`<span class="pill lose">${op().playPill}</span>`:""}<span class="pr-lv">${u.now} ${x.v===null?u.unrated:fmtSk(x.v)}${ns?` → ${fmtSk(ns.t)}`:""}</span></div>
       ${ns?`<p><span class="muted">${u.targetStd} ${fmtSk(ns.t)}</span>${esc(ns.d)}</p>`:""}
       <p><span class="muted">${u.drill}</span><b>${esc(d[0])}</b>${T.colon}${esc(d[1])}</p>
       <p><span class="muted">${u.test}</span>${esc(d[2])}</p>
@@ -730,7 +765,8 @@ function nextInfo(s){
       <div class="actions cal-btns"><button type="button" class="primary" id="b-ics">${T.calApple}</button><a class="btn-link" id="a-gcal" href="${esc(gcalUrl(s,canEdit))}" target="_blank" rel="noopener">${canEdit&&EMAIL_RE.test(String(s.email||""))?calI().inv:T.calGoogle}</a></div>
       <p class="muted" style="margin:0;font-size:12px">${T.calHint}</p>${canEdit?`<p class="muted" style="margin:0;font-size:12px">${EMAIL_RE.test(String(s.email||""))?calI().invHint:calI().noMail}</p>`:""}`:`<p class="muted" style="margin:0">${T.noTime}</p>`}
     <p class="goal-lbl">${({zh:"下次目標",en:"Next goal",ja:"次の目標"})[lang]||"下次目標"}</p><div class="goal">${s.nextGoal?tx(s,s.nextGoal):esc(T.noGoal)}</div>
-    ${prep.length?`<p class="goal-lbl">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${tx(s,p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}`;
+    ${prep.length?`<p class="goal-lbl">${T.improve}</p><ul class="prep">${prep.map((p,i)=>`<li><label><input type="checkbox" class="prep-cb" id="prep-${i}" data-i="${i}" ${ticks.includes(i)?"checked":""}><span>${tx(s,p)}</span></label></li>`).join("")}</ul><p class="muted" style="margin:0">${T.prepHint}</p>`:""}
+    ${playInsight(true)}`;
 }
 let msgs=[],msgFor=null,msgUnsub=null,msgCanWrite=null,msgsReady=false;
 function watchMsgs(id){if(msgFor===id||!db)return;if(msgUnsub)msgUnsub();msgFor=id;msgs=[];msgsReady=false;pendingFiles=[];
@@ -893,6 +929,113 @@ function proBind(s){
     const last=hist[hist.length-1];if(last&&new Date(last.t).toDateString()===now.toDateString())hist[hist.length-1]=pt;else hist.push(pt);
     if(await save(s.id,{pro,proHist:hist.slice(-24)})){clean(f);flash("m-pro",pu().saved)}});
 }
+// ===== Open Play 球敘紀錄 =====
+const LOSS_KEYS=["serve","return","third","transition","dink","reset","attack","choice","unforced","mental","team","fitness"];
+const LOSS_SKILL={serve:"serve",return:"return",third:"drive",transition:"transition",dink:"dink",reset:"reset",attack:"aggression",choice:"selection",mental:"composure"};
+const OPUI={
+ zh:{title:"Open Play 球敘紀錄",add:"新增球敘",date:"日期",fmt:"賽制",dbl:"雙打",sgl:"單打",partner:"搭檔",opp:"對手",oppPh:"例：小王、阿明",
+  score:n=>`比分（${n} : 對方）`,scoreMe:"我方",win:"贏",loss:"輸",result:"結果",lost:"輸在哪裡（可複選）",lostHint:"輸的時候勾選，教練會依照常輸的地方安排下次上課",
+  note:"心得／備註",notePh:"例：對手一直打我反手，第三拍吊太高",save:"儲存球敘",saved:"已儲存球敘",none:"還沒有球敘紀錄。打完一場就記下來，教練會依照你常輸的地方安排下次上課。",
+  del:"刪除",wl:(w,l)=>`${w} 勝 ${l} 敗`,recent:n=>`最近 ${n} 場`,insight:"球敘常輸",insightNone:"最近沒有輸球原因紀錄",toPrep:"帶入改進重點",added:"已帶入改進重點",
+  cnote:"教練回饋",cnotePh:"給學員的建議",cnoteSave:"儲存回饋",by:{student:"學員記錄",coach:"教練記錄"},vs:"vs",with:"搭檔",playPill:"球敘常輸",prepPre:"球敘常輸：",
+  needScore:"請填比分",fail:"儲存失敗，請稍後再試",
+  tags:{serve:"發球失誤",return:"接發球太淺",third:"第三拍被攻擊",transition:"過渡區被抓",dink:"丁克失誤／沒耐心",reset:"擋不住快球",attack:"加速時機不對",choice:"選球錯誤",unforced:"非受迫失誤多",mental:"關鍵分緊張",team:"站位／搭檔配合",fitness:"體能／步伐跟不上"}},
+ en:{title:"Open Play Log",add:"Add a game",date:"Date",fmt:"Format",dbl:"Doubles",sgl:"Singles",partner:"Partner",opp:"Opponents",oppPh:"e.g. Alex, Sam",
+  score:n=>`Score (${n} : them)`,scoreMe:"Us",win:"Won",loss:"Lost",result:"Result",lost:"Where the points were lost",lostHint:"Tick these when you lose — your coach plans the next lesson around them",
+  note:"Notes",notePh:"e.g. they kept attacking my backhand; third shots too high",save:"Save game",saved:"Game saved",none:"No games yet. Log each Open Play game and your coach will plan lessons around where you lose points.",
+  del:"Delete",wl:(w,l)=>`${w}W ${l}L`,recent:n=>`last ${n} games`,insight:"Often lost on",insightNone:"No loss reasons logged recently",toPrep:"Add to focus points",added:"Added to focus points",
+  cnote:"Coach feedback",cnotePh:"Advice for the student",cnoteSave:"Save feedback",by:{student:"Logged by student",coach:"Logged by coach"},vs:"vs",with:"with",playPill:"Open Play",prepPre:"From Open Play: ",
+  needScore:"Enter the score",fail:"Couldn't save. Please try again",
+  tags:{serve:"Serve errors",return:"Short returns",third:"Third shot attacked",transition:"Caught in transition",dink:"Dink errors / impatience",reset:"Couldn't reset hard balls",attack:"Bad speed-up timing",choice:"Poor shot selection",unforced:"Too many unforced errors",mental:"Nerves on big points",team:"Positioning / teamwork",fitness:"Fitness / footwork"}},
+ ja:{title:"オープンプレー記録",add:"試合を追加",date:"日付",fmt:"形式",dbl:"ダブルス",sgl:"シングルス",partner:"パートナー",opp:"対戦相手",oppPh:"例：田中、佐藤",
+  score:n=>`スコア（${n} : 相手）`,scoreMe:"自分",win:"勝ち",loss:"負け",result:"結果",lost:"負けた原因（複数可）",lostHint:"負けた時にチェック。コーチが次のレッスンに反映します",
+  note:"メモ",notePh:"例：バックばかり狙われた、3球目が高い",save:"試合を保存",saved:"保存しました",none:"まだ記録がありません。試合ごとに記録すると、コーチが負けパターンに合わせてレッスンを組みます。",
+  del:"削除",wl:(w,l)=>`${w}勝 ${l}敗`,recent:n=>`直近 ${n} 試合`,insight:"よく負ける原因",insightNone:"最近の負け原因の記録はありません",toPrep:"改善ポイントに追加",added:"改善ポイントに追加しました",
+  cnote:"コーチのコメント",cnotePh:"生徒へのアドバイス",cnoteSave:"コメントを保存",by:{student:"生徒が記録",coach:"コーチが記録"},vs:"vs",with:"ペア",playPill:"オープンプレー",prepPre:"オープンプレー：",
+  needScore:"スコアを入力してください",fail:"保存できませんでした",
+  tags:{serve:"サーブミス",return:"リターンが浅い",third:"3球目を攻められる",transition:"トランジションで捕まる",dink:"ディンクミス／我慢できない",reset:"速い球をリセットできない",attack:"スピードアップのタイミング",choice:"ショット選択ミス",unforced:"凡ミスが多い",mental:"大事な場面で緊張",team:"ポジション／連携",fitness:"体力／フットワーク"}}};
+function op(){return OPUI[lang]||OPUI.zh}
+let plays=[],playFor=null,playUnsub=null;
+function watchPlays(id){if(playFor===id||!db)return;if(playUnsub)playUnsub();playFor=id;plays=[];
+  playUnsub=db.collection(`students/${id}/plays`).onSnapshot(sn=>{plays=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))||String(b.t||"").localeCompare(String(a.t||"")));render()},()=>{plays=[]})}
+function playStats(n){const r=plays.slice(0,n||10),w=r.filter(p=>p.res==="W").length,l=r.filter(p=>p.res==="L").length,c={};
+  r.filter(p=>p.res==="L").forEach(p=>(p.lost||[]).forEach(k=>{if(LOSS_KEYS.includes(k))c[k]=(c[k]||0)+1}));
+  return {n:r.length,w,l,top:Object.entries(c).sort((a,b)=>b[1]-a[1]||LOSS_KEYS.indexOf(a[0])-LOSS_KEYS.indexOf(b[0]))}}
+function playSkills(){return playStats(10).top.filter(([k,c])=>c>=2&&LOSS_SKILL[k]).map(([k])=>LOSS_SKILL[k])}
+function playInsight(withBtn){const u=op(),st=playStats(10);if(!st.n)return "";
+  return `<div class="play-ins"><div class="play-ins-h"><b>${u.insight}</b><span class="muted">${u.recent(st.n)} · ${u.wl(st.w,st.l)}</span></div>
+    ${st.top.length?`<div class="chips">${st.top.slice(0,4).map(([k,c])=>`<span class="pill lose">${esc(u.tags[k])} ×${c}</span>`).join("")}</div>`:`<p class="muted" style="margin:0">${u.insightNone}</p>`}
+    ${withBtn&&canEdit&&st.top.length?`<div class="actions"><button type="button" id="b-play-prep">${u.toPrep}</button><span class="msg" id="m-play-prep"></span></div>`:""}</div>`}
+function playList(s){const u=op();
+  if(!plays.length)return `<p class="muted" style="margin:0">${u.none}</p>`;
+  return `<ul class="play-list">${plays.map(p=>{const mine=canEdit||p.by==="student";
+    return `<li class="play-item ${p.res==="W"?"win":"lose"}">
+      <div class="play-top"><span class="play-res">${p.res==="W"?u.win:u.loss}</span><span class="play-score">${+p.me||0} : ${+p.them||0}</span><span class="muted play-date">${esc(p.date||"")} · ${p.fmt==="s"?u.sgl:u.dbl}</span></div>
+      <p class="play-who">${p.partner?`<span class="muted">${u.with}</span> ${esc(p.partner)} `:""}${p.opp?`<span class="muted">${u.vs}</span> ${esc(p.opp)}`:""}</p>
+      ${(p.lost||[]).length?`<div class="chips">${p.lost.filter(k=>u.tags[k]).map(k=>`<span class="pill lose">${esc(u.tags[k])}</span>`).join("")}</div>`:""}
+      ${p.note?`<p class="play-note">${tx(s,p.note)}</p>`:""}
+      ${p.cnote?`<p class="play-cnote"><b>${u.cnote}</b>${tx(s,p.cnote)}</p>`:""}
+      ${canEdit?`<details class="play-fb"><summary>${u.cnote}</summary><div class="grid"><textarea id="pc-${esc(p.id)}" class="grow" rows="2" placeholder="${u.cnotePh}" style="grid-column:1/-1">${esc(p.cnote||"")}</textarea>
+        <div class="actions" style="grid-column:1/-1"><button type="button" data-pcsave="${esc(p.id)}">${u.cnoteSave}</button></div></div></details>`:""}
+      <div class="play-foot"><span class="muted">${u.by[p.by]||""}</span>${mine?`<button type="button" class="danger" data-pdel="${esc(p.id)}">${u.del}</button>`:""}</div>
+    </li>`}).join("")}</ul>`}
+function playCard(s){const u=op();return `<section class="card" id="c-play" aria-label="${u.title}"><h2>${u.title}</h2>${playInsight(false)}${playList(s)}</section>`}
+function playForm(s){const u=op(),d=new Date(),today=`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  return `<details class="card coach-ed" id="ed-play" ${plays.length?"":"open"}><summary>${u.add}</summary>
+   <form id="f-play" class="grid" style="margin-top:12px">
+    <label class="field">${u.date}<input type="date" id="pl-date" value="${today}" required></label>
+    <label class="field">${u.fmt}<select id="pl-fmt"><option value="d">${u.dbl}</option><option value="s">${u.sgl}</option></select></label>
+    <label class="field" id="pl-partner-w">${u.partner}<input id="pl-partner" maxlength="40" autocomplete="off"></label>
+    <label class="field">${u.opp}<input id="pl-opp" maxlength="80" placeholder="${u.oppPh}" autocomplete="off"></label>
+    <div class="field" style="grid-column:1/-1">${u.score(canEdit?esc(s.name||u.scoreMe):u.scoreMe)}
+      <div class="play-sc"><input type="number" id="pl-me" min="0" max="30" inputmode="numeric" aria-label="${u.scoreMe}"><span>:</span><input type="number" id="pl-them" min="0" max="30" inputmode="numeric" aria-label="${u.opp}">
+        <div class="seg" role="group" aria-label="${u.result}"><button type="button" data-res="W" aria-pressed="false">${u.win}</button><button type="button" data-res="L" aria-pressed="false">${u.loss}</button></div><input type="hidden" id="pl-res"></div></div>
+    <fieldset class="field play-lost" style="grid-column:1/-1"><legend>${u.lost}</legend><p class="muted" style="margin:0 0 6px;font-size:12px">${u.lostHint}</p>
+      <div class="chips">${LOSS_KEYS.map(k=>`<button type="button" class="chip" data-lost="${k}" aria-pressed="false">${esc(u.tags[k])}</button>`).join("")}</div><input type="hidden" id="pl-lost"></fieldset>
+    <label class="field" style="grid-column:1/-1">${u.note}<textarea id="pl-note" class="grow" rows="3" maxlength="300" placeholder="${u.notePh}"></textarea></label>
+    <div class="actions" style="grid-column:1/-1"><button class="primary" type="submit">${u.save}</button><span class="msg" id="m-play"></span></div>
+   </form></details>`}
+function playBind(s){
+  const u=op(),f=document.getElementById("f-play");
+  if(f){
+    const res=document.getElementById("pl-res"),lost=document.getElementById("pl-lost"),me=document.getElementById("pl-me"),th=document.getElementById("pl-them");
+    const sync=()=>{f.querySelectorAll("[data-res]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.res===res.value)));
+      const ls=(lost.value||"").split(",").filter(Boolean);f.querySelectorAll("[data-lost]").forEach(b=>b.setAttribute("aria-pressed",String(ls.includes(b.dataset.lost))));
+      const pw=document.getElementById("pl-partner-w");if(pw)pw.hidden=val("pl-fmt")==="s"};
+    sync();
+    f.querySelectorAll("[data-res]").forEach(b=>b.addEventListener("click",()=>{res.value=b.dataset.res;dirty.add("pl-res");sync()}));
+    f.querySelectorAll("[data-lost]").forEach(b=>b.addEventListener("click",()=>{const ls=(lost.value||"").split(",").filter(Boolean),i=ls.indexOf(b.dataset.lost);if(i>=0)ls.splice(i,1);else ls.push(b.dataset.lost);lost.value=ls.join(",");dirty.add("pl-lost");if(!res.value){res.value="L";dirty.add("pl-res")}sync()}));
+    const auto=()=>{if(me.value!==""&&th.value!==""&&+me.value!==+th.value){res.value=+me.value>+th.value?"W":"L";dirty.add("pl-res");sync()}};
+    me.addEventListener("input",auto);th.addEventListener("input",auto);document.getElementById("pl-fmt").addEventListener("change",sync);
+    f.addEventListener("submit",async e=>{e.preventDefault();
+      if(me.value===""||th.value===""||!res.value){flash("m-play",u.needScore);return}
+      const clamp=v=>Math.max(0,Math.min(30,parseInt(v)||0));
+      const p={date:val("pl-date")||localNow().slice(0,10),fmt:val("pl-fmt")==="s"?"s":"d",partner:val("pl-fmt")==="s"?"":val("pl-partner").trim().slice(0,40),opp:val("pl-opp").trim().slice(0,80),
+        me:clamp(me.value),them:clamp(th.value),res:res.value==="W"?"W":"L",lost:res.value==="L"?(lost.value||"").split(",").filter(k=>LOSS_KEYS.includes(k)).slice(0,6):[],
+        note:val("pl-note").trim().slice(0,300),by:canEdit?"coach":"student",t:new Date().toISOString()};
+      try{await db.collection(`students/${s.id}/plays`).doc().set(p);
+        ["pl-partner","pl-opp","pl-me","pl-them","pl-res","pl-lost","pl-note"].forEach(id=>{dirty.delete(id);const el=document.getElementById(id);if(el)el.value=""});sync();flash("m-play",u.saved);
+}
+      catch(e){alertBox(u.fail+(e&&e.message?"："+e.message:""))}});
+  }
+  document.querySelectorAll("[data-pdel]").forEach(b=>b.addEventListener("click",async()=>{try{await db.collection(`students/${s.id}/plays`).doc(b.dataset.pdel).delete()}catch(e){alertBox(T.delFail)}}));
+  document.querySelectorAll("[data-pcsave]").forEach(b=>b.addEventListener("click",async()=>{const id=b.dataset.pcsave,t=(document.getElementById("pc-"+id)?.value||"").trim().slice(0,500);
+    try{await db.collection(`students/${s.id}/plays`).doc(id).update({cnote:t});dirty.delete("pc-"+id)}catch(e){alertBox(u.fail)}}));
+  document.getElementById("b-play-prep")?.addEventListener("click",async()=>{const st=playStats(10),add=st.top.slice(0,3).map(([k])=>u.prepPre+u.tags[k]);
+    const prep=[...(s.prep||[])];add.forEach(a=>{if(!prep.includes(a))prep.push(a)});
+    if(await save(s.id,{prep})){flash("m-play-prep",u.added);const pi=document.getElementById("i-prep");if(pi&&!dirty.has("i-prep"))pi.value=prep.join("\n")}});
+}
+// ===== 分頁 =====
+const TABS=[["ov",["總覽","Overview","概要"]],["lesson",["上課","Lessons","レッスン"]],["play",["球敘","Open Play","試合"]],["prog",["進步","Progress","成長"]],["msg",["留言","Messages","メッセージ"]]];
+let curTab="ov",tabFor=null;
+function tabsHtml(s){const unread=canEdit?msgs.filter(m=>!m.reply&&m.from!=="coach").length:0;
+  return `<nav class="tabs" role="tablist" aria-label="${esc(s.name||"")}">${TABS.map(([k,n])=>{const badge=k==="msg"&&unread?`<span class="tab-badge">${unread}</span>`:(k==="play"&&plays.length?`<span class="tab-n">${plays.length}</span>`:"");
+    return `<button type="button" role="tab" id="tab-${k}" aria-controls="panel-${k}" aria-selected="${curTab===k}" data-tab="${k}">${n[li()]}${badge}</button>`}).join("")}</nav>`}
+function panelHtml(k,L,R){const one=!R;return `<div class="cols${one?" one":""}" role="tabpanel" id="panel-${k}" aria-labelledby="tab-${k}" data-panel="${k}" ${curTab===k?"":"hidden"}><div class="col">${L}</div>${one?"":`<div class="col">${R}</div>`}</div>`}
+function setTab(k){if(!TABS.some(t=>t[0]===k))return;curTab=k;
+  document.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==k);
+  document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===k)))}
+{const siv=Element.prototype.scrollIntoView;Element.prototype.scrollIntoView=function(...a){const p=this.closest&&this.closest("[data-panel]");if(p&&p.hidden)setTab(p.dataset.panel);return siv.apply(this,a)}}
 function fold(id,title,inner){return `<details class="card fold" id="${id}"><summary>${title}</summary>${inner}</details>`}
 function rowsCard(s){
   const rec=[...(s.sessions||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
@@ -968,9 +1111,9 @@ function skillsEditor(s){
     </form></details>`;
 }
 
-function accountBar(){
+function accountBar(extra){
   const nm=me&&me.name?esc(me.name):"";
-  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?(isAdmin?mc().roleAdmin:mc().roleCoach):T.roleStu}${canEdit&&pendTotal()?`<button type="button" id="b-pend" class="pend-badge" title="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}" aria-label="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}">💬 ${pendTotal()}</button>`:""}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span></div>`;
+  return `<div class="acct"><div class="acct-row"><span>${T.me}${nm?`${T.colon}<b>${nm}</b>`:""} · ${canEdit?(isAdmin?mc().roleAdmin:mc().roleCoach):T.roleStu}${canEdit&&pendTotal()?`<button type="button" id="b-pend" class="pend-badge" title="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}" aria-label="${esc((PDUI[lang]||PDUI.zh).replace("{n}",pendTotal()))}">💬 ${pendTotal()}</button>`:""}</span><button type="button" id="b-signout">${T.signOutBtn}</button></div><span class="muted">${me&&me.email?esc(me.email)+" · ":""}${T.logoutHint}</span>${extra||""}</div>`;
 }
 function rankCard(open){
   const rows=visible().map(x=>{const ov=overall(x.skills||{});const ev=evalsOf(x).filter(e=>isFinite(+e.overall)&&!isNaN(new Date(e.t)));
@@ -995,12 +1138,12 @@ function rankCard(open){
   </details>`;
 }
 function coachBar(){
-  return `<div class="card"><div class="coachbar">
+  return `<div class="coach-in"><div class="coachbar">
     <span class="tag">${T.coach}</span>
     ${isAdmin&&coachDir.length?`<select id="cfilter" aria-label="${mc().coachOf}" style="flex:0 1 auto;width:auto"><option value="">${mc().all}</option>${[ownerEmail(),...coachDir.map(c=>c.email)].map(e=>`<option value="${esc(e)}" ${e===coachFilter?"selected":""}>${esc(coachName(e))}</option>`).join("")}</select>`:""}
     <select id="pick" aria-label="${T.pick}"><option value="">${T.pick}</option>${visible().map(s=>`<option value="${s.id}" ${s.id===currentId?"selected":""}>${esc(s.name)}${overall(s.skills||{})!==null?` (${overall(s.skills||{})})`:""}${pendOf(s.id)?` · 💬${pendOf(s.id)}`:""}${s.email?"":` · ${T.unbound}`}${isAdmin&&coachDir.length&&!coachFilter&&coachOfStu(s)!==me.email?` · ${esc(coachName(coachOfStu(s)))}`:""}</option>`).join("")}</select>
     <button id="b-new" type="button">${T.newStu}</button>
-  </div><p class="muted" style="margin:0">${T.shareHint}</p></div>`;
+  </div>${students.length?"":`<p class="muted" style="margin:0">${T.shareHint}</p>`}</div>`;
 }
 
 function render(){
@@ -1010,30 +1153,38 @@ function render(){
   const ae=document.activeElement,focusId=ae&&ae.id&&app.contains(ae)?ae.id:null;
   let sel=null;try{if(focusId&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
   const sy=window.scrollY;
-  const open={};["ed-basic","ed-rec","ed-info","ed-skill","ed-pro","rank","dupr","c-rows","c-next","coachm"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
+  const open={};["ed-basic","ed-rec","ed-info","ed-skill","ed-pro","ed-play","rank","dupr","c-rows","c-next","coachm"].forEach(id=>{const d=document.getElementById(id);if(d)open[id]=d.open});
   const s=students.find(x=>x.id===currentId);
-  let h=accountBar();
-  if(canEdit)h+=coachBar()+rankCard(false)+coachMgmtCard();
+  let h=canEdit?accountBar(coachBar()):accountBar();
+  if(canEdit)h+=rankCard(false)+coachMgmtCard();
   if(!canEdit&&!s){h+=me&&me.email?`<div class="card"><h2>${T.notLinked}</h2><p style="margin:0">${T.sendCode}</p>
       <div class="codebox"><code id="my-code">${esc(me.email)}</code></div></div>`
       :`<div class="card empty"><p class="muted">${T.noId}</p></div>`;app.innerHTML=h;bind();return}
   if(!s){h+=`<div class="card empty"><h1 style="font-size:20px">${T.title}</h1><p class="muted">${canEdit?(students.length?T.emptyCoach:T.emptyNone):T.emptyStu}</p></div>`;app.innerHTML=h;bind();return}
   const upd=s.updatedAt?new Date(s.updatedAt).toLocaleDateString(T.locale):"";
-  h+=`<header class="head"><div><p class="muted" style="margin:0">${T.history}</p><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
-  watchMsgs(s.id);
-  // two columns on wide screens (iPhone Duo unfolded landscape, iPad, desktop); one column otherwise, same reading order
-  const left=canEdit?basicCard(s)+skillsCard(s)+practiceCard(s)+curveCard(s)+proCard(s):skillsCard(s)+practiceCard(s)+curveCard(s)+proCard(s);
-  const right=canEdit?skillsEditor(s)+proEditor(s)+recCard(s)+fold("c-rows",`${T.progressShort} <span class="muted sum-sub">${T.countRec((s.sessions||[]).length)}</span>`,rowsCard(s))+infoCard(s)
-      +fold("c-next",`${T.msgTitle} <span class="sum-sub ${msgs.some(m=>!m.reply&&m.from!=="coach")?"warn-t":"muted"}">${T.countMsg(msgs.length,msgs.filter(m=>!m.reply&&m.from!=="coach").length)}</span>`,msgBlock(s))
-    :nextCard(s)+msgCard(s)+rowsCard(s);
-  h+=`<div class="cols"><div class="col">${left}</div><div class="col">${right}</div></div>`+duprCard();
+  h+=`<header class="head"><div><h1>${esc(s.name)}</h1></div><span class="muted">${upd?T.updated+upd:""}</span></header>`;
+  watchMsgs(s.id);watchPlays(s.id);
+  if(tabFor!==s.id){tabFor=s.id;curTab="ov"}
+  h+=tabsHtml(s);
+  h+=canEdit
+    ?panelHtml("ov",skillsCard(s),basicCard(s)+(plays.length?`<section class="card">${playInsight(false)}</section>`:""))
+     +panelHtml("lesson",infoCard(s)+practiceCard(s),recCard(s)+rowsCard(s))
+     +panelHtml("play",playForm(s),playCard(s))
+     +panelHtml("prog",curveCard(s)+proCard(s)+duprCard(),skillsEditor(s)+proEditor(s))
+     +panelHtml("msg",`<section class="card" aria-label="${T.msgTitle}"><h2>${T.msgTitle}</h2>${msgBlock(s)}</section>`)
+    :panelHtml("ov",nextCard(s),skillsCard(s))
+     +panelHtml("lesson",practiceCard(s),rowsCard(s))
+     +panelHtml("play",playForm(s),playCard(s))
+     +panelHtml("prog",curveCard(s)+duprCard(),proCard(s))
+     +panelHtml("msg",msgCard(s));
   app.innerHTML=h;
   for(const k of ["rank","dupr","c-rows","c-next","coachm"])if(open[k]!==undefined&&document.getElementById(k))document.getElementById(k).open=open[k];
   if(s.id===render.lastId)for(const id in open){const d=document.getElementById(id);if(d)d.open=open[id]}
   if(s.id===render.lastId)for(const id in keep){const el=document.getElementById(id);if(el){if(el.type==="checkbox")el.checked=keep[id];else el.value=keep[id]}}
   else dirty.clear();
   render.lastId=s.id;
-  bind();proBind(s);
+  bind();proBind(s);playBind(s);
+  document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{setTab(b.dataset.tab);const t=document.querySelector(".tabs");if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({block:"start"})}));
   if(focusId){const el=document.getElementById(focusId);if(el){el.focus({preventScroll:true});if(sel)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
   if(Math.abs(window.scrollY-sy)>1)window.scrollTo(0,sy);
 }
@@ -1100,7 +1251,7 @@ function bind(){
   const pick=document.getElementById("pick");
   pick&&pick.addEventListener("change",()=>{currentId=pick.value||null;location.hash=currentId||"";render()});
   document.getElementById("b-pend")?.addEventListener("click",()=>{const cur=visible().find(x=>x.id===currentId&&pendOf(x.id));const t=cur||visible().find(x=>pendOf(x.id));if(!t)return;currentId=t.id;location.hash=t.id;render();
-    const d=document.getElementById("c-next");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})}});
+    setTab("msg");const d=document.getElementById("panel-msg");if(d){d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})}});
   document.getElementById("b-rate")?.addEventListener("click",()=>{const d=document.getElementById("ed-skill");if(d){d.open=true;d.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});document.getElementById("k-serve-level")?.focus({preventScroll:true})}});
   document.getElementById("b-new")?.addEventListener("click",async()=>{
     const ref=db.collection("students").doc(),id=ref.id;
@@ -1176,7 +1327,7 @@ function makeDb(){return{collection(path){return{
   doc(id){const r=id?doc(fs,path,id):doc(collection(fs,path));return{id:r.id,
     get:async()=>wrapDoc(await getDoc(r)),set:d=>setDoc(r,d),update:d=>updateDoc(r,d),delete:()=>deleteDoc(r),
     onSnapshot(cb,err){return onSnapshot(r,d=>cb(wrapDoc(d)),err)}}}}}}}
-function stopAll(){stopPending();unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];if(msgUnsub){try{msgUnsub()}catch(e){}}msgUnsub=null;msgFor=null;msgs=[];msgsReady=false;students=[];currentId=null;loaded=false;render.lastId=null}
+function stopAll(){stopPending();unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];if(msgUnsub){try{msgUnsub()}catch(e){}}msgUnsub=null;msgFor=null;msgs=[];msgsReady=false;if(playUnsub){try{playUnsub()}catch(e){}}playUnsub=null;playFor=null;plays=[];tabFor=null;students=[];currentId=null;loaded=false;render.lastId=null}
 const inLine=/\bLine\//i.test(navigator.userAgent);
 function showLogin(err){
   view="login";
