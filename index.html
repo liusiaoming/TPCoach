@@ -20,6 +20,7 @@ img{max-width:100%}
 .tabs button[aria-selected="true"]{background:var(--court);color:var(--bg)}
 .tab-badge{display:inline-block;background:#e5484d;color:#fff;border-radius:999px;font-size:11px;line-height:16px;padding:0 6px;margin-left:5px;vertical-align:2px}
 .tab-n{font-size:12px;opacity:.7;margin-left:4px}
+@media (min-width:600px){.tabs{gap:8px}.tabs button{flex:0 0 auto;min-width:96px}}
 .pill.lose{border-color:var(--warn);color:var(--warn)}
 .play-ins{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
 .play-ins-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
@@ -107,19 +108,19 @@ textarea.grow{min-height:96px;resize:vertical;line-height:1.5;overflow:hidden}
 .row .vid-btn,.row .vid-link{grid-column:1/-1;justify-self:start;font-size:13px;padding:4px 12px}
 /* Layout: one phone-width column, a "score card" per student — level track, next lesson, 10-ball test rows */
 :root{
-  /* TPC palette: deep navy #0c2430 + gold #eaca7e */
-  --bg:#0c2430; --surface:#12303f; --ink:#f1ead8; --muted:#9fb0b8; --line:#24434f;
-  --court:#eaca7e; --ball:#eaca7e; --ball-ink:#0c2430; --miss:#1d3a48; --warn:#f08a74;
+  /* palette: graphite #0b0e13 + pickleball volt #c6f24e */
+  --bg:#0b0e13; --surface:#151a21; --ink:#f4f6f8; --muted:#98a2b3; --line:#262d38;
+  --court:#c6f24e; --ball:#c6f24e; --ball-ink:#0b0e13; --miss:#1e242d; --warn:#ff6b5b;
   color-scheme:dark;
   --display:"Barlow Condensed","Noto Sans TC",system-ui,sans-serif;
   --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0c2430; --surface:#12303f; --ink:#f1ead8; --muted:#9fb0b8; --line:#24434f;
-  --court:#eaca7e; --ball:#eaca7e; --ball-ink:#0c2430; --miss:#1d3a48; --warn:#f08a74; color-scheme:dark}}
+  --bg:#0b0e13; --surface:#151a21; --ink:#f4f6f8; --muted:#98a2b3; --line:#262d38;
+  --court:#c6f24e; --ball:#c6f24e; --ball-ink:#0b0e13; --miss:#1e242d; --warn:#ff6b5b; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c2430; --surface:#12303f; --ink:#f1ead8; --muted:#9fb0b8; --line:#24434f;
-  --court:#eaca7e; --ball:#eaca7e; --ball-ink:#0c2430; --miss:#1d3a48; --warn:#f08a74; color-scheme:dark}
+  --bg:#0b0e13; --surface:#151a21; --ink:#f4f6f8; --muted:#98a2b3; --line:#262d38;
+  --court:#c6f24e; --ball:#c6f24e; --ball-ink:#0b0e13; --miss:#1e242d; --warn:#ff6b5b; color-scheme:dark}
 .head{border-bottom:2px solid var(--ball);padding-bottom:10px}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -129,7 +130,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15p
 /* iPhone Duo unfolded portrait (~626pt) and small tablets: roomier single column */
 @media (min-width:600px){.wrap{max-width:720px}.radar-wrap{max-width:520px;margin-inline:auto;width:100%}}
 /* iPhone Duo unfolded landscape (~890pt), iPad, desktop: overview left, work right */
-@media (min-width:840px){
+@media (min-width:960px){
   .wrap{max-width:1180px}
   .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
   .cols.one{grid-template-columns:minmax(0,1fr)}
@@ -874,7 +875,7 @@ function proRadar(axes,series,label){
     if(a.sub)g+=`<text x="${lx}" y="${ly+dy+19}" text-anchor="${anchor}" font-size="16" font-weight="700" fill="var(--court)">${esc(a.sub)}</text>`});
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}" style="width:100%;height:auto;display:block;font-family:inherit">${g}</svg>`;
 }
-const PRO_BH="#5fb3d9";
+const PRO_BH="#4fb3ff";
 function proCard(s){
   const p=s.pro;if(!p||!p.sc||proOverall(p.sc)==null)return "";
   const u=pu(),sc=p.sc,cat=proCatAvg(sc),ov=proOverall(sc),hist=(s.proHist||[]).filter(h=>h&&h.t),prev=hist.length>1?hist[hist.length-2]:null;
